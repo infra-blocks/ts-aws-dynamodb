@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "skipLibCheck": true,
-    "module": "nodenext",
-    "outDir": "./lib/compile",
-    "strict": true,
-    "target": "esnext",
+    "incremental": true,
     "lib": ["esnext"],
+    "module": "nodenext",
     "noEmit": true,
-    "incremental": true
+    "outDir": "./lib/compile",
+    "rootDir": "./",
+    "strict": true,
+    "target": "esnext"
   },
   "include": [
     "**/*.ts",
