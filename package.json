@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",
+    "@infra-blocks/checks": "^0.2.6",
     "@infra-blocks/test": "^0.4.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.0.10",
