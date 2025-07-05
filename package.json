@@ -1,16 +1,15 @@
 {
-  "name": "@infra-blocks/lib-template",
+  "name": "@infra-blocks/aws-dynamodb",
   "version": "0.0.0",
-  "description": "This repository is a template to generate repositories meant to hold the source code of NPM packages written in TypeScript.",
+  "description": "A convenience wrapper over @aws-sdk/client-dynamodb and @aws-sdk/lib-dynamodb.",
   "keywords": [
-    "template",
-    "typescript",
-    "esm",
-    "cjs"
+    "aws",
+    "dynamodb",
+    "expression"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/infra-blocks/ts-lib-template.git"
+    "url": "https://github.com/infra-blocks/ts-aws-dynamodb.git"
   },
   "license": "ISC",
   "author": "",
