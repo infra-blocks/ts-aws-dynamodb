@@ -17,7 +17,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
-import { type Retry, retry } from "@infra-blocks/retry";
+import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
 import type {
   Attributes,
   GetItem,
@@ -50,12 +50,23 @@ export class DynamoDbClient {
     this.logger = logger;
   }
 
-  ready(): Retry<void> {
+  /**
+   * Awaits until the DynamoDB service is ready to accept requests.
+   *
+   * This is mostly useful in local and test environments, where DynamoDB might be started as a docker container.
+   * This function uses the {@link @infra-blocks/retry} with its default configuration. If the user wishes
+   * to change those, they can do so by passing the `options` parameter that is simply forwarded to the
+   * library.
+   *
+   * @param options - Options to pass to the underlying retry mechanism.
+   */
+  ready(options?: Omit<RetryConfig, "isRetryableError">): Retry<void> {
     return retry(
       async () => {
         await this.client.send(new ListTablesCommand({}));
       },
       {
+        ...options,
         isRetryableError: (err: Error) => {
           if ("code" in err) {
             return err.code === "ECONNRESET";
@@ -66,6 +77,16 @@ export class DynamoDbClient {
     );
   }
 
+  /**
+   * Gets an item using the GetItem API.
+   *
+   * @param params - The parameters to use to get the item.
+   *
+   * @returns The item casted to the generic type provided, or undefined if not such item
+   * matches the primary key.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
+   */
   async getItem<T>(params: GetItem): Promise<T | undefined> {
     try {
       const { table, parititionKey, sortKey } = params;

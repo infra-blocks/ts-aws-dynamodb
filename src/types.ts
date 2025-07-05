@@ -22,9 +22,24 @@ export interface Attribute {
 }
 export type Attributes = Record<AttributeName, NativeAttributeValue>;
 
+/**
+ * The input required to call the GetItem API.
+ */
 export interface GetItem {
+  /**
+   * The name of the table to query.
+   */
   table: string;
+  /**
+   * The partition key value of the item to retrieve.
+   */
   parititionKey: Attribute;
+  /**
+   * The optional sort key value of the item to retrieve.
+   *
+   * Note that this is only optional if the table's primary key is made only of the partition key.
+   * It's mandatory otherwise.
+   */
   sortKey?: Attribute;
 }
 
