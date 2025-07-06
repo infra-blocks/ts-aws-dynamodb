@@ -1,0 +1,12 @@
+name: aws.dynamodb.tests
+
+services:
+  db:    
+    container_name: aws.dynamodb.tests.db
+    image: "amazon/dynamodb-local:latest"
+    ports:
+      - "${DYNAMODB_PORT}:8000"
+
+networks:
+  default:
+    name: aws.dynamodb.tests
