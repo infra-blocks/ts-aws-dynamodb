@@ -1,15 +1,12 @@
 import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
-import {
-  DynamoDBClient as BaseClient,
-  ListTablesCommand,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import type {
   PutCommandInput,
   TransactWriteCommandInput,
   TranslateConfig,
 } from "@aws-sdk/lib-dynamodb";
 import {
-  DynamoDBDocumentClient as Client,
+  DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
   QueryCommand,
@@ -26,6 +23,32 @@ import type {
   WriteTransaction,
 } from "./types.js";
 
+/**
+ * Creation parameters for the {@link DynamoDbClient}.
+ */
+export type CreateParams = {
+  /**
+   * The configuration for the vanilly DynamoDB client.
+   *
+   * When none is provided, the client is instantiated with the default configuration
+   * provided by the AWS SDK.
+   */
+  dynamodb?: DynamoDBClientConfig;
+  /**
+   * The configuration for the document client.
+   *
+   * When none is provided, the document client is instantiated with the default
+   * configuration provided by the AWS SDK.
+   */
+  document?: TranslateConfig;
+  /**
+   * Optional logger to use for logging.
+   *
+   * When none is provided, a {@link NullLogger} is used, which logs into the void.
+   */
+  logger?: Logger;
+};
+
 export class DynamoDbClientError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options);
@@ -33,18 +56,18 @@ export class DynamoDbClientError extends Error {
   }
 }
 
-/*
-The uniqueness constraint of an attribute, for example an email, can be enforced in DynamoDB using
-this scheme: https://aws.amazon.com/blogs/database/simulating-amazon-dynamodb-unique-constraints-using-transactions/#:~:text=Primary%20keys%20are%20guaranteed%20to,are%20not%20the%20primary%20key.
-
-This is to say, we can create items in a different table that only has a pk for this specific use case, or we could
-also use the same table. It's just going to add some sheeet to the table.
-*/
+/**
+ * Wrapper class around the {@link DynamoDBDocumentClient} that provides added functionality,
+ * safer types and some convenience methods.
+ */
 export class DynamoDbClient {
-  private readonly client: Client;
+  private readonly client: DynamoDBDocumentClient;
   private readonly logger: Logger;
 
-  private constructor(params: { client: Client; logger: Logger }) {
+  private constructor(params: {
+    client: DynamoDBDocumentClient;
+    logger: Logger;
+  }) {
     const { client, logger } = params;
     this.client = client;
     this.logger = logger;
@@ -115,6 +138,17 @@ export class DynamoDbClient {
     }
   }
 
+  /**
+   * Puts an item using the PutItem API.
+   *
+   * Refer to the API documentation for more details on how it works. Basically, without
+   * conditions, this function will either insert a new document or *replace* the existing
+   * one with whatever attributes are provided.
+   *
+   * @param params - The parameters to use to put the item.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
+   */
   async putItem(params: PutItem): Promise<void> {
     try {
       await this.client.send(toPutCommand(params));
@@ -129,6 +163,105 @@ export class DynamoDbClient {
     }
   }
 
+  /**
+   * Queries a table, or an index, using the Query API.
+   *
+   * Pagination is automatically handled as an async generator, yielding
+   * one item at a time.
+   *
+   * @param params - The parameters to use to query the table or index.
+   *
+   * @returns An async generator that yields items matching the query, one
+   * at a time, and that handles pagination automatically.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
+   */
+  async *query<T extends Attributes = Attributes>(
+    params: Query,
+  ): AsyncGenerator<T> {
+    try {
+      const { expression, attributeValues } = params.condition.toJson();
+      let response = await this.client.send(
+        new QueryCommand({
+          TableName: params.table,
+          IndexName: params.index,
+          KeyConditionExpression: expression,
+          ExpressionAttributeValues: attributeValues,
+        }),
+      );
+
+      for (const item of response.Items || []) {
+        yield item as T;
+      }
+
+      while (response.LastEvaluatedKey != null) {
+        response = await this.client.send(
+          new QueryCommand({
+            TableName: params.table,
+            IndexName: params.index,
+            KeyConditionExpression: expression,
+            ExpressionAttributeValues: attributeValues,
+            ExclusiveStartKey: response.LastEvaluatedKey,
+          }),
+        );
+
+        for (const item of response.Items || []) {
+          yield item as T;
+        }
+      }
+    } catch (err) {
+      throw new DynamoDbClientError(
+        `error while querying DynamoDB on table ${params.table}${params.index != null ? ` and index ${params.index}` : ""}`,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
+
+  /**
+   * Convenience method over the {@link query} method enforcing that the query
+   * matches at most one item.
+   *
+   * If the query doesn't match any item, then `undefined` is returned. If there are
+   * matches, then the function throws as soon as a second matching item is returned.
+   *
+   * @param params - The parameters to use to query the table or index.
+   *
+   * @returns The only item matching the query, or `undefined` if no item matches.
+   */
+  async queryOne<T extends Attributes = Attributes>(
+    params: Query,
+  ): Promise<T | undefined> {
+    try {
+      let item: T | undefined;
+      for await (const queryItem of this.query<T>(params)) {
+        if (item != null) {
+          throw new DynamoDbClientError(
+            "expected one item in query but found at least 2",
+          );
+        }
+        item = queryItem;
+      }
+      return item;
+    } catch (err) {
+      // TODO: careful here as email is PII.
+      throw new DynamoDbClientError(
+        `error while querying one: ${JSON.stringify(params)}`,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
+
+  /**
+   * Executes a write transaction using the TransactWriteItems API.
+   *
+   * @param params - The parameters describing the transaction.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html
+   */
   async transactWriteItems(params: WriteTransaction): Promise<void> {
     try {
       const commandInput = toTransactWriteItemsCommandInput(params);
@@ -150,97 +283,61 @@ export class DynamoDbClient {
     }
   }
 
-  async *query<T extends Attributes = Attributes>(
-    query: Query,
-  ): AsyncGenerator<T> {
-    try {
-      const { expression, attributeValues } = query.condition.toJson();
-      let response = await this.client.send(
-        new QueryCommand({
-          TableName: query.table,
-          IndexName: query.index,
-          KeyConditionExpression: expression,
-          ExpressionAttributeValues: attributeValues,
-        }),
-      );
+  /**
+   * Alias for the {@link putItem} method.
+   */
+  upsert = this.putItem;
 
-      for (const item of response.Items || []) {
-        yield item as T;
-      }
-
-      while (response.LastEvaluatedKey != null) {
-        response = await this.client.send(
-          new QueryCommand({
-            TableName: query.table,
-            IndexName: query.index,
-            KeyConditionExpression: expression,
-            ExpressionAttributeValues: attributeValues,
-            ExclusiveStartKey: response.LastEvaluatedKey,
-          }),
-        );
-
-        for (const item of response.Items || []) {
-          yield item as T;
-        }
-      }
-    } catch (err) {
-      throw new DynamoDbClientError(
-        "error while querying DynamoDB on the lookup index",
-        {
-          cause: err,
-        },
-      );
-    }
-  }
-
-  async queryOne<T extends Attributes = Attributes>(
-    query: Query,
-  ): Promise<T | undefined> {
-    try {
-      let item: T | undefined;
-      for await (const queryItem of this.query<T>(query)) {
-        if (item != null) {
-          throw new DynamoDbClientError(
-            "expected one item in query but found at least 2",
-          );
-        }
-        item = queryItem;
-      }
-      return item;
-    } catch (err) {
-      // TODO: careful here as email is PII.
-      throw new DynamoDbClientError(
-        `error while querying one: ${JSON.stringify(query)}`,
-        {
-          cause: err,
-        },
-      );
-    }
-  }
-
-  static fromBase(params: {
-    client: BaseClient;
-    document?: TranslateConfig;
+  /**
+   * Creates an instance of the {@link DynamoDbClient} wrapping the provided document
+   * client directly.
+   *
+   * This is useful when the user has already created a document client, or when the document
+   * client is a mock for testing purposes. Otherwise, {@link DynamoDbClient.create} should be
+   * preferred.
+   *
+   * @param params - The creation parameters.
+   *
+   * @returns A new instance of the {@link DynamoDbClient} wrapping the provided document client.
+   */
+  static from(params: {
+    client: DynamoDBDocumentClient;
     logger?: Logger;
   }): DynamoDbClient {
-    const { client, document: documentClientConfig, logger } = params;
-    const documentClient = Client.from(client, documentClientConfig);
-    return DynamoDbClient.from({ client: documentClient, logger });
-  }
-
-  static from(params: { client: Client; logger?: Logger }): DynamoDbClient {
     const { client, logger = NullLogger.create() } = params;
     return new DynamoDbClient({ client, logger });
   }
 
-  static create(params?: {
-    base?: DynamoDBClientConfig;
-    document?: TranslateConfig;
-    logger?: Logger;
-  }): DynamoDbClient {
-    const { base, document, logger } = params || {};
-    const baseClient = new BaseClient(base || {});
-    return DynamoDbClient.fromBase({ client: baseClient, document, logger });
+  /**
+   * Creates an instance of the {@link DynamoDbClient} using the provided parameters.
+   *
+   * The client is a wrapper around the {@link DynamoDBDocumentClient} from the `@aws-sdk/lib-dynamodb`
+   * package, which is itself a wrapper around the {@link DynamoDBClient} from the
+   * `@aws-sdk/client-dynamodb` package.
+   *
+   * This factory function first intantiates the vanilla client with optionally provided
+   * configuration, then wraps it in a {@link DynamoDBDocumentClient} that can also
+   * be configured. When no configuration is used, both clients are created using their
+   * respective default configuration.
+   *
+   * The DynamoDB vanilla client can be configured using the `dynamodb` parameter,
+   * The document client can be configured using the `document` parameter,
+   *
+   * The `logger` parameter is optional and defaults to a {@link NullLogger}.
+   *
+   * The user also has the option to create and configure the document client outside of this code
+   * and use the {@link DynamoDbClient.from} method wrap it with a fresh instance of this class.
+   *
+   * @param params - The creation parameters.
+   *
+   * @returns A new instance of the {@link DynamoDbClient}.
+   */
+  static create(params?: CreateParams): DynamoDbClient {
+    const p = params || {};
+    const { logger } = p;
+    const dynamodb = new DynamoDBClient(p.dynamodb || {});
+    const client = DynamoDBDocumentClient.from(dynamodb, p.document);
+    return DynamoDbClient.from({ client, logger });
   }
 }
 
