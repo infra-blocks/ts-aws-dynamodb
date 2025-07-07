@@ -6,7 +6,6 @@ import type {
 } from "@aws-sdk/lib-dynamodb";
 import {
   DynamoDBDocumentClient,
-  GetCommand,
   QueryCommand,
   TransactWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -17,8 +16,9 @@ import {
   CreateTable,
   type CreateTableParams,
 } from "./commands/create-table.js";
+import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import { PutItem, type PutItemParams } from "./commands/put-item.js";
-import type { Attributes, GetItem, Query, WriteTransaction } from "./types.js";
+import type { Attributes, Query, WriteTransaction } from "./types.js";
 
 /**
  * Creation parameters for the {@link DynamoDbClient}.
@@ -102,21 +102,14 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
    */
-  async getItem<T>(params: GetItem): Promise<T | undefined> {
-    try {
-      const { table, parititionKey, sortKey } = params;
-      const key = {
-        [parititionKey.name]: parititionKey.value,
-      };
-      if (sortKey != null) {
-        key[sortKey.name] = sortKey.value;
-      }
+  async getItem<T>(params: GetItemParams): Promise<T | undefined> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("getItem(%s)", JSON.stringify(params));
+    }
 
+    try {
       const response = await this.client.send(
-        new GetCommand({
-          TableName: table,
-          Key: key,
-        }),
+        GetItem.from(params).toAwsCommand(),
       );
 
       return response.Item as T | undefined;
