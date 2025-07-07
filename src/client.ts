@@ -15,6 +15,10 @@ import {
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
+import {
+  CreateTable,
+  type CreateTableParams,
+} from "./commands/create-table.js";
 import type {
   Attributes,
   GetItem,
@@ -74,30 +78,28 @@ export class DynamoDbClient {
   }
 
   /**
-   * Awaits until the DynamoDB service is ready to accept requests.
+   * Creates a table using the CreateTable API.
    *
-   * This is mostly useful in local and test environments, where DynamoDB might be started as a docker container.
-   * This function uses the {@link @infra-blocks/retry} with its default configuration. If the user wishes
-   * to change those, they can do so by passing the `options` parameter that is simply forwarded to the
-   * library.
+   * @param params - The parameters to use to create the table.
    *
-   * @param options - Options to pass to the underlying retry mechanism.
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_CreateTable.html
    */
-  ready(options?: Omit<RetryConfig, "isRetryableError">): Retry<void> {
-    return retry(
-      async () => {
-        await this.client.send(new ListTablesCommand({}));
-      },
-      {
-        ...options,
-        isRetryableError: (err: Error) => {
-          if ("code" in err) {
-            return err.code === "ECONNRESET";
-          }
-          return false;
+  async createTable(params: CreateTableParams): Promise<void> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("createTable(%s)", JSON.stringify(params));
+    }
+
+    try {
+      const command = CreateTable.from(params);
+      await this.client.send(command.toAwsCommand());
+    } catch (err) {
+      throw new DynamoDbClientError(
+        `error while creating table: ${JSON.stringify(params)}`,
+        {
+          cause: err,
         },
-      },
-    );
+      );
+    }
   }
 
   /**
@@ -253,6 +255,33 @@ export class DynamoDbClient {
         },
       );
     }
+  }
+
+  /**
+   * Awaits until the DynamoDB service is ready to accept requests.
+   *
+   * This is mostly useful in local and test environments, where DynamoDB might be started as a docker container.
+   * This function uses the {@link @infra-blocks/retry} with its default configuration. If the user wishes
+   * to change those, they can do so by passing the `options` parameter that is simply forwarded to the
+   * library.
+   *
+   * @param options - Options to pass to the underlying retry mechanism.
+   */
+  ready(options?: Omit<RetryConfig, "isRetryableError">): Retry<void> {
+    return retry(
+      async () => {
+        await this.client.send(new ListTablesCommand({}));
+      },
+      {
+        ...options,
+        isRetryableError: (err: Error) => {
+          if ("code" in err) {
+            return err.code === "ECONNRESET";
+          }
+          return false;
+        },
+      },
+    );
   }
 
   /**
