@@ -45,6 +45,14 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["test/**/*.spec.ts"],
+      "linter": {
+        "rules": {}
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double"

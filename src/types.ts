@@ -1,3 +1,4 @@
+import type { ScalarAttributeType } from "@aws-sdk/client-dynamodb";
 import type { NativeAttributeValue } from "@aws-sdk/lib-dynamodb";
 import type { ConditionExpression } from "./condition-expression.js";
 import type { KeyConditionExpression } from "./key-condition-expression.js";
@@ -21,6 +22,18 @@ export interface Attribute {
   value: AttributeValue;
 }
 export type Attributes = Record<AttributeName, NativeAttributeValue>;
+
+export type IndexFieldType = ScalarAttributeType;
+
+export interface IndexField {
+  name: string;
+  type: IndexFieldType;
+}
+
+export interface Index {
+  partitionKey: IndexField;
+  sortKey?: IndexField;
+}
 
 /**
  * The input required to call the GetItem API.

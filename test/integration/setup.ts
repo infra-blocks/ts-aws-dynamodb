@@ -1,4 +1,5 @@
 import * as childProcess from "node:child_process";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { ConsoleLogger } from "@infra-blocks/node-console-logger";
 import type { EnvironmentVariables } from "@infra-blocks/types";
@@ -77,6 +78,16 @@ before("test suite setup", async function () {
 
   this.config = config;
   this.logger = logger;
+  this.createClient = () =>
+    DynamoDbClient.create({
+      dynamodb: { endpoint: config.DYNAMODB_ENDPOINT_URL },
+      logger,
+    });
+  this.createTestClient = () =>
+    new DynamoDBClient({
+      endpoint: config.DYNAMODB_ENDPOINT_URL,
+      logger,
+    });
   logger.info("setup complete");
 });
 
