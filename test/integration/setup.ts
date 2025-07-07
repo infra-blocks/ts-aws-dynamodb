@@ -78,15 +78,23 @@ before("test suite setup", async function () {
 
   this.config = config;
   this.logger = logger;
+  const clientLogger = ConsoleLogger.create({
+    name: "dynamodb",
+    level: config.TEST_LOG_LEVEL,
+  });
   this.createClient = () =>
     DynamoDbClient.create({
       dynamodb: { endpoint: config.DYNAMODB_ENDPOINT_URL },
-      logger,
+      logger: clientLogger,
     });
+  const testClientLogger = ConsoleLogger.create({
+    name: "aws-sdk",
+    level: config.AWS_SDK_LOG_LEVEL,
+  });
   this.createTestClient = () =>
     new DynamoDBClient({
       endpoint: config.DYNAMODB_ENDPOINT_URL,
-      logger,
+      logger: testClientLogger,
     });
   logger.info("setup complete");
 });

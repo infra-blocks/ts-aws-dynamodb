@@ -1,11 +1,15 @@
 import dotenv from "dotenv";
 import { z } from "zod";
 
+// TODO: export this array from logger interface.
+const logLevel = z.enum(["trace", "debug", "info", "warn", "error"]);
+
 const schema = z.object({
+  AWS_SDK_LOG_LEVEL: logLevel
+    .describe("The AWS SDK log level.")
+    .default("error"),
   DYNAMODB_ENDPOINT_URL: z.string().describe("The DynamoDB endpoint URL."),
-  TEST_LOG_LEVEL: z
-    // TODO: export this array from logger interface.
-    .enum(["trace", "debug", "info", "warn", "error"])
+  TEST_LOG_LEVEL: logLevel
     .describe("The test harness log level")
     .default("info"),
 });
