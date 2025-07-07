@@ -6,6 +6,7 @@ import {
   type LocalSecondaryIndex,
 } from "@aws-sdk/client-dynamodb";
 import type { Index, IndexFieldType } from "../types.js";
+import type { Command } from "./types.js";
 
 export interface CreateTableParams {
   name: string;
@@ -14,7 +15,9 @@ export interface CreateTableParams {
   lsis?: Record<string, Index>;
 }
 
-export class CreateTable {
+export class CreateTable
+  implements Command<CreateTableCommandInput, CreateTableCommand>
+{
   private readonly name: string;
   private readonly primaryKey: Index;
   private readonly gsis?: Record<string, Index>;
@@ -28,7 +31,7 @@ export class CreateTable {
     this.lsis = lsis;
   }
 
-  toInput(): CreateTableCommandInput {
+  toAwsCommandInput(): CreateTableCommandInput {
     const { name } = this;
     const attributeDefinitions: Map<string, IndexFieldType> = new Map();
     const primaryKeySchema = keySchema({
@@ -59,7 +62,7 @@ export class CreateTable {
   }
 
   toAwsCommand(): CreateTableCommand {
-    return new CreateTableCommand(this.toInput());
+    return new CreateTableCommand(this.toAwsCommandInput());
   }
 
   private gsiInput(

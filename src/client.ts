@@ -1,14 +1,12 @@
 import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import type {
-  PutCommandInput,
   TransactWriteCommandInput,
   TranslateConfig,
 } from "@aws-sdk/lib-dynamodb";
 import {
   DynamoDBDocumentClient,
   GetCommand,
-  PutCommand,
   QueryCommand,
   TransactWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -19,13 +17,8 @@ import {
   CreateTable,
   type CreateTableParams,
 } from "./commands/create-table.js";
-import type {
-  Attributes,
-  GetItem,
-  PutItem,
-  Query,
-  WriteTransaction,
-} from "./types.js";
+import { PutItem, type PutItemParams } from "./commands/put-item.js";
+import type { Attributes, GetItem, Query, WriteTransaction } from "./types.js";
 
 /**
  * Creation parameters for the {@link DynamoDbClient}.
@@ -93,12 +86,9 @@ export class DynamoDbClient {
       const command = CreateTable.from(params);
       await this.client.send(command.toAwsCommand());
     } catch (err) {
-      throw new DynamoDbClientError(
-        `error while creating table: ${JSON.stringify(params)}`,
-        {
-          cause: err,
-        },
-      );
+      throw new DynamoDbClientError("error while creating table", {
+        cause: err,
+      });
     }
   }
 
@@ -151,15 +141,16 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
-  async putItem(params: PutItem): Promise<void> {
+  async putItem(params: PutItemParams): Promise<void> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("putItem(%s)", JSON.stringify(params));
+    }
+
     try {
-      await this.client.send(toPutCommand(params));
+      const command = PutItem.from(params);
+      await this.client.send(command.toAwsCommand());
     } catch (err) {
-      this.logger.error(
-        "error while putting item in DynamoDB caused by %s",
-        err,
-      );
-      throw new DynamoDbClientError("error while putting item in DynamoDB", {
+      throw new DynamoDbClientError("error while putting item", {
         cause: err,
       });
     }
@@ -370,28 +361,12 @@ export class DynamoDbClient {
   }
 }
 
-// Could be associated on the PutItem type if it was an opaque type rather
-// than an interface.
-function toPutCommand(params: PutItem): PutCommand {
-  return new PutCommand(toToPutCommandInput(params));
-}
-
-function toToPutCommandInput(params: PutItem): PutCommandInput {
-  const { table, item, condition } = params;
-  const conditionPayload = condition != null ? condition.toAwsInput() : {};
-  return {
-    TableName: table,
-    Item: item,
-    ...conditionPayload,
-  };
-}
-
 function toTransactWriteItemsCommandInput(
   params: WriteTransaction,
 ): TransactWriteCommandInput {
   return {
     TransactItems: params.items.map((item) => ({
-      Put: toToPutCommandInput(item),
+      Put: PutItem.from(item).toAwsCommandInput(),
     })),
   };
 }
