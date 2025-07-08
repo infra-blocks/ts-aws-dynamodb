@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-07-08
+
+### Changed
+
+- Renamed `Query` to `QueryParams`
+- Moved `client.query` and `client.queryOne` internal implementation to use a new
+command class.
+- Renamed `KeyCondition` factory function params `attributeName` to just `name`.
+- Moved expressions under `commands/expressions`. This is non-breaking.
+
 ## [0.4.0] - 2025-07-08
 
 ### Changed
@@ -69,6 +79,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.5.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.0...v0.3.1

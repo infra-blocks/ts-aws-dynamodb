@@ -1,6 +1,5 @@
 import type { ScalarAttributeType } from "@aws-sdk/client-dynamodb";
 import type { NativeAttributeValue } from "@aws-sdk/lib-dynamodb";
-import type { KeyConditionExpression } from "./key-condition-expression.js";
 
 export type AttributeName = string;
 export type AttributeValue = NativeAttributeValue;
@@ -32,10 +31,4 @@ export interface IndexField {
 export interface Index {
   partitionKey: IndexField;
   sortKey?: IndexField;
-}
-
-export interface Query {
-  table: string;
-  index?: string;
-  condition: KeyConditionExpression;
 }

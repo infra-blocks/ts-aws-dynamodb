@@ -1,4 +1,4 @@
-import type { Attributes } from "./types.js";
+import type { Attributes } from "../../types.js";
 
 export class KeyConditionExpression {
   private readonly expression: string;
@@ -21,27 +21,27 @@ export class KeyConditionExpression {
   }
 
   static partitionKeyEquals(params: {
-    attributeName: string;
+    name: string;
     value: string;
     token?: string;
   }): KeyConditionExpression {
-    const { attributeName, value, token = ":pk" } = params;
+    const { name, value, token = ":pk" } = params;
     return KeyConditionExpression.equals({
-      attributeName,
+      name,
       value,
       token,
     });
   }
 
   static equals(params: {
-    attributeName: string;
+    name: string;
     value: string;
     token: string;
   }): KeyConditionExpression {
-    const { attributeName, value, token } = params;
+    const { name, value, token } = params;
 
     return new KeyConditionExpression({
-      expression: `${attributeName} = ${token}`,
+      expression: `${name} = ${token}`,
       attributeValues: { [token]: value },
     });
   }

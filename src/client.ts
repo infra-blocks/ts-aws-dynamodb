@@ -1,7 +1,7 @@
 import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
@@ -11,11 +11,12 @@ import {
 } from "./commands/create-table.js";
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import { PutItem, type PutItemParams } from "./commands/put-item.js";
+import { Query, type QueryParams } from "./commands/query.js";
 import {
   WriteTransaction,
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
-import type { Attributes, Query } from "./types.js";
+import type { Attributes } from "./types.js";
 
 /**
  * Creation parameters for the {@link DynamoDbClient}.
@@ -160,18 +161,14 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
   async *query<T extends Attributes = Attributes>(
-    params: Query,
+    params: QueryParams,
   ): AsyncGenerator<T> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("query(%s)", JSON.stringify(params));
+    }
+
     try {
-      const { expression, attributeValues } = params.condition.toJson();
-      let response = await this.client.send(
-        new QueryCommand({
-          TableName: params.table,
-          IndexName: params.index,
-          KeyConditionExpression: expression,
-          ExpressionAttributeValues: attributeValues,
-        }),
-      );
+      let response = await this.client.send(Query.from(params).toAwsCommand());
 
       for (const item of response.Items || []) {
         yield item as T;
@@ -179,13 +176,10 @@ export class DynamoDbClient {
 
       while (response.LastEvaluatedKey != null) {
         response = await this.client.send(
-          new QueryCommand({
-            TableName: params.table,
-            IndexName: params.index,
-            KeyConditionExpression: expression,
-            ExpressionAttributeValues: attributeValues,
-            ExclusiveStartKey: response.LastEvaluatedKey,
-          }),
+          Query.from({
+            ...params,
+            exclusiveStartKey: response.LastEvaluatedKey,
+          }).toAwsCommand(),
         );
 
         for (const item of response.Items || []) {
@@ -193,12 +187,9 @@ export class DynamoDbClient {
         }
       }
     } catch (err) {
-      throw new DynamoDbClientError(
-        `error while querying DynamoDB on table ${params.table}${params.index != null ? ` and index ${params.index}` : ""}`,
-        {
-          cause: err,
-        },
-      );
+      throw new DynamoDbClientError("error while querying table", {
+        cause: err,
+      });
     }
   }
 
@@ -214,7 +205,7 @@ export class DynamoDbClient {
    * @returns The only item matching the query, or `undefined` if no item matches.
    */
   async queryOne<T extends Attributes = Attributes>(
-    params: Query,
+    params: QueryParams,
   ): Promise<T | undefined> {
     try {
       let item: T | undefined;

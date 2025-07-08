@@ -1,4 +1,8 @@
-import type { AttributePath, AttributeType, AttributeValue } from "./types.js";
+import type {
+  AttributePath,
+  AttributeType,
+  AttributeValue,
+} from "../../types.js";
 
 type AttributeSubstitution = `#${string}`;
 
