@@ -1,14 +1,7 @@
 import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
-import type {
-  TransactWriteCommandInput,
-  TranslateConfig,
-} from "@aws-sdk/lib-dynamodb";
-import {
-  DynamoDBDocumentClient,
-  QueryCommand,
-  TransactWriteCommand,
-} from "@aws-sdk/lib-dynamodb";
+import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
@@ -18,7 +11,11 @@ import {
 } from "./commands/create-table.js";
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import { PutItem, type PutItemParams } from "./commands/put-item.js";
-import type { Attributes, Query, WriteTransaction } from "./types.js";
+import {
+  WriteTransaction,
+  type WriteTransactionParams,
+} from "./commands/write-transaction.js";
+import type { Attributes, Query } from "./types.js";
 
 /**
  * Creation parameters for the {@link DynamoDbClient}.
@@ -275,17 +272,13 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html
    */
-  async transactWriteItems(params: WriteTransaction): Promise<void> {
+  async writeTransaction(params: WriteTransactionParams): Promise<void> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("transactWriteItems(%s)", JSON.stringify(params));
+    }
+
     try {
-      const commandInput = toTransactWriteItemsCommandInput(params);
-      if (this.logger.isDebugEnabled()) {
-        this.logger.debug(
-          "executing transaction write: %s",
-          JSON.stringify(commandInput),
-        );
-      }
-      const command = new TransactWriteCommand(commandInput);
-      await this.client.send(command);
+      await this.client.send(WriteTransaction.from(params).toAwsCommand());
     } catch (err) {
       throw new DynamoDbClientError(
         "error while transactionally writing items in DynamoDB",
@@ -352,14 +345,4 @@ export class DynamoDbClient {
     const client = DynamoDBDocumentClient.from(dynamodb, p.document);
     return DynamoDbClient.from({ client, logger });
   }
-}
-
-function toTransactWriteItemsCommandInput(
-  params: WriteTransaction,
-): TransactWriteCommandInput {
-  return {
-    TransactItems: params.items.map((item) => ({
-      Put: PutItem.from(item).toAwsCommandInput(),
-    })),
-  };
 }

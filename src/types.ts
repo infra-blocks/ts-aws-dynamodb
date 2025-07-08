@@ -1,6 +1,5 @@
 import type { ScalarAttributeType } from "@aws-sdk/client-dynamodb";
 import type { NativeAttributeValue } from "@aws-sdk/lib-dynamodb";
-import type { PutItemParams } from "./commands/put-item.js";
 import type { KeyConditionExpression } from "./key-condition-expression.js";
 
 export type AttributeName = string;
@@ -35,11 +34,6 @@ export interface Index {
   sortKey?: IndexField;
 }
 
-export interface WriteTransaction {
-  items: PutItemParams[];
-}
-
-// TODO: Target either index or table.
 export interface Query {
   table: string;
   index?: string;
