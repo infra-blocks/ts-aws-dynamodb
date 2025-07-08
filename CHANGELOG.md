@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-07-08
+
+### Changed
+
+- Renamed `WriteTransaction` to `WriteTransactionParams`.
+- Renamed `WriteTransactionParams.items` to `WriteTransactionParams.writes`.
+- Renamed `client.transactWriteItems` to `client.writeTransaction` for coherence.
+- Moved internal implementation to use an internal command class.
+
 ## [0.3.2] - 2025-07-07
 
 ### Changed
 
-- Introduce a non-breaking change where th implementation of `getItem` is leveraging
+- Introduce a non-breaking change where the implementation of `getItem` is leveraging
 a new internal command class.
 
 ## [0.3.1] - 2025-07-07
@@ -60,4 +69,11 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.4.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.2...v0.4.0
+[0.3.2]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/infra-blocks/ts-aws-dynamodb/releases/tag/v0.1.0
