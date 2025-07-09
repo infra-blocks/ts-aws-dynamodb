@@ -1,6 +1,6 @@
 import { PutCommand, type PutCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { ConditionExpression } from "../condition-expression.js";
 import type { Attributes } from "../types.js";
+import type { ConditionExpression } from "./expressions/condition.js";
 import type { Command } from "./types.js";
 
 export interface PutItemParams {

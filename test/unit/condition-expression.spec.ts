@@ -1,6 +1,6 @@
 import { checkNotNull } from "@infra-blocks/checks";
 import { expect } from "@infra-blocks/test";
-import { ConditionExpression } from "../../src/condition-expression.js";
+import { ConditionExpression } from "../../src/commands/expressions/condition.js";
 
 describe("lib.dynamodb.condition-expression", () => {
   describe(ConditionExpression.name, () => {
