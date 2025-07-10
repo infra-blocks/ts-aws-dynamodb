@@ -4,7 +4,7 @@ import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import { ConditionExpression } from "../../../../src/commands/expressions/condition.js";
 
-describe("lib.dynamodb.condition-expression", () => {
+describe("commands.expressions.condition-expression", () => {
   describe(ConditionExpression.name, () => {
     describe(ConditionExpression.attributeNotExists.name, () => {
       it("should work with regular attribute path", () => {
