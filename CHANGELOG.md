@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - 2025-07-08
+## [0.6.0] - 2025-07-10
+
+### Changed
+
+- Refactoring around how expressions and conditions will generate substitutions and
+value references automatically. This is technically not a breaking change, but since
+the `ConditionExpression` class *is* public and was changed, it could be. Although
+external code is not expected to call methods like *toAwsInput* or *stringify* for
+example.
+
+## [0.5.0] - 2025-07-09
 
 ### Changed
 

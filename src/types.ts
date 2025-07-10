@@ -19,7 +19,7 @@ export interface Attribute {
   name: AttributeName;
   value: AttributeValue;
 }
-export type Attributes = Record<AttributeName, NativeAttributeValue>;
+export type Attributes = Record<AttributeName, AttributeValue>;
 
 export type IndexFieldType = ScalarAttributeType;
 
