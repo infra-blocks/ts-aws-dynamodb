@@ -1,5 +1,7 @@
 import { PutCommand, type PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
+import { AttributeNames } from "./attributes/names.js";
+import { AttributeValues } from "./attributes/values.js";
 import type { ConditionExpression } from "./expressions/condition.js";
 import type { Command } from "./types.js";
 
@@ -23,11 +25,31 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
 
   toAwsCommandInput(): PutCommandInput {
     const { table, item, condition } = this;
-    const conditionPayload = condition != null ? condition.toAwsInput() : {};
-    return {
+
+    const input: PutCommandInput = {
       TableName: table,
       Item: item,
-      ...conditionPayload,
+    };
+
+    // Expression attribute names and values can only be specified when a condition is provided,
+    // which is optional.
+    if (condition == null) {
+      return input;
+    }
+
+    const attributeNames = AttributeNames.create();
+    const attributeValues = AttributeValues.create();
+    // Ask the expression to stringify itself, applying the substitutions by itself.
+    const expression = condition.stringify({
+      attributeNames,
+      attributeValues,
+    });
+
+    return {
+      ...input,
+      ConditionExpression: expression,
+      ExpressionAttributeNames: attributeNames.getSubstitutions(),
+      ExpressionAttributeValues: attributeValues.getReferences(),
     };
   }
 

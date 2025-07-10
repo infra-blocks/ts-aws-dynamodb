@@ -1,5 +1,6 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
+import { ConditionExpression } from "../../../src/commands/expressions/condition.js";
 import type { PutItemParams } from "../../../src/commands/put-item.js";
 import type { CreateTableParams } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
@@ -52,6 +53,41 @@ describe(DynamoDBClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
+      };
+      await client.putItem(putItemParams);
+
+      const testClient = this.createTestClient();
+      const response = await testClient.send(
+        new GetItemCommand({
+          TableName: createTableParams.name,
+          Key: {
+            pk: { S: putItemParams.item.pk },
+            sk: { N: String(putItemParams.item.sk) },
+          },
+        }),
+      );
+      expect(response.Item).to.deep.include({
+        pk: { S: putItemParams.item.pk },
+        sk: { N: String(putItemParams.item.sk) },
+      });
+    });
+    it("should work with expression", async function () {
+      const client = this.createClient();
+      const createTableParams: CreateTableParams = {
+        name: "test-table",
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+          sortKey: { name: "sk", type: "N" },
+        },
+      };
+      await client.createTable(createTableParams);
+      const putItemParams: PutItemParams = {
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+          sk: 42,
+        },
+        condition: ConditionExpression.attributeNotExists("pk"),
       };
       await client.putItem(putItemParams);
 
