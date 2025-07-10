@@ -31,10 +31,7 @@ describe(DynamoDBClient.name, () => {
 
       const result = client.query({
         table: createTableParams.name,
-        condition: KeyConditionExpression.partitionKeyEquals({
-          name: "pk",
-          value: "User#BigToto",
-        }),
+        condition: KeyConditionExpression.equals("pk", "User#BigToto"),
       });
       const items = await asyncArrayCollect(result);
       expect(items).to.have.lengthOf(1);
@@ -63,10 +60,7 @@ describe(DynamoDBClient.name, () => {
 
     const result = client.query({
       table: createTableParams.name,
-      condition: KeyConditionExpression.partitionKeyEquals({
-        name: "pk",
-        value: "User#BigToto",
-      }),
+      condition: KeyConditionExpression.equals("pk", "User#BigToto"),
     });
     const items = await asyncArrayCollect(result);
     expect(items).to.have.lengthOf(1);

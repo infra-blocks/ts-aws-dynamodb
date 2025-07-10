@@ -1,48 +1,37 @@
-import type { Attributes } from "../../types.js";
+import type { AttributePath, AttributeValue } from "../../types.js";
+import type { AttributeNames } from "../attributes/names.js";
+import type { AttributeValues } from "../attributes/values.js";
+import type { Expression } from "./expression.js";
 
-export class KeyConditionExpression {
-  private readonly expression: string;
-  private readonly attributeValues: Attributes;
+export class KeyConditionExpression implements Expression {
+  private readonly inner: Expression;
 
-  private constructor(params: {
-    expression: string;
-    attributeValues: Attributes;
-  }) {
-    const { expression, attributeValues } = params;
-    this.expression = expression;
-    this.attributeValues = attributeValues;
+  private constructor(params: { inner: Expression }) {
+    const { inner } = params;
+    this.inner = inner;
   }
 
-  toJson(): { expression: string; attributeValues: Attributes } {
-    return {
-      expression: this.expression,
-      attributeValues: this.attributeValues,
-    };
+  stringify(params: {
+    attributeNames: AttributeNames;
+    attributeValues: AttributeValues;
+  }): string {
+    return this.inner.stringify(params);
   }
 
-  static partitionKeyEquals(params: {
-    name: string;
-    value: string;
-    token?: string;
-  }): KeyConditionExpression {
-    const { name, value, token = ":pk" } = params;
-    return KeyConditionExpression.equals({
-      name,
-      value,
-      token,
-    });
-  }
-
-  static equals(params: {
-    name: string;
-    value: string;
-    token: string;
-  }): KeyConditionExpression {
-    const { name, value, token } = params;
-
+  static equals(
+    name: AttributePath,
+    value: AttributeValue,
+  ): KeyConditionExpression {
     return new KeyConditionExpression({
-      expression: `${name} = ${token}`,
-      attributeValues: { [token]: value },
+      inner: {
+        stringify: ({ attributeNames, attributeValues }) => {
+          attributeNames.add(name);
+          attributeValues.add(value);
+          const substitute = attributeNames.getSubstitute(name);
+          const reference = attributeValues.getReference(value);
+          return `${substitute} = ${reference}`;
+        },
+      },
     });
   }
 }
