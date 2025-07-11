@@ -2,14 +2,19 @@ import { checkNotNull } from "@infra-blocks/checks";
 import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
-import { ConditionExpression } from "../../../../src/commands/expressions/condition.js";
+import {
+  attributeExists,
+  attributeNotExists,
+  attributeType,
+  ConditionExpression,
+} from "../../../../src/commands/expressions/condition.js";
 
 describe("commands.expressions.condition-expression", () => {
   describe(ConditionExpression.name, () => {
-    describe(ConditionExpression.attributeNotExists.name, () => {
+    describe(attributeNotExists.name, () => {
       it("should work with regular attribute path", () => {
         const attribute = "test.attribute";
-        const condition = ConditionExpression.attributeNotExists(attribute);
+        const condition = attributeNotExists(attribute);
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = condition.stringify({ attributeNames, attributeValues });
@@ -20,10 +25,10 @@ describe("commands.expressions.condition-expression", () => {
         expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
       });
     });
-    describe(ConditionExpression.attributeExists.name, () => {
+    describe(attributeExists.name, () => {
       it("should work with regular attribute path", () => {
         const attribute = "test.attribute";
-        const condition = ConditionExpression.attributeExists(attribute);
+        const condition = attributeExists(attribute);
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = condition.stringify({ attributeNames, attributeValues });
@@ -32,11 +37,11 @@ describe("commands.expressions.condition-expression", () => {
         expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
       });
     });
-    describe(ConditionExpression.attributeType.name, () => {
+    describe(attributeType.name, () => {
       it("should work with regular attribute path", () => {
         const attribute = "test.attribute";
         const type = "S";
-        const condition = ConditionExpression.attributeType(attribute, type);
+        const condition = attributeType(attribute, type);
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = condition.stringify({ attributeNames, attributeValues });

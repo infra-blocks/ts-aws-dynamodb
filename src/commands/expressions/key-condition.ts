@@ -6,7 +6,7 @@ import type { Expression } from "./expression.js";
 export class KeyConditionExpression implements Expression {
   private readonly inner: Expression;
 
-  private constructor(params: { inner: Expression }) {
+  constructor(params: { inner: Expression }) {
     const { inner } = params;
     this.inner = inner;
   }
@@ -17,21 +17,21 @@ export class KeyConditionExpression implements Expression {
   }): string {
     return this.inner.stringify(params);
   }
+}
 
-  static equals(
-    name: AttributePath,
-    value: AttributeValue,
-  ): KeyConditionExpression {
-    return new KeyConditionExpression({
-      inner: {
-        stringify: ({ attributeNames, attributeValues }) => {
-          attributeNames.add(name);
-          attributeValues.add(value);
-          const substitute = attributeNames.getSubstitute(name);
-          const reference = attributeValues.getReference(value);
-          return `${substitute} = ${reference}`;
-        },
+export function equals(
+  name: AttributePath,
+  value: AttributeValue,
+): KeyConditionExpression {
+  return new KeyConditionExpression({
+    inner: {
+      stringify: ({ attributeNames, attributeValues }) => {
+        attributeNames.add(name);
+        attributeValues.add(value);
+        const substitute = attributeNames.getSubstitute(name);
+        const reference = attributeValues.getReference(value);
+        return `${substitute} = ${reference}`;
       },
-    });
-  }
+    },
+  });
 }

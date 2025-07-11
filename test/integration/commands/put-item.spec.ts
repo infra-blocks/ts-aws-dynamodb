@@ -1,6 +1,6 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { ConditionExpression } from "../../../src/commands/expressions/condition.js";
+import { attributeNotExists } from "../../../src/commands/expressions/condition.js";
 import type { PutItemParams } from "../../../src/commands/put-item.js";
 import type { CreateTableParams } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
@@ -87,7 +87,7 @@ describe(DynamoDBClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: ConditionExpression.attributeNotExists("pk"),
+        condition: attributeNotExists("pk"),
       };
       await client.putItem(putItemParams);
 
