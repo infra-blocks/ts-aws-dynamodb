@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-07-11
+
+### Added
+
+- `ConditionExpression` logical operators `not`, `and` and `or`. `not` is provided as
+a free floating function, whereas `and` and `or` are provided as methods. This choice
+is made because it's the natural pronunciation of those constructs:
+  - `not(attributeExists(...))`
+  - `attributeNotExists(...).and(attributeType(...))`
+
 ## [0.8.0] - 2025-07-11
 
 ### Changed

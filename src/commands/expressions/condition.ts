@@ -3,6 +3,10 @@ import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
 import type { Expression } from "./expression.js";
 
+/**
+ *
+ * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html
+ */
 export class ConditionExpression implements Expression {
   private readonly inner: Expression;
 
@@ -16,6 +20,30 @@ export class ConditionExpression implements Expression {
     attributeValues: AttributeValues;
   }): string {
     return this.inner.stringify(params);
+  }
+
+  or(other: ConditionExpression): ConditionExpression {
+    return new ConditionExpression({
+      inner: {
+        stringify: ({ attributeNames, attributeValues }) => {
+          const left = this.stringify({ attributeNames, attributeValues });
+          const right = other.stringify({ attributeNames, attributeValues });
+          return `(${left} OR ${right})`;
+        },
+      },
+    });
+  }
+
+  and(other: ConditionExpression): ConditionExpression {
+    return new ConditionExpression({
+      inner: {
+        stringify: ({ attributeNames, attributeValues }) => {
+          const left = this.stringify({ attributeNames, attributeValues });
+          const right = other.stringify({ attributeNames, attributeValues });
+          return `(${left} AND ${right})`;
+        },
+      },
+    });
   }
 }
 
@@ -53,6 +81,17 @@ export function attributeType(
         attributeNames.add(attribute);
         attributeValues.add(type);
         return `attribute_type(${attributeNames.getSubstitute(attribute)}, ${attributeValues.getReference(type)})`;
+      },
+    },
+  });
+}
+
+export function not(condition: ConditionExpression): ConditionExpression {
+  return new ConditionExpression({
+    inner: {
+      stringify: ({ attributeNames, attributeValues }) => {
+        const inner = condition.stringify({ attributeNames, attributeValues });
+        return `NOT (${inner})`;
       },
     },
   });
