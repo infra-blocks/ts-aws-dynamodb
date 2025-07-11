@@ -1,11 +1,7 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { asyncArrayCollect } from "@infra-blocks/iter";
 import { expect } from "@infra-blocks/test";
-import { equals } from "../../../src/commands/expressions/key-condition.js";
-// At the time of this writing, there seems to be a bug where tsx (or mocha???) complains about
-// missing a named export if we import this specific type from the main index file. Hence why
-// we go the full path here.
-import type { CreateTableParams } from "../../../src/index.js";
+import { type CreateTableParams, equals } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe(DynamoDBClient.name, () => {

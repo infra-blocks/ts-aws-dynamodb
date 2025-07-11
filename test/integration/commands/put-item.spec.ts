@@ -1,8 +1,11 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { attributeNotExists } from "../../../src/commands/expressions/condition.js";
-import type { PutItemParams } from "../../../src/commands/put-item.js";
-import type { CreateTableParams } from "../../../src/index.js";
+import {
+  attributeNotExists,
+  attributeType,
+  type CreateTableParams,
+  type PutItemParams,
+} from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe(DynamoDBClient.name, () => {
@@ -87,7 +90,7 @@ describe(DynamoDBClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: attributeNotExists("pk"),
+        condition: attributeType("sk", "N").or(attributeNotExists("pk")),
       };
       await client.putItem(putItemParams);
 
