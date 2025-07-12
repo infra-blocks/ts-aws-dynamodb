@@ -86,6 +86,21 @@ export function attributeType(
   });
 }
 
+export function beginsWith(
+  attribute: AttributePath,
+  value: string,
+): ConditionExpression {
+  return new ConditionExpression({
+    inner: {
+      stringify: ({ attributeNames, attributeValues }) => {
+        attributeNames.add(attribute);
+        attributeValues.add(value);
+        return `begins_with(${attributeNames.getSubstitute(attribute)}, ${attributeValues.getReference(value)})`;
+      },
+    },
+  });
+}
+
 export function not(condition: ConditionExpression): ConditionExpression {
   return new ConditionExpression({
     inner: {
