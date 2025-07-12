@@ -24,7 +24,7 @@ describe("commands.expressions.condition-expression", () => {
           /attribute_not_exists\((#.+)\)/.exec(result),
         );
         const substitution = match[1];
-        expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
       });
     });
     describe(attributeExists.name, () => {
@@ -36,7 +36,7 @@ describe("commands.expressions.condition-expression", () => {
         const result = condition.stringify({ attributeNames, attributeValues });
         const match = checkNotNull(/attribute_exists\((#.+)\)/.exec(result));
         const substitution = match[1];
-        expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
       });
     });
     describe(attributeType.name, () => {
@@ -52,8 +52,8 @@ describe("commands.expressions.condition-expression", () => {
         );
         const substitution = match[1];
         const reference = match[2];
-        expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
-        expect(reference).to.equal(attributeValues.getReference(type));
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
+        expect(reference).to.equal(attributeValues.reference(type));
       });
     });
     describe(beginsWith.name, () => {
@@ -69,8 +69,8 @@ describe("commands.expressions.condition-expression", () => {
         );
         const substitution = match[1];
         const reference = match[2];
-        expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
-        expect(reference).to.equal(attributeValues.getReference(value));
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
+        expect(reference).to.equal(attributeValues.reference(value));
       });
     });
     describe("logical operators", () => {
@@ -94,10 +94,8 @@ describe("commands.expressions.condition-expression", () => {
           );
           const leftSubstitution = match[1];
           const rightSubstitution = match[2];
-          expect(leftSubstitution).to.equal(attributeNames.getSubstitute(left));
-          expect(rightSubstitution).to.equal(
-            attributeNames.getSubstitute(right),
-          );
+          expect(leftSubstitution).to.equal(attributeNames.substitute(left));
+          expect(rightSubstitution).to.equal(attributeNames.substitute(right));
         });
       });
       describe("and", () => {
@@ -120,10 +118,8 @@ describe("commands.expressions.condition-expression", () => {
           );
           const leftSubstitution = match[1];
           const rightSubstitution = match[2];
-          expect(leftSubstitution).to.equal(attributeNames.getSubstitute(left));
-          expect(rightSubstitution).to.equal(
-            attributeNames.getSubstitute(right),
-          );
+          expect(leftSubstitution).to.equal(attributeNames.substitute(left));
+          expect(rightSubstitution).to.equal(attributeNames.substitute(right));
         });
       });
       describe("not", () => {
@@ -140,9 +136,7 @@ describe("commands.expressions.condition-expression", () => {
             /NOT \(attribute_exists\((#.+)\)\)/.exec(result),
           );
           const substitution = match[1];
-          expect(substitution).to.equal(
-            attributeNames.getSubstitute(attribute),
-          );
+          expect(substitution).to.equal(attributeNames.substitute(attribute));
         });
       });
     });

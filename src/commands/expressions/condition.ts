@@ -53,8 +53,7 @@ export function attributeNotExists(
   return new ConditionExpression({
     inner: {
       stringify: ({ attributeNames }) => {
-        attributeNames.add(attribute);
-        return `attribute_not_exists(${attributeNames.getSubstitute(attribute)})`;
+        return `attribute_not_exists(${attributeNames.substitute(attribute)})`;
       },
     },
   });
@@ -64,8 +63,7 @@ export function attributeExists(attribute: AttributePath): ConditionExpression {
   return new ConditionExpression({
     inner: {
       stringify: ({ attributeNames }) => {
-        attributeNames.add(attribute);
-        return `attribute_exists(${attributeNames.getSubstitute(attribute)})`;
+        return `attribute_exists(${attributeNames.substitute(attribute)})`;
       },
     },
   });
@@ -78,9 +76,7 @@ export function attributeType(
   return new ConditionExpression({
     inner: {
       stringify: ({ attributeNames, attributeValues }) => {
-        attributeNames.add(attribute);
-        attributeValues.add(type);
-        return `attribute_type(${attributeNames.getSubstitute(attribute)}, ${attributeValues.getReference(type)})`;
+        return `attribute_type(${attributeNames.substitute(attribute)}, ${attributeValues.reference(type)})`;
       },
     },
   });
@@ -93,9 +89,7 @@ export function beginsWith(
   return new ConditionExpression({
     inner: {
       stringify: ({ attributeNames, attributeValues }) => {
-        attributeNames.add(attribute);
-        attributeValues.add(value);
-        return `begins_with(${attributeNames.getSubstitute(attribute)}, ${attributeValues.getReference(value)})`;
+        return `begins_with(${attributeNames.substitute(attribute)}, ${attributeValues.reference(value)})`;
       },
     },
   });

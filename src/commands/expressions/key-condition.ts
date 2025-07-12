@@ -26,10 +26,8 @@ export function equals(
   return new KeyConditionExpression({
     inner: {
       stringify: ({ attributeNames, attributeValues }) => {
-        attributeNames.add(name);
-        attributeValues.add(value);
-        const substitute = attributeNames.getSubstitute(name);
-        const reference = attributeValues.getReference(value);
+        const substitute = attributeNames.substitute(name);
+        const reference = attributeValues.reference(value);
         return `${substitute} = ${reference}`;
       },
     },
