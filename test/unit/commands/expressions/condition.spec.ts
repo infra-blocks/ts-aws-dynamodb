@@ -8,7 +8,9 @@ import {
   attributeType,
   beginsWith,
   ConditionExpression,
+  contains,
   not,
+  size,
 } from "../../../../src/index.js";
 
 describe("commands.expressions.condition-expression", () => {
@@ -71,6 +73,41 @@ describe("commands.expressions.condition-expression", () => {
         const reference = match[2];
         expect(substitution).to.equal(attributeNames.substitute(attribute));
         expect(reference).to.equal(attributeValues.reference(value));
+      });
+    });
+    describe(contains.name, () => {
+      it("should work with regular attribute path and value", () => {
+        const attribute = "test.attribute";
+        const value = "substring";
+        const condition = contains(attribute, value);
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = condition.stringify({ attributeNames, attributeValues });
+        const match = checkNotNull(/contains\((#.+),\s*(:.+)\)/.exec(result));
+        const substitution = match[1];
+        const reference = match[2];
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
+        expect(reference).to.equal(attributeValues.reference(value));
+      });
+      it("should work with the size function as value", () => {
+        const attribute = "test.attribute";
+        const sizedAttribute = "test.sized_attribute";
+        const value = size(sizedAttribute);
+        const condition = contains(attribute, value);
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = condition.stringify({ attributeNames, attributeValues });
+        const match = checkNotNull(
+          /contains\((#.+),\s*size\((#.+)\)\)/.exec(result),
+          "mismatched result %s",
+          result,
+        );
+        const substitution = match[1];
+        const sizeSubstitution = match[2];
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
+        expect(sizeSubstitution).to.equal(
+          attributeNames.substitute(sizedAttribute),
+        );
       });
     });
     describe("logical operators", () => {
