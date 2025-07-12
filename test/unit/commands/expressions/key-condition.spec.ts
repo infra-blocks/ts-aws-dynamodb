@@ -20,8 +20,8 @@ describe("commands.expressions.condition-expression", () => {
         const match = checkNotNull(/(#.+?)\s*=\s*(:.+)/.exec(result));
         const substitution = match[1];
         const reference = match[2];
-        expect(substitution).to.equal(attributeNames.getSubstitute(attribute));
-        expect(reference).to.equal(attributeValues.getReference(value));
+        expect(substitution).to.equal(attributeNames.substitute(attribute));
+        expect(reference).to.equal(attributeValues.reference(value));
       });
     });
   });
