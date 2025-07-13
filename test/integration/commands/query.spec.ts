@@ -1,7 +1,11 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { asyncArrayCollect } from "@infra-blocks/iter";
 import { expect } from "@infra-blocks/test";
-import { type CreateTableParams, equals } from "../../../src/index.js";
+import {
+  attribute,
+  type CreateTableParams,
+  value,
+} from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe(DynamoDBClient.name, () => {
@@ -27,7 +31,7 @@ describe(DynamoDBClient.name, () => {
 
       const result = client.query({
         table: createTableParams.name,
-        condition: equals("pk", "User#BigToto"),
+        condition: attribute("pk").equals(value("User#BigToto")),
       });
       const items = await asyncArrayCollect(result);
       expect(items).to.have.lengthOf(1);
@@ -56,7 +60,7 @@ describe(DynamoDBClient.name, () => {
 
     const result = client.query({
       table: createTableParams.name,
-      condition: equals("pk", "User#BigToto"),
+      condition: attribute("pk").equals(value("User#BigToto")),
     });
     const items = await asyncArrayCollect(result);
     expect(items).to.have.lengthOf(1);

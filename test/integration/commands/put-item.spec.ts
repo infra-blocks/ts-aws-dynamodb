@@ -1,8 +1,7 @@
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
-  attributeNotExists,
-  attributeType,
+  attribute,
   type CreateTableParams,
   type PutItemParams,
 } from "../../../src/index.js";
@@ -90,7 +89,7 @@ describe(DynamoDBClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: attributeType("sk", "N").or(attributeNotExists("pk")),
+        condition: attribute("sk").type("N").or(attribute("pk").notExists()),
       };
       await client.putItem(putItemParams);
 
