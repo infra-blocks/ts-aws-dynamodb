@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-07-13
+
+### Added
+
+- `ConditionExpression` `contains` and `size` functions. The `size` function is peculiar
+in that, contrary to the other functions, it does not return a boolean but rather a
+number that should be used within the context of a higher order expression. Therefore,
+we introduced a new type: `FunctionExpression`, that is returned by the factory and
+that is different than `ConditionExpression` (so it cannot be used alone with a `putItem`
+command, for example). The only place right now where it can be embedded is within the
+`contains` function, where it can be called as such: `contains(Tata, size(Toto))`.
+
 ## [0.10.0] - 2025-07-12
 
 ### Added
@@ -124,6 +136,12 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.11.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.10.0...v0.11.0
+[0.10.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.9.0...v0.10.0
+[0.9.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.8.0...v0.9.0
+[0.8.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.3.1...v0.3.2
