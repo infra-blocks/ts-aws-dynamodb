@@ -94,6 +94,15 @@ export abstract class Operand {
     });
   }
 
+  /**
+   * Tests that two operands are equals.
+   *
+   * This uses the `=` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
   equals(rhs: Operand): Expression {
     return expression({
       stringify: ({ attributeNames, attributeValues }) => {
@@ -102,6 +111,122 @@ export abstract class Operand {
     });
   }
 
+  /**
+   * An alias for {@link equals}.
+   */
+  eq = this.equals.bind(this);
+
+  /**
+   * Tests that the left operand is greater than the right operand.
+   *
+   * This uses the `>` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
+  greaterThan(rhs: Operand): Expression {
+    return expression({
+      stringify: ({ attributeNames, attributeValues }) => {
+        return `${this.register({ attributeNames, attributeValues })} > ${rhs.register({ attributeNames, attributeValues })}`;
+      },
+    });
+  }
+
+  /**
+   * Tests that the left operand is greater than or equals to the right operand.
+   *
+   * This uses the `>=` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
+  greaterThanOrEquals(rhs: Operand): Expression {
+    return expression({
+      stringify: ({ attributeNames, attributeValues }) => {
+        return `${this.register({ attributeNames, attributeValues })} >= ${rhs.register({ attributeNames, attributeValues })}`;
+      },
+    });
+  }
+
+  /**
+   * An alias for {@link greaterThan}.
+   */
+  gt = this.greaterThan.bind(this);
+
+  /**
+   * An alias for {@link greaterThanOrEquals}
+   */
+  gte = this.greaterThanOrEquals.bind(this);
+
+  /**
+   * Tests that the left operand is lower than the right operand.
+   *
+   * This uses the `<` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
+  lowerThan(rhs: Operand): Expression {
+    return expression({
+      stringify: ({ attributeNames, attributeValues }) => {
+        return `${this.register({ attributeNames, attributeValues })} < ${rhs.register({ attributeNames, attributeValues })}`;
+      },
+    });
+  }
+
+  /**
+   * Tests that the left operand is lower than or equals to the right operand.
+   *
+   * This uses the `<=` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
+  lowerThanOrEquals(rhs: Operand): Expression {
+    return expression({
+      stringify: ({ attributeNames, attributeValues }) => {
+        return `${this.register({ attributeNames, attributeValues })} <= ${rhs.register({ attributeNames, attributeValues })}`;
+      },
+    });
+  }
+
+  /**
+   * An alias for {@link lowerThan}.
+   */
+  lt = this.lowerThan.bind(this);
+
+  /**
+   * An alias for {@link lowerThanOrEquals}
+   */
+  lte = this.lowerThanOrEquals.bind(this);
+
+  /**
+   * Tests that two operands are not equals.
+   *
+   * This is the opposite of {@link equals} and it uses the `<>` operator.
+   *
+   * @param rhs - The right hand side operand.
+   *
+   * @returns The corresponding {@link Expression}.
+   */
+  notEquals(rhs: Operand): Expression {
+    return expression({
+      stringify: ({ attributeNames, attributeValues }) => {
+        return `${this.register({ attributeNames, attributeValues })} <> ${rhs.register({ attributeNames, attributeValues })}`;
+      },
+    });
+  }
+
+  /**
+   * An alias for {@link notEquals}.
+   */
+  ne = this.notEquals.bind(this);
+
+  // TODO: make a function? size(attribute("toto")) is more readable than attribute("toto").size()
   size(): Operand {
     return new SizeOperand(this);
   }
