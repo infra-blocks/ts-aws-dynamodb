@@ -151,6 +151,176 @@ describe("commands.expressions.condition-expression", () => {
         expect(substitution).to.equal(attributeNames.substitute(name));
       });
     });
+    describe("greaterThan", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "test.attribute.rhs";
+        const expression = attribute(lhs).gt(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*>\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "I am a value";
+        const expression = attribute(lhs).gt(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*>\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("greaterThanOrEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "test.attribute.rhs";
+        const expression = attribute(lhs).gte(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*>=\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "I am a value";
+        const expression = attribute(lhs).gte(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*>=\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("lowerThan", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "test.attribute.rhs";
+        const expression = attribute(lhs).lt(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "I am a value";
+        const expression = attribute(lhs).lt(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("lowerThanOrEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "test.attribute.rhs";
+        const expression = attribute(lhs).lte(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<=\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "I am a value";
+        const expression = attribute(lhs).lte(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<=\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("notEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "test.attribute.rhs";
+        const expression = attribute(lhs).ne(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<>\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "test.attribute.lhs";
+        const rhs = "I am a value";
+        const expression = attribute(lhs).ne(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(#\S+)\s*<>\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
     describe("notExists", () => {
       it("should work", () => {
         const path = "test.attribute";
@@ -266,7 +436,7 @@ describe("commands.expressions.condition-expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const expression = value(lhs).equals(attribute(rhs));
+        const expression = value(lhs).eq(attribute(rhs));
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = expression.stringify({
@@ -282,7 +452,7 @@ describe("commands.expressions.condition-expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const expression = value(lhs).equals(value(rhs));
+        const expression = value(lhs).eq(value(rhs));
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = expression.stringify({
@@ -298,7 +468,7 @@ describe("commands.expressions.condition-expression", () => {
       it("should work with size rhs", () => {
         const lhs = "I am a value";
         const rhs = "I contain things";
-        const expression = value(lhs).equals(value(rhs).size());
+        const expression = value(lhs).eq(value(rhs).size());
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = expression.stringify({
@@ -306,6 +476,176 @@ describe("commands.expressions.condition-expression", () => {
           attributeValues,
         });
         const match = checkNotNull(/(:\S+)\s*=\s*size\((:\S+)\)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("greaterThan", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "test.attribute.rhs";
+        const expression = value(lhs).gt(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*>\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "I am also a value";
+        const expression = value(lhs).gt(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*>\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("greaterThanOrEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "test.attribute.rhs";
+        const expression = value(lhs).gte(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*>=\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "I am also a value";
+        const expression = value(lhs).gte(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*>=\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("lowerThan", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "test.attribute.rhs";
+        const expression = value(lhs).lt(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "I am also a value";
+        const expression = value(lhs).lt(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("lowerThanOrEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "test.attribute.rhs";
+        const expression = value(lhs).lte(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<=\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "I am also a value";
+        const expression = value(lhs).lte(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<=\s*(:\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("notEquals", () => {
+      it("should work with attribute rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "test.attribute.rhs";
+        const expression = value(lhs).ne(attribute(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<>\s*(#\S+)/.exec(result));
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(rhsSubstitution).to.equal(attributeNames.substitute(rhs));
+      });
+      it("should work with value rhs", () => {
+        const lhs = "I am a value";
+        const rhs = "I am also a value";
+        const expression = value(lhs).ne(value(rhs));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(/(:\S+)\s*<>\s*(:\S+)/.exec(result));
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
