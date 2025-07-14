@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2025-07-14
+
+### Changed
+
+- Reviewed the `Expression` interface significantly to reflect better the behavior of the
+actual engine. For example, DynamoDB accepts `contains` to be called with attributes names
+or values for both operands, whereas `attribute_exists` requires an attribute as its
+argument. This was reflected by grouping attribute names and values under the generic
+`Operand` type, and specialize with subclasses.
+
 ## [0.11.0] - 2025-07-13
 
 ### Added
