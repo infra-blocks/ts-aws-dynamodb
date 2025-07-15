@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2025-07-15
+
+### Added
+
+- The `between` and `in` expression operators. 
+
+### Changed
+
+- Renamed `attribute(<name>).type(<type>)` for `attribute(<name>).isType(<type>)`.
+- Now requires the argument to `isType` to be an `ExpressionValue` and no longer implies
+it. Before, you could call `attribute(<name>).type("S")` (before the renaming). Now,
+you have to be explicit: `attribute(<name>).isType(value("S"))`.
+
 ## [0.13.0] - 2025-07-14
 
 ### Added

@@ -36,6 +36,7 @@ export class AttributeValues {
    *
    * @returns The reference associated with the attribute value.
    */
+  //TODO: rename to substitute so it's the same errrrrwhere.
   reference(value: AttributeValue): ValueReference {
     const existing = this.values.get(value);
     if (existing != null) {

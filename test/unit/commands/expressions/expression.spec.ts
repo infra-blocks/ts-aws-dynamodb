@@ -52,6 +52,53 @@ describe("commands.expressions.condition-expression", () => {
         expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
       });
     });
+    describe("between", () => {
+      it("should work with attribute bounds", () => {
+        const lhs = "test.attribute.lhs";
+        const lower = "test.attribute.lower";
+        const upper = "test.attribute.upper";
+        const expression = attribute(lhs).between(
+          attribute(lower),
+          attribute(upper),
+        );
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(#\S+)\s+BETWEEN\s+(#\S+)\s+AND\s+(#\S+)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const lowerSubstitution = match[2];
+        const upperSubstitution = match[3];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(lowerSubstitution).to.equal(attributeNames.substitute(lower));
+        expect(upperSubstitution).to.equal(attributeNames.substitute(upper));
+      });
+      it("should work with value bounds", () => {
+        const lhs = "test.attribute.lhs";
+        const lower = "I am a value";
+        const upper = "I am also a value";
+        const expression = attribute(lhs).between(value(lower), value(upper));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(#\S+)\s+BETWEEN\s+(:\S+)\s+AND\s+(:\S+)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const lowerSubstitution = match[2];
+        const upperSubstitution = match[3];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(lowerSubstitution).to.equal(attributeValues.reference(lower));
+        expect(upperSubstitution).to.equal(attributeValues.reference(upper));
+      });
+    });
     describe("contains", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
@@ -219,6 +266,89 @@ describe("commands.expressions.condition-expression", () => {
         expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
       });
     });
+    describe("in", () => {
+      it("should throw when no operands are provided", () => {
+        expect(() => {
+          attribute("test.attribute.lhs").in();
+        }).to.throw();
+      });
+      it("should throw when more than 100 operands are provided", () => {
+        const operands = Array.from({ length: 101 }, (_, i) =>
+          attribute(`test.attribute.${i}`),
+        );
+        expect(() => {
+          attribute("test.attribute.lhs").in(...operands);
+        }).to.throw();
+      });
+      it("should work with attribute operands", () => {
+        const lhs = "test.attribute.lhs";
+        const operands = [
+          "test.attribute.operand1",
+          "test.attribute.operand2",
+          "test.attribute.operand3",
+        ];
+        const expression = attribute(lhs).in(
+          ...operands.map((op) => attribute(op)),
+        );
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(#\S+)\s+IN\s+\((#\S+),(#\S+),(#\S+)\)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const operand1Substitution = match[2];
+        const operand2Substitution = match[3];
+        const operand3Substitution = match[4];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(operand1Substitution).to.equal(
+          attributeNames.substitute(operands[0]),
+        );
+        expect(operand2Substitution).to.equal(
+          attributeNames.substitute(operands[1]),
+        );
+        expect(operand3Substitution).to.equal(
+          attributeNames.substitute(operands[2]),
+        );
+      });
+      it("should work with value operands", () => {
+        const lhs = "test.attribute.lhs";
+        const operands = [
+          "I am a value",
+          "I am also a value",
+          "I am yet another",
+        ];
+        const expression = attribute(lhs).in(
+          ...operands.map((op) => value(op)),
+        );
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(#\S+)\s+IN\s+\((:\S+),(:\S+),(:\S+)\)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const operand1Substitution = match[2];
+        const operand2Substitution = match[3];
+        const operand3Substitution = match[4];
+        expect(lhsSubstitution).to.equal(attributeNames.substitute(lhs));
+        expect(operand1Substitution).to.equal(
+          attributeValues.reference(operands[0]),
+        );
+        expect(operand2Substitution).to.equal(
+          attributeValues.reference(operands[1]),
+        );
+        expect(operand3Substitution).to.equal(
+          attributeValues.reference(operands[2]),
+        );
+      });
+    });
     describe("lowerThan", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
@@ -342,7 +472,7 @@ describe("commands.expressions.condition-expression", () => {
       it("should work with string type", () => {
         const name = "test.attribute";
         const type = "S";
-        const condition = attribute(name).type(type);
+        const condition = attribute(name).isType(value(type));
         const attributeNames = AttributeNames.create();
         const attributeValues = AttributeValues.create();
         const result = condition.stringify({
@@ -396,6 +526,53 @@ describe("commands.expressions.condition-expression", () => {
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
         expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("between", () => {
+      it("should work with attribute bounds", () => {
+        const lhs = "I am a value";
+        const lower = "test.attribute.lower";
+        const upper = "test.attribute.upper";
+        const expression = value(lhs).between(
+          attribute(lower),
+          attribute(upper),
+        );
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(:\S+)\s+BETWEEN\s+(#\S+)\s+AND\s+(#\S+)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const lowerSubstitution = match[2];
+        const upperSubstitution = match[3];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(lowerSubstitution).to.equal(attributeNames.substitute(lower));
+        expect(upperSubstitution).to.equal(attributeNames.substitute(upper));
+      });
+      it("should work with value bounds", () => {
+        const lhs = "I am a value";
+        const lower = "I am a also value";
+        const upper = "Geezus Louizus we're all values!";
+        const expression = value(lhs).between(value(lower), value(upper));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(:\S+)\s+BETWEEN\s+(:\S+)\s+AND\s+(:\S+)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const lowerSubstitution = match[2];
+        const upperSubstitution = match[3];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(lowerSubstitution).to.equal(attributeValues.reference(lower));
+        expect(upperSubstitution).to.equal(attributeValues.reference(upper));
       });
     });
     describe("contains", () => {
@@ -548,6 +725,87 @@ describe("commands.expressions.condition-expression", () => {
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
         expect(rhsSubstitution).to.equal(attributeValues.reference(rhs));
+      });
+    });
+    describe("in", () => {
+      it("should throw when no operands are provided", () => {
+        expect(() => {
+          value("I am a value").in();
+        }).to.throw();
+      });
+      it("should throw when more than 100 operands are provided", () => {
+        const operands = Array.from({ length: 101 }, (_, i) =>
+          value(`I am a value ${i}`),
+        );
+        expect(() => {
+          value("I am a value").in(...operands);
+        }).to.throw();
+      });
+      it("should work with attribute operands", () => {
+        const lhs = "I am a value";
+        const operands = [
+          "test.attribute.operand1",
+          "test.attribute.operand2",
+          "test.attribute.operand3",
+        ];
+        const expression = value(lhs).in(
+          ...operands.map((op) => attribute(op)),
+        );
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(:\S+)\s+IN\s+\((#\S+),(#\S+),(#\S+)\)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const operand1Substitution = match[2];
+        const operand2Substitution = match[3];
+        const operand3Substitution = match[4];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(operand1Substitution).to.equal(
+          attributeNames.substitute(operands[0]),
+        );
+        expect(operand2Substitution).to.equal(
+          attributeNames.substitute(operands[1]),
+        );
+        expect(operand3Substitution).to.equal(
+          attributeNames.substitute(operands[2]),
+        );
+      });
+      it("should work with value operands", () => {
+        const lhs = "I am a value";
+        const operands = [
+          "I am also a value",
+          "I am yet another",
+          "Geezus Louizus we're all values!",
+        ];
+        const expression = value(lhs).in(...operands.map((op) => value(op)));
+        const attributeNames = AttributeNames.create();
+        const attributeValues = AttributeValues.create();
+        const result = expression.stringify({
+          attributeNames,
+          attributeValues,
+        });
+        const match = checkNotNull(
+          /(:\S+)\s+IN\s+\((:\S+),(:\S+),(:\S+)\)/.exec(result),
+        );
+        const lhsSubstitution = match[1];
+        const operand1Substitution = match[2];
+        const operand2Substitution = match[3];
+        const operand3Substitution = match[4];
+        expect(lhsSubstitution).to.equal(attributeValues.reference(lhs));
+        expect(operand1Substitution).to.equal(
+          attributeValues.reference(operands[0]),
+        );
+        expect(operand2Substitution).to.equal(
+          attributeValues.reference(operands[1]),
+        );
+        expect(operand3Substitution).to.equal(
+          attributeValues.reference(operands[2]),
+        );
       });
     });
     describe("lowerThan", () => {
