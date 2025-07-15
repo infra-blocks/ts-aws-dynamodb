@@ -37,19 +37,16 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
       return input;
     }
 
-    const attributeNames = AttributeNames.create();
-    const attributeValues = AttributeValues.create();
+    const names = AttributeNames.create();
+    const values = AttributeValues.create();
     // Ask the expression to stringify itself, applying the substitutions by itself.
-    const expression = condition.stringify({
-      attributeNames,
-      attributeValues,
-    });
+    const expression = condition.stringify({ names, values });
 
     return {
       ...input,
       ConditionExpression: expression,
-      ExpressionAttributeNames: attributeNames.getSubstitutions(),
-      ExpressionAttributeValues: attributeValues.getReferences(),
+      ExpressionAttributeNames: names.getSubstitutions(),
+      ExpressionAttributeValues: values.getReferences(),
     };
   }
 

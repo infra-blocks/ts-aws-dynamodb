@@ -13,8 +13,8 @@ import type { AttributeValues } from "../attributes/values.js";
 
 // TODO: rename for serializer, and the method to be serialize.
 export type Stringifier = (params: {
-  attributeNames: AttributeNames;
-  attributeValues: AttributeValues;
+  names: AttributeNames;
+  values: AttributeValues;
 }) => string;
 
 export interface ExpressionParams {
@@ -38,9 +38,9 @@ export class Expression {
    */
   and(other: Expression): Expression {
     return new Expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        const left = this.stringify({ attributeNames, attributeValues });
-        const right = other.stringify({ attributeNames, attributeValues });
+      stringify: ({ names, values }) => {
+        const left = this.stringify({ names, values });
+        const right = other.stringify({ names, values });
         return `(${left} AND ${right})`;
       },
     });
@@ -54,17 +54,17 @@ export class Expression {
    */
   or(other: Expression): Expression {
     return new Expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        const left = this.stringify({ attributeNames, attributeValues });
-        const right = other.stringify({ attributeNames, attributeValues });
+      stringify: ({ names, values }) => {
+        const left = this.stringify({ names, values });
+        const right = other.stringify({ names, values });
         return `(${left} OR ${right})`;
       },
     });
   }
 
   stringify(params: {
-    attributeNames: AttributeNames;
-    attributeValues: AttributeValues;
+    names: AttributeNames;
+    values: AttributeValues;
   }): string {
     return this.stringifier(params);
   }
@@ -82,8 +82,8 @@ export function expression(params: ExpressionParams): Expression {
  */
 export function not(expression: Expression): Expression {
   return new Expression({
-    stringify: ({ attributeNames, attributeValues }) => {
-      return `NOT (${expression.stringify({ attributeNames, attributeValues })})`;
+    stringify: ({ names, values }) => {
+      return `NOT (${expression.stringify({ names, values })})`;
     },
   });
 }
@@ -94,8 +94,8 @@ export abstract class Operand {
   // NOTE: both sides of this expression can either be attribute names or attribute values.
   beginsWith(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `begins_with(${this.substitute({ attributeNames, attributeValues })}, ${rhs.substitute({ attributeNames, attributeValues })})`;
+      stringify: ({ names, values }) => {
+        return `begins_with(${this.substitute({ names, values })}, ${rhs.substitute({ names, values })})`;
       },
     });
   }
@@ -112,8 +112,8 @@ export abstract class Operand {
    */
   between(lower: Operand, upper: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} BETWEEN ${lower.substitute({ attributeNames, attributeValues })} AND ${upper.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} BETWEEN ${lower.substitute({ names, values })} AND ${upper.substitute({ names, values })}`;
       },
     });
   }
@@ -121,8 +121,8 @@ export abstract class Operand {
   // NOTE: both sides of this expression can either be attribute names or attribute values.
   contains(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `contains(${this.substitute({ attributeNames, attributeValues })}, ${rhs.substitute({ attributeNames, attributeValues })})`;
+      stringify: ({ names, values }) => {
+        return `contains(${this.substitute({ names, values })}, ${rhs.substitute({ names, values })})`;
       },
     });
   }
@@ -138,8 +138,8 @@ export abstract class Operand {
    */
   equals(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} = ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} = ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -160,8 +160,8 @@ export abstract class Operand {
    */
   greaterThan(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} > ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} > ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -177,8 +177,8 @@ export abstract class Operand {
    */
   greaterThanOrEquals(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} >= ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} >= ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -214,13 +214,11 @@ export abstract class Operand {
     }
 
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
+      stringify: ({ names, values }) => {
         const operandsString = operands
-          .map((operand) =>
-            operand.substitute({ attributeNames, attributeValues }),
-          )
+          .map((operand) => operand.substitute({ names, values }))
           .join(",");
-        return `${this.substitute({ attributeNames, attributeValues })} IN (${operandsString})`;
+        return `${this.substitute({ names, values })} IN (${operandsString})`;
       },
     });
   }
@@ -236,8 +234,8 @@ export abstract class Operand {
    */
   lowerThan(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} < ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} < ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -253,8 +251,8 @@ export abstract class Operand {
    */
   lowerThanOrEquals(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} <= ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} <= ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -280,8 +278,8 @@ export abstract class Operand {
    */
   notEquals(rhs: Operand): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `${this.substitute({ attributeNames, attributeValues })} <> ${rhs.substitute({ attributeNames, attributeValues })}`;
+      stringify: ({ names, values }) => {
+        return `${this.substitute({ names, values })} <> ${rhs.substitute({ names, values })}`;
       },
     });
   }
@@ -297,8 +295,8 @@ export abstract class Operand {
   }
 
   abstract substitute(params: {
-    attributeNames: AttributeNames;
-    attributeValues: AttributeValues;
+    names: AttributeNames;
+    values: AttributeValues;
   }): string;
 }
 
@@ -316,8 +314,8 @@ export class ExpressionAttribute extends Operand {
   // NOTE: the left hand side of this expression can only be a literal value (tested)
   exists(): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `attribute_exists(${this.substitute({ attributeNames, attributeValues })})`;
+      stringify: ({ names, values }) => {
+        return `attribute_exists(${this.substitute({ names, values })})`;
       },
     });
   }
@@ -331,8 +329,8 @@ export class ExpressionAttribute extends Operand {
   // NOTE: the right hand side of this expression *must be* an expression attribute (not a literal).
   isType(type: ExpressionValue<AttributeType>): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `attribute_type(${this.substitute({ attributeNames, attributeValues })}, ${type.substitute({ attributeNames, attributeValues })})`;
+      stringify: ({ names, values }) => {
+        return `attribute_type(${this.substitute({ names, values })}, ${type.substitute({ names, values })})`;
       },
     });
   }
@@ -340,18 +338,18 @@ export class ExpressionAttribute extends Operand {
   // NOTE: the left hand side of this expression can only be a literal value (tested)
   notExists(): Expression {
     return expression({
-      stringify: ({ attributeNames, attributeValues }) => {
-        return `attribute_not_exists(${this.substitute({ attributeNames, attributeValues })})`;
+      stringify: ({ names, values }) => {
+        return `attribute_not_exists(${this.substitute({ names, values })})`;
       },
     });
   }
 
   substitute(params: {
-    attributeNames: AttributeNames;
-    attributeValues: AttributeValues;
+    names: AttributeNames;
+    values: AttributeValues;
   }): string {
-    const { attributeNames } = params;
-    return attributeNames.substitute(this.path);
+    const { names } = params;
+    return names.substitute(this.path);
   }
 }
 
@@ -368,11 +366,11 @@ export class ExpressionValue<T extends AttributeValue> extends Operand {
   }
 
   substitute(params: {
-    attributeNames: AttributeNames;
-    attributeValues: AttributeValues;
+    names: AttributeNames;
+    values: AttributeValues;
   }): string {
-    const { attributeValues } = params;
-    return attributeValues.reference(this.value).toString();
+    const { values } = params;
+    return values.reference(this.value).toString();
   }
 }
 
@@ -391,8 +389,8 @@ class SizeOperand extends Operand {
   }
 
   substitute(params: {
-    attributeNames: AttributeNames;
-    attributeValues: AttributeValues;
+    names: AttributeNames;
+    values: AttributeValues;
   }): string {
     return `size(${this.inner.substitute(params)})`;
   }
