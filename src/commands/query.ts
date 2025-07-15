@@ -27,18 +27,15 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
   }
 
   toAwsCommandInput(): QueryCommandInput {
-    const attributeNames = AttributeNames.create();
-    const attributeValues = AttributeValues.create();
-    const expression = this.condition.stringify({
-      attributeNames,
-      attributeValues,
-    });
+    const names = AttributeNames.create();
+    const values = AttributeValues.create();
+    const expression = this.condition.stringify({ names, values });
     return {
       TableName: this.table,
       IndexName: this.index,
       KeyConditionExpression: expression,
-      ExpressionAttributeNames: attributeNames.getSubstitutions(),
-      ExpressionAttributeValues: attributeValues.getReferences(),
+      ExpressionAttributeNames: names.getSubstitutions(),
+      ExpressionAttributeValues: values.getReferences(),
       ExclusiveStartKey: this.exclusiveStartKey,
     };
   }

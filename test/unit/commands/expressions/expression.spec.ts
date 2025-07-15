@@ -24,12 +24,7 @@ describe("commands.expressions.expression", () => {
     const names = AttributeNames.create();
     const values = AttributeValues.create();
     const match = checkNotNull(
-      matcher.exec(
-        expression.stringify({
-          attributeNames: names,
-          attributeValues: values,
-        }),
-      ),
+      matcher.exec(expression.stringify({ names, values })),
     );
     return {
       names: names,
