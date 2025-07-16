@@ -5,6 +5,7 @@ import {
   type CreateTableParams,
   type PutItemParams,
   value,
+  where,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -90,9 +91,9 @@ describe(DynamoDBClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: attribute("sk")
+        condition: where(attribute("sk"))
           .isType(value("N"))
-          .or(attribute("pk").notExists()),
+          .or(where(attribute("pk")).notExists()),
       };
       await client.putItem(putItemParams);
 
