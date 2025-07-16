@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2025-07-17
+
+### Added
+
+- The first `UpdateExpression`s foundational unit: the `Assignement`! It is the only
+supported action so far, but his fully implemented: `path = operand`,
+`path = operand + operand`, `path = operand - operand` and the `if_not_exists` function
+can be used in place of any `operand`.
+
 ## [0.16.0] - 2025-07-16
 
 ### Changed
