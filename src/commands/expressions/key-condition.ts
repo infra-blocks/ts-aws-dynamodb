@@ -1,3 +1,4 @@
-import type { Expression } from "./expression.js";
+import type { Condition } from "./condition.js";
 
-export type KeyConditionExpression = Expression;
+// This is a straight up subset of {@link Condition}
+export type KeyConditionExpression = Condition;

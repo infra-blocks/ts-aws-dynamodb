@@ -2,19 +2,19 @@ import { PutCommand, type PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
-import type { ConditionExpression } from "./expressions/condition.js";
+import type { Condition } from "./expressions/condition.js";
 import type { Command } from "./types.js";
 
 export interface PutItemParams {
   table: string;
   item: Attributes;
-  condition?: ConditionExpression;
+  condition?: Condition;
 }
 
 export class PutItem implements Command<PutCommandInput, PutCommand> {
   private readonly table: string;
   private readonly item: Attributes;
-  private readonly condition?: ConditionExpression;
+  private readonly condition?: Condition;
 
   private constructor(params: PutItemParams) {
     const { table, item, condition } = params;

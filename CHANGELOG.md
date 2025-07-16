@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2025-07-16
+
+### Changed
+
+- Refactoring around the generic `Expression` context. While thinking about the
+upcoming `Update` expressions, it seemed a good idea to isolate operands and
+reuse their concepts differently within each expression types (`Condition`s and
+upcoming `Update`s). This lead to removing the `Expression` type altogether in
+favor of the `Condition` type.
+- To allow for coherent code reuse, `Condition`s are no longer created from operand
+type methods but rather require being wrapped in a `where` call first. For example,
+what used to be `attribute(<name>).exists()` is now `where(attribute(<name>)).exists()`.
+This way, functions that provide `Condition`s won't pollute functions that provide
+`Update`s.
+- Made `size` a floating function instead of a method as it reads more clearly
+and makes more sense within the new split. What used to be `attribute(<name>).size()`
+is now `where(size(attribute(<name>)))...`.
+
 ## [0.15.0] - 2025-07-15
 
 ### Changed
@@ -180,6 +198,10 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.15.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.14.0...v0.15.0
+[0.14.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.12.0...v0.13.0
+[0.12.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.8.0...v0.9.0

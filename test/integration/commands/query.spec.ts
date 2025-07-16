@@ -5,6 +5,7 @@ import {
   attribute,
   type CreateTableParams,
   value,
+  where,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -31,7 +32,7 @@ describe(DynamoDBClient.name, () => {
 
       const result = client.query({
         table: createTableParams.name,
-        condition: attribute("pk").equals(value("User#BigToto")),
+        condition: where(attribute("pk")).equals(value("User#BigToto")),
       });
       const items = await asyncArrayCollect(result);
       expect(items).to.have.lengthOf(1);
@@ -60,7 +61,7 @@ describe(DynamoDBClient.name, () => {
 
     const result = client.query({
       table: createTableParams.name,
-      condition: attribute("pk").equals(value("User#BigToto")),
+      condition: where(attribute("pk")).equals(value("User#BigToto")),
     });
     const items = await asyncArrayCollect(result);
     expect(items).to.have.lengthOf(1);

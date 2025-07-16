@@ -3,28 +3,27 @@ import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import {
+  AttributeOperand,
   attribute,
-  Expression,
-  ExpressionAttribute,
-  ExpressionValue,
+  Condition,
   not,
+  size,
+  ValueOperand,
   value,
+  where,
 } from "../../../../src/index.js";
 
-describe("commands.expressions.expression", () => {
-  function expressionMatch(params: {
-    expression: Expression;
-    matcher: RegExp;
-  }): {
+describe("commands.expressions.condition", () => {
+  function conditionMatch(params: { condition: Condition; matcher: RegExp }): {
     names: AttributeNames;
     values: AttributeValues;
     match: RegExpExecArray;
   } {
-    const { expression, matcher } = params;
+    const { condition, matcher } = params;
     const names = AttributeNames.create();
     const values = AttributeValues.create();
     const match = checkNotNull(
-      matcher.exec(expression.stringify({ names, values })),
+      matcher.exec(condition.stringify({ names, values })),
     );
     return {
       names: names,
@@ -34,14 +33,14 @@ describe("commands.expressions.expression", () => {
   }
 
   // TODO: test manually how to reference `.` paths (i.e is it #path or #path.#subpath)
-  describe(ExpressionAttribute.name, () => {
+  describe(AttributeOperand.name, () => {
     describe("beginsWith", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const expression = attribute(lhs).beginsWith(attribute(rhs));
-        const { match, names } = expressionMatch({
-          expression,
+        const expression = where(attribute(lhs)).beginsWith(attribute(rhs));
+        const { match, names } = conditionMatch({
+          condition: expression,
           matcher: /begins_with\((#\S+),\s*(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -52,8 +51,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).beginsWith(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).beginsWith(value(rhs)),
           matcher: /begins_with\((#\S+),\s*(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -67,8 +66,8 @@ describe("commands.expressions.expression", () => {
         const lhs = "test.attribute.lhs";
         const lower = "test.attribute.lower";
         const upper = "test.attribute.upper";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).between(
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).between(
             attribute(lower),
             attribute(upper),
           ),
@@ -85,8 +84,8 @@ describe("commands.expressions.expression", () => {
         const lhs = "test.attribute.lhs";
         const lower = "I am a value";
         const upper = "I am also a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).between(value(lower), value(upper)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).between(value(lower), value(upper)),
           matcher: /(#\S+)\s+BETWEEN\s+(:\S+)\s+AND\s+(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -101,8 +100,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).contains(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).contains(attribute(rhs)),
           matcher: /contains\((#\S+),\s*(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -113,8 +112,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).contains(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).contains(value(rhs)),
           matcher: /contains\((#\S+),\s*(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -127,8 +126,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).equals(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).equals(attribute(rhs)),
           matcher: /(#\S+)\s*=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -139,8 +138,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).equals(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).equals(value(rhs)),
           matcher: /(#\S+)\s*=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -151,8 +150,8 @@ describe("commands.expressions.expression", () => {
       it("should work with size rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I contain things";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).equals(value(rhs).size()),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).equals(size(value(rhs))),
           matcher: /(#\S+)\s*=\s*size\((:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -164,8 +163,8 @@ describe("commands.expressions.expression", () => {
     describe("exists", () => {
       it("should work", () => {
         const name = "test.attribute";
-        const { match, names } = expressionMatch({
-          expression: attribute(name).exists(),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(name)).exists(),
           matcher: /attribute_exists\((#.+)\)/,
         });
         const substitution = match[1];
@@ -176,8 +175,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).gt(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).gt(attribute(rhs)),
           matcher: /(#\S+)\s*>\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -188,8 +187,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).gt(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).gt(value(rhs)),
           matcher: /(#\S+)\s*>\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -202,8 +201,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).gte(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).gte(attribute(rhs)),
           matcher: /(#\S+)\s*>=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -214,8 +213,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).gte(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).gte(value(rhs)),
           matcher: /(#\S+)\s*>=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -227,7 +226,7 @@ describe("commands.expressions.expression", () => {
     describe("in", () => {
       it("should throw when no operands are provided", () => {
         expect(() => {
-          attribute("test.attribute.lhs").in();
+          where(attribute("test.attribute.lhs")).in();
         }).to.throw();
       });
       it("should throw when more than 100 operands are provided", () => {
@@ -235,7 +234,7 @@ describe("commands.expressions.expression", () => {
           attribute(`test.attribute.${i}`),
         );
         expect(() => {
-          attribute("test.attribute.lhs").in(...operands);
+          where(attribute("test.attribute.lhs")).in(...operands);
         }).to.throw();
       });
       it("should work with attribute operands", () => {
@@ -245,8 +244,10 @@ describe("commands.expressions.expression", () => {
           "test.attribute.operand2",
           "test.attribute.operand3",
         ];
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).in(...operands.map((op) => attribute(op))),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).in(
+            ...operands.map((op) => attribute(op)),
+          ),
           matcher: /(#\S+)\s+IN\s+\((#\S+),(#\S+),(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -265,8 +266,10 @@ describe("commands.expressions.expression", () => {
           "I am also a value",
           "I am yet another",
         ];
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).in(...operands.map((op) => value(op))),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).in(
+            ...operands.map((op) => value(op)),
+          ),
           matcher: /(#\S+)\s+IN\s+\((:\S+),(:\S+),(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -283,8 +286,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).lt(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).lt(attribute(rhs)),
           matcher: /(#\S+)\s*<\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -295,8 +298,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).lt(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).lt(value(rhs)),
           matcher: /(#\S+)\s*<\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -309,8 +312,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).lte(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).lte(attribute(rhs)),
           matcher: /(#\S+)\s*<=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -321,8 +324,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).lte(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).lte(value(rhs)),
           matcher: /(#\S+)\s*<=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -335,8 +338,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "test.attribute.rhs";
-        const { match, names } = expressionMatch({
-          expression: attribute(lhs).ne(attribute(rhs)),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(lhs)).ne(attribute(rhs)),
           matcher: /(#\S+)\s*<>\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -347,8 +350,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "test.attribute.lhs";
         const rhs = "I am a value";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(lhs).ne(value(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(lhs)).ne(value(rhs)),
           matcher: /(#\S+)\s*<>\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -360,8 +363,8 @@ describe("commands.expressions.expression", () => {
     describe("notExists", () => {
       it("should work", () => {
         const path = "test.attribute";
-        const { match, names } = expressionMatch({
-          expression: attribute(path).notExists(),
+        const { match, names } = conditionMatch({
+          condition: where(attribute(path)).notExists(),
           matcher: /attribute_not_exists\((#.+)\)/,
         });
         const substitution = match[1];
@@ -372,8 +375,8 @@ describe("commands.expressions.expression", () => {
       it("should work with string type", () => {
         const name = "test.attribute";
         const type = "S";
-        const { match, names, values } = expressionMatch({
-          expression: attribute(name).isType(value(type)),
+        const { match, names, values } = conditionMatch({
+          condition: where(attribute(name)).isType(value(type)),
           matcher: /attribute_type\((#.+),\s*(:.+)\)/,
         });
         const substitution = match[1];
@@ -383,13 +386,13 @@ describe("commands.expressions.expression", () => {
       });
     });
   });
-  describe(ExpressionValue.name, () => {
+  describe(ValueOperand.name, () => {
     describe("beginsWith", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).beginsWith(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).beginsWith(attribute(rhs)),
           matcher: /begins_with\((:\S+),\s*(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -400,8 +403,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).beginsWith(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).beginsWith(value(rhs)),
           matcher: /begins_with\((:\S+),\s*(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -415,8 +418,11 @@ describe("commands.expressions.expression", () => {
         const lhs = "I am a value";
         const lower = "test.attribute.lower";
         const upper = "test.attribute.upper";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).between(attribute(lower), attribute(upper)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).between(
+            attribute(lower),
+            attribute(upper),
+          ),
           matcher: /(:\S+)\s+BETWEEN\s+(#\S+)\s+AND\s+(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -430,8 +436,8 @@ describe("commands.expressions.expression", () => {
         const lhs = "I am a value";
         const lower = "I am a also value";
         const upper = "Geezus Louizus we're all values!";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).between(value(lower), value(upper)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).between(value(lower), value(upper)),
           matcher: /(:\S+)\s+BETWEEN\s+(:\S+)\s+AND\s+(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -446,8 +452,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).contains(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).contains(attribute(rhs)),
           matcher: /contains\((:\S+),\s*(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -458,8 +464,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).contains(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).contains(value(rhs)),
           matcher: /contains\((:\S+),\s*(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -472,8 +478,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).eq(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).eq(attribute(rhs)),
           matcher: /(:\S+)\s*=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -484,8 +490,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).eq(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).eq(value(rhs)),
           matcher: /(:\S+)\s*=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -496,8 +502,8 @@ describe("commands.expressions.expression", () => {
       it("should work with size rhs", () => {
         const lhs = "I am a value";
         const rhs = "I contain things";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).eq(value(rhs).size()),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).eq(size(value(rhs))),
           matcher: /(:\S+)\s*=\s*size\((:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -510,8 +516,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).gt(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).gt(attribute(rhs)),
           matcher: /(:\S+)\s*>\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -522,8 +528,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).gt(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).gt(value(rhs)),
           matcher: /(:\S+)\s*>\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -536,8 +542,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).gte(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).gte(attribute(rhs)),
           matcher: /(:\S+)\s*>=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -548,8 +554,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).gte(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).gte(value(rhs)),
           matcher: /(:\S+)\s*>=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -561,7 +567,7 @@ describe("commands.expressions.expression", () => {
     describe("in", () => {
       it("should throw when no operands are provided", () => {
         expect(() => {
-          value("I am a value").in();
+          where(value("I am a value")).in();
         }).to.throw();
       });
       it("should throw when more than 100 operands are provided", () => {
@@ -569,7 +575,7 @@ describe("commands.expressions.expression", () => {
           value(`I am a value ${i}`),
         );
         expect(() => {
-          value("I am a value").in(...operands);
+          where(value("I am a value")).in(...operands);
         }).to.throw();
       });
       it("should work with attribute operands", () => {
@@ -579,8 +585,10 @@ describe("commands.expressions.expression", () => {
           "test.attribute.operand2",
           "test.attribute.operand3",
         ];
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).in(...operands.map((op) => attribute(op))),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).in(
+            ...operands.map((op) => attribute(op)),
+          ),
           matcher: /(:\S+)\s+IN\s+\((#\S+),(#\S+),(#\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -599,8 +607,8 @@ describe("commands.expressions.expression", () => {
           "I am yet another",
           "Geezus Louizus we're all values!",
         ];
-        const { match, values } = expressionMatch({
-          expression: value(lhs).in(...operands.map((op) => value(op))),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).in(...operands.map((op) => value(op))),
           matcher: /(:\S+)\s+IN\s+\((:\S+),(:\S+),(:\S+)\)/,
         });
         const lhsSubstitution = match[1];
@@ -617,8 +625,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).lt(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).lt(attribute(rhs)),
           matcher: /(:\S+)\s*<\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -629,8 +637,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).lt(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).lt(value(rhs)),
           matcher: /(:\S+)\s*<\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -643,8 +651,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).lte(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).lte(attribute(rhs)),
           matcher: /(:\S+)\s*<=\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -655,8 +663,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).lte(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).lte(value(rhs)),
           matcher: /(:\S+)\s*<=\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -669,8 +677,8 @@ describe("commands.expressions.expression", () => {
       it("should work with attribute rhs", () => {
         const lhs = "I am a value";
         const rhs = "test.attribute.rhs";
-        const { match, names, values } = expressionMatch({
-          expression: value(lhs).ne(attribute(rhs)),
+        const { match, names, values } = conditionMatch({
+          condition: where(value(lhs)).ne(attribute(rhs)),
           matcher: /(:\S+)\s*<>\s*(#\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -681,8 +689,8 @@ describe("commands.expressions.expression", () => {
       it("should work with value rhs", () => {
         const lhs = "I am a value";
         const rhs = "I am also a value";
-        const { match, values } = expressionMatch({
-          expression: value(lhs).ne(value(rhs)),
+        const { match, values } = conditionMatch({
+          condition: where(value(lhs)).ne(value(rhs)),
           matcher: /(:\S+)\s*<>\s*(:\S+)/,
         });
         const lhsSubstitution = match[1];
@@ -692,15 +700,15 @@ describe("commands.expressions.expression", () => {
       });
     });
   });
-  describe(Expression.name, () => {
+  describe(Condition.name, () => {
     describe("and", () => {
       it("should properly combine two expressions", () => {
         const left = "attr.left";
         const right = "attr.right";
-        const leftExpression = attribute(left).exists();
-        const rightExpression = attribute(right).notExists();
-        const { match, names } = expressionMatch({
-          expression: leftExpression.and(rightExpression),
+        const leftCondition = where(attribute(left)).exists();
+        const rightCondition = where(attribute(right)).notExists();
+        const { match, names } = conditionMatch({
+          condition: leftCondition.and(rightCondition),
           matcher:
             /\(attribute_exists\((#.+)\) AND attribute_not_exists\((#.+)\)\)/,
         });
@@ -714,10 +722,10 @@ describe("commands.expressions.expression", () => {
       it("should properly combine two expressions", () => {
         const left = "attr.left";
         const right = "attr.right";
-        const leftExpression = attribute(left).exists();
-        const rightExpression = attribute(right).notExists();
-        const { match, names } = expressionMatch({
-          expression: leftExpression.or(rightExpression),
+        const leftCondition = where(attribute(left)).exists();
+        const rightCondition = where(attribute(right)).notExists();
+        const { match, names } = conditionMatch({
+          condition: leftCondition.or(rightCondition),
           matcher:
             /\(attribute_exists\((#.+)\) OR attribute_not_exists\((#.+)\)\)/,
         });
@@ -731,8 +739,8 @@ describe("commands.expressions.expression", () => {
   describe(not.name, () => {
     it("should properly negate the expression", () => {
       const name = "test.attribute";
-      const { match, names } = expressionMatch({
-        expression: not(attribute(name).exists()),
+      const { match, names } = conditionMatch({
+        condition: not(where(attribute(name)).exists()),
         matcher: /NOT \(attribute_exists\((#.+)\)\)/,
       });
       const substitution = match[1];
