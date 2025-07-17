@@ -46,7 +46,7 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
       ...input,
       ConditionExpression: expression,
       ExpressionAttributeNames: names.getSubstitutions(),
-      ExpressionAttributeValues: values.getReferences(),
+      ExpressionAttributeValues: values.getSubstitutions(),
     };
   }
 

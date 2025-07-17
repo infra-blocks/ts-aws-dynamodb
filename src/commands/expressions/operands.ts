@@ -26,7 +26,7 @@ export class ValueOperand<T extends AttributeValue> implements IOperand {
     values: AttributeValues;
   }): string {
     const { values } = params;
-    return values.reference(this.value).toString();
+    return values.substitute(this.value).toString();
   }
 }
 

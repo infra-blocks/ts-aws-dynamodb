@@ -49,7 +49,7 @@ describe("commands.expressions.update", () => {
           matcher: /(#\S+)\s+=\s+(:\S+)/,
         });
         expect(match[1]).to.equal(names.substitute(path));
-        expect(match[2]).to.equal(values.reference(operand));
+        expect(match[2]).to.equal(values.substitute(operand));
       });
       it("should work with an if_not_exists operand with attribute default value", () => {
         const path = "attr.path";
@@ -76,7 +76,7 @@ describe("commands.expressions.update", () => {
         });
         expect(match[1]).to.equal(names.substitute(path));
         expect(match[2]).to.equal(names.substitute(otherPath));
-        expect(match[3]).to.equal(values.reference(defaultValue));
+        expect(match[3]).to.equal(values.substitute(defaultValue));
       });
       it("should be able to add an attribute as part of the assignment", () => {
         const path = "attr.path";
@@ -102,7 +102,7 @@ describe("commands.expressions.update", () => {
         });
         expect(match[1]).to.equal(names.substitute(path));
         expect(match[2]).to.equal(names.substitute(lhs));
-        expect(match[3]).to.equal(values.reference(rhs));
+        expect(match[3]).to.equal(values.substitute(rhs));
       });
       it("should be able to add an attribute if it exists or a default value otherwise", () => {
         const path = "attr.path";
@@ -119,7 +119,7 @@ describe("commands.expressions.update", () => {
         expect(match[1]).to.equal(names.substitute(path));
         expect(match[2]).to.equal(names.substitute(lhs));
         expect(match[3]).to.equal(names.substitute(rhs));
-        expect(match[4]).to.equal(values.reference(defaultValue));
+        expect(match[4]).to.equal(values.substitute(defaultValue));
       });
       it("should be able to subtract an attribute as part of the assignment", () => {
         const path = "attr.path";
@@ -145,7 +145,7 @@ describe("commands.expressions.update", () => {
         });
         expect(match[1]).to.equal(names.substitute(path));
         expect(match[2]).to.equal(names.substitute(lhs));
-        expect(match[3]).to.equal(values.reference(rhs));
+        expect(match[3]).to.equal(values.substitute(rhs));
       });
       it("should be able to subtract an attribute if it exists or a default value otherwise", () => {
         const path = "attr.path";
@@ -162,7 +162,7 @@ describe("commands.expressions.update", () => {
         expect(match[1]).to.equal(names.substitute(path));
         expect(match[2]).to.equal(names.substitute(lhs));
         expect(match[3]).to.equal(names.substitute(rhs));
-        expect(match[4]).to.equal(values.reference(defaultValue));
+        expect(match[4]).to.equal(values.substitute(defaultValue));
       });
     });
   });
