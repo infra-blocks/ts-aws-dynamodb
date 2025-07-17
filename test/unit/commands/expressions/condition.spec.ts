@@ -58,7 +58,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("between", () => {
@@ -92,8 +92,8 @@ describe("commands.expressions.condition", () => {
         const lowerSubstitution = match[2];
         const upperSubstitution = match[3];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(lowerSubstitution).to.equal(values.reference(lower));
-        expect(upperSubstitution).to.equal(values.reference(upper));
+        expect(lowerSubstitution).to.equal(values.substitute(lower));
+        expect(upperSubstitution).to.equal(values.substitute(upper));
       });
     });
     describe("contains", () => {
@@ -119,7 +119,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("equals", () => {
@@ -145,7 +145,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
       it("should work with size rhs", () => {
         const lhs = "test.attribute.lhs";
@@ -157,7 +157,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("exists", () => {
@@ -194,7 +194,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("greaterThanOrEquals", () => {
@@ -220,7 +220,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("in", () => {
@@ -277,9 +277,9 @@ describe("commands.expressions.condition", () => {
         const operand2Substitution = match[3];
         const operand3Substitution = match[4];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(operand1Substitution).to.equal(values.reference(operands[0]));
-        expect(operand2Substitution).to.equal(values.reference(operands[1]));
-        expect(operand3Substitution).to.equal(values.reference(operands[2]));
+        expect(operand1Substitution).to.equal(values.substitute(operands[0]));
+        expect(operand2Substitution).to.equal(values.substitute(operands[1]));
+        expect(operand3Substitution).to.equal(values.substitute(operands[2]));
       });
     });
     describe("lowerThan", () => {
@@ -305,7 +305,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("lowerThanOrEquals", () => {
@@ -331,7 +331,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("notEquals", () => {
@@ -357,7 +357,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("notExists", () => {
@@ -382,7 +382,7 @@ describe("commands.expressions.condition", () => {
         const substitution = match[1];
         const reference = match[2];
         expect(substitution).to.equal(names.substitute(name));
-        expect(reference).to.equal(values.reference(type));
+        expect(reference).to.equal(values.substitute(type));
       });
     });
   });
@@ -397,7 +397,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -409,8 +409,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("between", () => {
@@ -428,7 +428,7 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const lowerSubstitution = match[2];
         const upperSubstitution = match[3];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(lowerSubstitution).to.equal(names.substitute(lower));
         expect(upperSubstitution).to.equal(names.substitute(upper));
       });
@@ -443,9 +443,9 @@ describe("commands.expressions.condition", () => {
         const lhsSubstitution = match[1];
         const lowerSubstitution = match[2];
         const upperSubstitution = match[3];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(lowerSubstitution).to.equal(values.reference(lower));
-        expect(upperSubstitution).to.equal(values.reference(upper));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(lowerSubstitution).to.equal(values.substitute(lower));
+        expect(upperSubstitution).to.equal(values.substitute(upper));
       });
     });
     describe("contains", () => {
@@ -458,7 +458,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -470,8 +470,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("equals", () => {
@@ -484,7 +484,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -496,8 +496,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
       it("should work with size rhs", () => {
         const lhs = "I am a value";
@@ -508,8 +508,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("greaterThan", () => {
@@ -522,7 +522,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -534,8 +534,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("greaterThanOrEquals", () => {
@@ -548,7 +548,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -560,8 +560,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("in", () => {
@@ -595,7 +595,7 @@ describe("commands.expressions.condition", () => {
         const operand1Substitution = match[2];
         const operand2Substitution = match[3];
         const operand3Substitution = match[4];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(operand1Substitution).to.equal(names.substitute(operands[0]));
         expect(operand2Substitution).to.equal(names.substitute(operands[1]));
         expect(operand3Substitution).to.equal(names.substitute(operands[2]));
@@ -615,10 +615,10 @@ describe("commands.expressions.condition", () => {
         const operand1Substitution = match[2];
         const operand2Substitution = match[3];
         const operand3Substitution = match[4];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(operand1Substitution).to.equal(values.reference(operands[0]));
-        expect(operand2Substitution).to.equal(values.reference(operands[1]));
-        expect(operand3Substitution).to.equal(values.reference(operands[2]));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(operand1Substitution).to.equal(values.substitute(operands[0]));
+        expect(operand2Substitution).to.equal(values.substitute(operands[1]));
+        expect(operand3Substitution).to.equal(values.substitute(operands[2]));
       });
     });
     describe("lowerThan", () => {
@@ -631,7 +631,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -643,8 +643,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("lowerThanOrEquals", () => {
@@ -657,7 +657,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -669,8 +669,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
     describe("notEquals", () => {
@@ -683,7 +683,7 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
         expect(rhsSubstitution).to.equal(names.substitute(rhs));
       });
       it("should work with value rhs", () => {
@@ -695,8 +695,8 @@ describe("commands.expressions.condition", () => {
         });
         const lhsSubstitution = match[1];
         const rhsSubstitution = match[2];
-        expect(lhsSubstitution).to.equal(values.reference(lhs));
-        expect(rhsSubstitution).to.equal(values.reference(rhs));
+        expect(lhsSubstitution).to.equal(values.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(rhs));
       });
     });
   });

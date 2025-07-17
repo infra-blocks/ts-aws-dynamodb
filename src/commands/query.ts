@@ -35,7 +35,7 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
       IndexName: this.index,
       KeyConditionExpression: expression,
       ExpressionAttributeNames: names.getSubstitutions(),
-      ExpressionAttributeValues: values.getReferences(),
+      ExpressionAttributeValues: values.getSubstitutions(),
       ExclusiveStartKey: this.exclusiveStartKey,
     };
   }
