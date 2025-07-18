@@ -29,7 +29,9 @@ describe(DynamoDBClient.name, () => {
         item: {
           pk: "BigIron#1",
           // Going to update this field later.
-          field: 42,
+          stuff: {
+            "kebab-field": 42,
+          },
         },
       };
       await client.putItem(putItemParams);
@@ -41,11 +43,11 @@ describe(DynamoDBClient.name, () => {
         // Maybe use a generic type in the field that defaults to record?
         partitionKey: { name: "pk", value: putItemParams.item.pk },
         update: [
-          assign(attribute("field")).to(
-            ifNotExists(attribute("add"), value(0)),
+          assign(attribute("stuff.kebab-field")).to(
+            ifNotExists(attribute("default.add"), value(0)),
           ),
         ],
-        condition: where(attribute("field")).exists(),
+        condition: where(attribute("stuff.kebab-field")).exists(),
       });
       // Check the result.
       const item = await client.getItem({
@@ -54,7 +56,9 @@ describe(DynamoDBClient.name, () => {
       });
       expect(item).to.deep.include({
         pk: putItemParams.item.pk,
-        field: 0,
+        stuff: {
+          "kebab-field": 0,
+        },
       });
     });
   });
