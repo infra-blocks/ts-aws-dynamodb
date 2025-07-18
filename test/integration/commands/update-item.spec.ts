@@ -6,6 +6,7 @@ import {
   type CreateTableParams,
   ifNotExists,
   type PutItemParams,
+  remove,
   value,
   where,
 } from "../../../src/index.js";
@@ -31,6 +32,7 @@ describe(DynamoDBClient.name, () => {
           // Going to update this field later.
           stuff: {
             "kebab-field": 42,
+            removeMe: "please",
           },
         },
       };
@@ -46,6 +48,7 @@ describe(DynamoDBClient.name, () => {
           assign(attribute("stuff.kebab-field")).to(
             ifNotExists(attribute("default.add"), value(0)),
           ),
+          remove(attribute("stuff.removeMe")),
         ],
         condition: where(attribute("stuff.kebab-field")).exists(),
       });
