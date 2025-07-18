@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1] - 2025-07-18
+
+### Fixed
+
+- Changed the attribute name substitution logic to correctly implement nested path.
+Before, the substitution of `field.nested` would return `#field.nested`. This was
+invalid because the substitution mapped `#field.nested` to `field.nested`, whereas
+it really should map every path token alone. See
+ [here](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ExpressionAttributeNames.html#Expressions.ExpressionAttributeNames.NestedAttributes).
+Now, the algorithm correctly generates a substitution per path token. I.e., the previous
+example resolves to `#attr1.#attr2`, with one substitution per path. This new naming
+convention of substitutes handles the case of special characters: they won't be found
+in the substitutions anymore.
+
+
+
 ## [0.18.0] - 2025-07-18
 
 ### Added

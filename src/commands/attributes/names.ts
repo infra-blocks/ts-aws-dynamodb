@@ -5,6 +5,8 @@ import type { AttributePath } from "../../types.js";
  */
 export type Substitution = `#${string}`;
 
+// TODO: handle the ambiguous case where an attribute name contains a `.` character (and isn't a path). This might require adding vocabulary to operands.
+// For example, it might be fixed by adding a `literal()` operand.
 /**
  * Represents a set of attribute names used in a condition expression.
  *
@@ -43,15 +45,25 @@ export class AttributeNames {
    * @returns The substitution associated with the attribute path.
    */
   substitute(attribute: AttributePath): Substitution {
-    const current = this.names.get(attribute);
-    if (current != null) {
-      // If the attribute is already known, we return its current substitution.
-      return current;
+    if (attribute.length === 0) {
+      throw new Error(
+        "error substituting attribute: empty attribute path not allowed",
+      );
     }
-    // Otherwise, we generate a new substitution for the attribute.
-    const substitute = this.generateSubstitute(attribute);
-    this.names.set(attribute, substitute);
-    return substitute;
+
+    const pathTokens = attribute.split(".");
+    const result = [];
+    for (const token of pathTokens) {
+      if (token.length === 0) {
+        throw new Error(
+          `error substituting attribute ${attribute}: empty path token not allowed`,
+        );
+      }
+      const substitute =
+        this.names.get(token) ?? this.getAndSetNextSubstituteFor(token);
+      result.push(substitute);
+    }
+    return result.join(".") as Substitution;
   }
 
   /**
@@ -72,8 +84,10 @@ export class AttributeNames {
     return result;
   }
 
-  private generateSubstitute(attribute: AttributePath): Substitution {
-    return `#${attribute}` as Substitution;
+  private getAndSetNextSubstituteFor(path: AttributePath): Substitution {
+    const nextSubstitute = `#attr${this.names.size + 1}` as Substitution;
+    this.names.set(path, nextSubstitute);
+    return nextSubstitute;
   }
 
   static create(): AttributeNames {
