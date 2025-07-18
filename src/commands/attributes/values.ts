@@ -17,11 +17,9 @@ export type ValueReference = `:${string}`;
  */
 export class AttributeValues {
   private readonly values: Map<AttributeValue, ValueReference>;
-  private counter: number;
 
   private constructor() {
     this.values = new Map<AttributeValue, ValueReference>();
-    this.counter = 0;
   }
 
   /**
@@ -37,15 +35,7 @@ export class AttributeValues {
    * @returns The reference associated with the attribute value.
    */
   substitute(value: AttributeValue): ValueReference {
-    const existing = this.values.get(value);
-    if (existing != null) {
-      // If the value is already known, we do not need to generate a new reference.
-      return existing;
-    }
-
-    const reference = this.nextReference();
-    this.values.set(value, reference);
-    return reference;
+    return this.values.get(value) ?? this.getAndSetNextSubstitutionFor(value);
   }
 
   /**
@@ -66,9 +56,9 @@ export class AttributeValues {
     return result;
   }
 
-  private nextReference(): ValueReference {
-    const reference = `:${this.counter}` as ValueReference;
-    this.counter += 1;
+  private getAndSetNextSubstitutionFor(value: AttributeValue): ValueReference {
+    const reference = `:value${this.values.size + 1}` as ValueReference;
+    this.values.set(value, reference);
     return reference;
   }
 

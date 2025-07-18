@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.18.1] - 2025-07-18
 
+### Changed
+
+- To follow conventions across the board, the `AttributeValues` substitution generation
+logic was also changed. This does not intentionally fix any known bug, however.
+Instead of generating substitutes as such: `:<number>`, they are now slightly more
+verbose and readable by being generated as such: `:value<number>`.
+
 ### Fixed
 
 - Changed the attribute name substitution logic to correctly implement nested path.
