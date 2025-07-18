@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2025-07-18
+
+### Added
+
+- Support for removal actions in update expressions through the exported function
+`remove`. You use it like that pal: `update: [remove(<name>)]`. There have it.
+
 ## [0.18.1] - 2025-07-18
 
 ### Changed
@@ -25,8 +32,6 @@ Now, the algorithm correctly generates a substitution per path token. I.e., the 
 example resolves to `#attr1.#attr2`, with one substitution per path. This new naming
 convention of substitutes handles the case of special characters: they won't be found
 in the substitutions anymore.
-
-
 
 ## [0.18.0] - 2025-07-18
 
@@ -254,6 +259,11 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.19.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.18.0...v0.19.0
+[0.18.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.17.1...v0.18.0
+[0.17.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.17.0...v0.17.1
+[0.17.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.16.0...v0.17.0
+[0.16.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.12.0...v0.13.0

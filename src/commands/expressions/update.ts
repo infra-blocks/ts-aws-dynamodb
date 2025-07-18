@@ -30,6 +30,7 @@ export type UpdateExpressionParams = ReadonlyArray<UpdateAction>;
 
 interface UpdateExpressionClauses {
   set?: SetAction[];
+  remove?: RemoveAction[];
 }
 
 export class UpdateExpression implements IExpression {
@@ -52,6 +53,13 @@ export class UpdateExpression implements IExpression {
           .join(",")}`,
       );
     }
+    if (this.clauses.remove != null) {
+      parts.push(
+        `REMOVE ${this.clauses.remove
+          .map((action) => action.stringify({ names, values }))
+          .join(",")}`,
+      );
+    }
     return parts.join("\n");
   }
 
@@ -63,11 +71,11 @@ export class UpdateExpression implements IExpression {
         action instanceof PlusAssignment ||
         action instanceof MinusAssignment
       ) {
-        if (clauses.set != null) {
-          clauses.set.push(action);
-        } else {
-          clauses.set = [action];
-        }
+        clauses.set ??= [];
+        clauses.set.push(action);
+      } else if (action instanceof RemoveAction) {
+        clauses.remove ??= [];
+        clauses.remove.push(action);
       } else {
         throw new Error("unknown action type in update expression");
       }
@@ -80,16 +88,12 @@ export interface IUpdateAction {
   stringify(params: { names: AttributeNames; values: AttributeValues }): string;
 }
 
-export type UpdateAction = SetAction;
+export type UpdateAction = SetAction | RemoveAction;
 
 export type SetAction = Assignment | PlusAssignment | MinusAssignment;
 
 export type SetOperand = Operand | IfNotExistsOperand;
 
-// Note: incrementation works with attribute names and values no prob.
-// There can only be one "+" sign.
-// Nothing forces the operation to happen on the same attribute. For example: SET x = y + 2 is valid and should
-// be supported. Increment should only be a fast track there.
 class Assignment implements IUpdateAction {
   private readonly path: AttributeOperand;
   private readonly operand: SetOperand;
@@ -191,6 +195,37 @@ class AssignmentBuilder {
 // TODO: increment/decrement utilities built on top of the assignments.
 export function assign(path: AttributeOperand): AssignmentBuilder {
   return new AssignmentBuilder(path);
+}
+
+export class RemoveAction implements IUpdateAction {
+  private readonly path: AttributeOperand;
+
+  private constructor(path: AttributeOperand) {
+    this.path = path;
+  }
+
+  stringify(params: {
+    names: AttributeNames;
+    values: AttributeValues;
+  }): string {
+    const { names, values } = params;
+    return this.path.substitute({ names, values });
+  }
+
+  static from(path: AttributeOperand): RemoveAction {
+    return new RemoveAction(path);
+  }
+}
+
+/**
+ * Returns an action that will remove the specific attribute at the provided path.
+ *
+ * @param path - The path of the attribute to remove.
+ *
+ * @returns A {@link RemoveAction} corresponding to the path provided.
+ */
+export function remove(path: AttributeOperand): RemoveAction {
+  return RemoveAction.from(path);
 }
 
 export class IfNotExistsOperand implements IOperand {
