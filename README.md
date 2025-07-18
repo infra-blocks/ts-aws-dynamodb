@@ -5,8 +5,8 @@
 
 A convenience library wrapper around [`@aws-sdk/client-dynamodb`](https://www.npmjs.com/package/@aws-sdk/client-dynamodb) and
 [`@aws-sdk/lib-dynamodb`](https://www.npmjs.com/package/@aws-sdk/lib-dynamodb). The wrapper offers:
-- More type safe interfaces (trough the use of descriptive types, such as for condition expressions).
-- More conventional field names. Input and output fields use the conventional `camelCase` JS/TS convention over the `PascalCase`
-imposed by the AWS APIs.
+- A type safe expression language that automatically handles the aliasing of attribute names and values.
+- More conventional field names. Input and output fields use the more common `camelCase` JS/TS convention
+over the `PascalCase` imposed by the AWS APIs.
 - Every client error is wrapped into a error adding description about which operation triggered the error.
 - Pagination is provided for APIs that support it and exposed as `AsyncIterators`.

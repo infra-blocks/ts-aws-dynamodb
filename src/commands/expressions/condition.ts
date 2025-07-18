@@ -1,6 +1,7 @@
 import type { AttributeType } from "../../types.js";
 import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
+import type { IExpression } from "./expression.js";
 import {
   AttributeOperand,
   type IOperand,
@@ -25,10 +26,10 @@ export interface ConditionParams {
   stringify: Stringifier;
 }
 
-export class Condition {
+export class Condition implements IExpression {
   private readonly stringifier: Stringifier;
 
-  constructor(params: ConditionParams) {
+  private constructor(params: ConditionParams) {
     const { stringify } = params;
     this.stringifier = stringify;
   }
@@ -51,7 +52,7 @@ export class Condition {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
    */
   and(other: Condition): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         const left = this.stringify({ names, values });
         const right = other.stringify({ names, values });
@@ -70,13 +71,26 @@ export class Condition {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
    */
   or(other: Condition): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         const left = this.stringify({ names, values });
         const right = other.stringify({ names, values });
         return `(${left} OR ${right})`;
       },
     });
+  }
+
+  /**
+   * Factory method to create a new {@link Condition} instance.
+   *
+   * This is not meant to be called outside this package.
+   *
+   * @param params - The parameters to create the condition.
+   *
+   * @returns A new {@link Condition} instance.
+   */
+  static from(params: ConditionParams): Condition {
+    return new Condition(params);
   }
 }
 
@@ -90,16 +104,11 @@ export class Condition {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
  */
 export function not(inner: Condition): Condition {
-  return condition({
+  return Condition.from({
     stringify: ({ names, values }) => {
       return `NOT (${inner.stringify({ names, values })})`;
     },
   });
-}
-
-// TODO: make this a static factory?
-function condition(params: ConditionParams): Condition {
-  return new Condition(params);
 }
 
 // NOTE: methods here means that both sides of the conditions can either be attribute names or attribute values.
@@ -120,7 +129,7 @@ export class OperandConditionBuilder<T extends Operand> {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
    */
   beginsWith(rhs: Operand<string>): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `begins_with(${this.substitute({ names, values })}, ${rhs.substitute({ names, values })})`;
       },
@@ -141,7 +150,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: test with size operands.
   between(lower: ConditionOperand, upper: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} BETWEEN ${lower.substitute({ names, values })} AND ${upper.substitute({ names, values })}`;
       },
@@ -159,7 +168,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: test with size operands.
   contains(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `contains(${this.substitute({ names, values })}, ${rhs.substitute({ names, values })})`;
       },
@@ -177,7 +186,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: this should be typed better once moved out. It accepts the interface only to make the tests compile.
   equals(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} = ${rhs.substitute({ names, values })}`;
       },
@@ -200,7 +209,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: test that both sides can be size manually, then add the unit tests if it makes sense.
   greaterThan(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} > ${rhs.substitute({ names, values })}`;
       },
@@ -223,7 +232,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: test that both sides can be size manually, then add the unit tests if it makes sense.
   greaterThanOrEquals(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} >= ${rhs.substitute({ names, values })}`;
       },
@@ -256,7 +265,7 @@ export class OperandConditionBuilder<T extends Operand> {
       );
     }
 
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         const operandsString = operands
           .map((operand) => operand.substitute({ names, values }))
@@ -277,7 +286,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   // TODO: test that both sides can be size manually, then add the unit tests if it makes sense.
   lowerThan(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} < ${rhs.substitute({ names, values })}`;
       },
@@ -300,7 +309,7 @@ export class OperandConditionBuilder<T extends Operand> {
    */
   //TODO: test that both sides can be size manually, then add the unit tests if it makes sense.
   lowerThanOrEquals(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} <= ${rhs.substitute({ names, values })}`;
       },
@@ -322,7 +331,7 @@ export class OperandConditionBuilder<T extends Operand> {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
    */
   notEquals(rhs: ConditionOperand): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `${this.substitute({ names, values })} <> ${rhs.substitute({ names, values })}`;
       },
@@ -349,7 +358,7 @@ export class AttributeConditionBuilder extends OperandConditionBuilder<Attribute
    */
   // NOTE: the left hand side of this condition can only be a literal value (tested)
   exists(): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `attribute_exists(${this.substitute({ names, values })})`;
       },
@@ -361,7 +370,7 @@ export class AttributeConditionBuilder extends OperandConditionBuilder<Attribute
    */
   // NOTE: the left hand side of this condition can only be a literal value (tested)
   notExists(): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `attribute_not_exists(${this.substitute({ names, values })})`;
       },
@@ -376,7 +385,7 @@ export class AttributeConditionBuilder extends OperandConditionBuilder<Attribute
   // NOTE: the left hand side of this condition *can be* an attribute value pointing to a valid path.
   // NOTE: the right hand side of this condition *must be* an condition attribute (not a literal).
   isType(type: ValueOperand<AttributeType>): Condition {
-    return condition({
+    return Condition.from({
       stringify: ({ names, values }) => {
         return `attribute_type(${this.substitute({ names, values })}, ${type.substitute({ names, values })})`;
       },

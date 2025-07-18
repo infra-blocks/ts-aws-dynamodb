@@ -9,9 +9,9 @@ can be present at least once in an update. The clauses are:
 SET actions can use the `if_not_exists` function, which returns the value of the attribute if it exists, or a default value if it does not.
 You can also use SET to add or subtract from an attribute that is of type Number. To perform multiple SET actions, separate them with commas.
 */
-
 import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
+import type { IExpression } from "./expression.js";
 import type { AttributeOperand, IOperand, Operand } from "./operands.js";
 
 /*
@@ -26,7 +26,55 @@ Values here can be attributes, values or the if_not_exists function. It should t
 sense.
 */
 
-// TODO: updateItem command to take in the parameters and an "actions" array that contains actions generated here.
+export type UpdateExpressionParams = ReadonlyArray<UpdateAction>;
+
+interface UpdateExpressionClauses {
+  set?: SetAction[];
+}
+
+export class UpdateExpression implements IExpression {
+  private readonly clauses: UpdateExpressionClauses;
+
+  private constructor(clauses: UpdateExpressionClauses) {
+    this.clauses = clauses;
+  }
+
+  stringify(params: {
+    names: AttributeNames;
+    values: AttributeValues;
+  }): string {
+    const { names, values } = params;
+    const parts: string[] = [];
+    if (this.clauses.set != null) {
+      parts.push(
+        `SET ${this.clauses.set
+          .map((action) => action.stringify({ names, values }))
+          .join(",")}`,
+      );
+    }
+    return parts.join("\n");
+  }
+
+  static from(params: UpdateExpressionParams): UpdateExpression {
+    const clauses: UpdateExpressionClauses = {};
+    for (const action of params) {
+      if (
+        action instanceof Assignment ||
+        action instanceof PlusAssignment ||
+        action instanceof MinusAssignment
+      ) {
+        if (clauses.set != null) {
+          clauses.set.push(action);
+        } else {
+          clauses.set = [action];
+        }
+      } else {
+        throw new Error("unknown action type in update expression");
+      }
+    }
+    return new UpdateExpression(clauses);
+  }
+}
 
 export interface IUpdateAction {
   stringify(params: { names: AttributeNames; values: AttributeValues }): string;

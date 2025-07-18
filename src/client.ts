@@ -12,6 +12,7 @@ import {
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import { PutItem, type PutItemParams } from "./commands/put-item.js";
 import { Query, type QueryParams } from "./commands/query.js";
+import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
 import {
   WriteTransaction,
   type WriteTransactionParams,
@@ -254,6 +255,36 @@ export class DynamoDbClient {
         },
       },
     );
+  }
+
+  /**
+   * Updates an item using the UpdateItem API.
+   *
+   * This API *updates* or create an item. In contrast to the {@link putItem} method,
+   * if the item already exists, updates do not replace the entire item, but rather
+   * apply the requested update actions to the existing item. Refer to the API
+   * documentation for more details.
+   *
+   * In this design, the `params.update` is a list of {@link UpdateAction}s that
+   * can be constructed using the provided factory methods, such as {@link assign}.
+   *
+   * @param params - The parameters to use to update the item.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html
+   */
+  async updateItem(params: UpdateItemParams): Promise<void> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("updateItem(%s)", JSON.stringify(params));
+    }
+
+    try {
+      const command = UpdateItem.from(params);
+      await this.client.send(command.toAwsCommand());
+    } catch (err) {
+      throw new DynamoDbClientError("error while updating item", {
+        cause: err,
+      });
+    }
   }
 
   /**
