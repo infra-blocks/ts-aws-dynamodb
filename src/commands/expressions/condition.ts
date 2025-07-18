@@ -1,6 +1,7 @@
 import type { AttributeType } from "../../types.js";
 import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
+import type { IExpression } from "./expression.js";
 import {
   AttributeOperand,
   type IOperand,
@@ -25,7 +26,7 @@ export interface ConditionParams {
   stringify: Stringifier;
 }
 
-export class Condition {
+export class Condition implements IExpression {
   private readonly stringifier: Stringifier;
 
   private constructor(params: ConditionParams) {

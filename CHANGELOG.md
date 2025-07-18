@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2025-07-18
+
+### Added
+
+- Added baseline support for `client.updateItem`. It can handle condition expressions
+are update expressions. The update expressions, however, currently only support the
+`SET` clauses with the `assign` action type. More are coming.
+
+### Changed
+
+- Removed the `condition` factory function in favor of having a more conventional
+`Condition.from` static factory. This should not impact client code, however, as
+the condition function was not meant to be called outside. Neither was the `Condition`
+constructor, which is now private and only accessed by the new factory method.
+
 ## [0.17.1] - 2025-07-17
 
 ### Changed

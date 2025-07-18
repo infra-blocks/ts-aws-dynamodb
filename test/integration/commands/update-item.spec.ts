@@ -1,0 +1,61 @@
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { expect } from "@infra-blocks/test";
+import {
+  assign,
+  attribute,
+  type CreateTableParams,
+  ifNotExists,
+  type PutItemParams,
+  value,
+  where,
+} from "../../../src/index.js";
+import { dropAllTables } from "../fixtures.js";
+
+describe(DynamoDBClient.name, () => {
+  afterEach("clean up", dropAllTables());
+
+  describe("updateItem", () => {
+    it("should work on table without sort key", async function () {
+      const client = this.createClient();
+      const createTableParams: CreateTableParams = {
+        name: "test-table",
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+      const putItemParams: PutItemParams = {
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+          // Going to update this field later.
+          field: 42,
+        },
+      };
+      await client.putItem(putItemParams);
+      // Test the update.
+      await client.updateItem({
+        table: createTableParams.name,
+        // TODO: review this design to be more concise? Like call it just key with two fields?
+        // The native implementation uses a record, which is good enough. This can only fail at runtime for now anyway.
+        // Maybe use a generic type in the field that defaults to record?
+        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        update: [
+          assign(attribute("field")).to(
+            ifNotExists(attribute("add"), value(0)),
+          ),
+        ],
+        condition: where(attribute("field")).exists(),
+      });
+      // Check the result.
+      const item = await client.getItem({
+        table: createTableParams.name,
+        partitionKey: { name: "pk", value: putItemParams.item.pk },
+      });
+      expect(item).to.deep.include({
+        pk: putItemParams.item.pk,
+        field: 0,
+      });
+    });
+  });
+});
