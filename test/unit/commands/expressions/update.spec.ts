@@ -3,6 +3,7 @@ import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import {
+  add,
   assign,
   attribute,
   ifNotExists,
@@ -29,6 +30,52 @@ describe("commands.expressions.update", () => {
       match,
     };
   }
+
+  describe(add.name, () => {
+    it("should not work with an attribute name and a string", () => {
+      // @ts-expect-error
+      add(attribute("name"), value("toto"));
+    });
+    it("should not work with an attribute name and a boolean", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(true));
+    });
+    it("should not work with an attribute name and null", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(null));
+    });
+    it("should not work with an attribute name and undefined", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(undefined));
+    });
+    it("should not work with an attribute name and a record", () => {
+      // Records are maps, which aren't sets or numbers.
+      // @ts-expect-error
+      add(attribute("name"), value({}));
+    });
+    it("should not work with an attribute name and an array", () => {
+      // Arrays are lists, which aren't sets or numbers.
+      // @ts-expect-error
+      add(attribute("name"), value([]));
+    });
+    it("should work with an attribute name and a number", () => {
+      const { match, names, values } = actionMatch({
+        action: add(attribute("attr.name"), value(42)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(42));
+    });
+    it("should work with an attribute name and a set", () => {
+      const added = new Set(["toto", "tata", "tutu"]);
+      const { match, names, values } = actionMatch({
+        action: add(attribute("attr.name"), value(added)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(added));
+    });
+  });
 
   describe(assign.name, () => {
     it("should work with an attribute name", () => {

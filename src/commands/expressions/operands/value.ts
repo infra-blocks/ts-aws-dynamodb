@@ -36,7 +36,7 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
  * @returns A new {@link ValueOperand} instance for the provided value.
  */
 export function value<T extends AttributeValue = AttributeValue>(
-  value: AttributeValue,
+  value: T,
 ): ValueOperand<T> {
   return new ValueOperand(value);
 }
