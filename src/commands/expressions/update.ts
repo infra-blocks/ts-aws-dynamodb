@@ -12,7 +12,8 @@ You can also use SET to add or subtract from an attribute that is of type Number
 import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
 import type { IExpression } from "./expression.js";
-import type { AttributeOperand, IOperand, Operand } from "./operands.js";
+import type { AttributeOperand } from "./operands/name.js";
+import type { IOperand, Operand } from "./operands/type.js";
 
 /*
 The syntax would look something like this:
