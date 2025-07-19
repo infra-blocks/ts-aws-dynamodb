@@ -7,7 +7,7 @@ import {
   type IOperand,
   type Operand,
   type ValueOperand,
-} from "./operands.js";
+} from "./operands/index.js";
 
 // NOTES:
 // A string literal in a condition is *always* a reference to an attribute path, and seems to be always valid syntax.
