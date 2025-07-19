@@ -5,15 +5,23 @@ export type ValueReference = `:${string}`;
 /**
  * Represents a set of attribute values used in an expression.
  *
- * This class provides an automated way to generate value reference variables
- * so that every value in an expression can be treated the same: systematically replaced
- * with an automatically generated variable.
+ * This class provides an automated way to generate value reference variables,
+ * or substitutions, so that every value in an expression can be treated
+ * the same: systematically replaced with an automatically generated variable.
  *
- * The class keeps track of the references generated for each value, such that when
- * the user requests a reference for a known value, that reference is returned.
+ * The class keeps track of the substitutions generated for each value, such that when
+ * the user requests a substitute for a known value, that previous one is returned.
+ *
+ * Values are compared using the SameValueZero algorithm(it uses a Map internally).
+ * This means that:
+ * ```ts
+ * assert(values.substitute(new Set([1,2,3])) !== values.substitute(new Set([1,2,3])));
+ * ```
  *
  * When the user requests a reference for an unknown value, then one is generated and
  * stored for future use.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness#same-value-zero_equality
  */
 export class AttributeValues {
   private readonly values: Map<AttributeValue, ValueReference>;
