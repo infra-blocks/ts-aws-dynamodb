@@ -40,7 +40,7 @@
     "test:unit": "mocha --config test/unit/.mocharc.cjs 'test/unit/**/*.spec.ts'"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.1.2",
     "@infra-blocks/checks": "^0.2.7",
     "@infra-blocks/iter": "^0.2.7",
     "@infra-blocks/node-console-logger": "^0.3.1",
