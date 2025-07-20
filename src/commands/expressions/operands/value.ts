@@ -19,6 +19,7 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
     this.value = value;
   }
 
+  // TODO: make the names optional
   substitute(params: {
     names: AttributeNames;
     values: AttributeValues;

@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2025-07-20
+
+### Added
+
+- Support for `DELETE` update clause through the `deleteFrom` function. Such as in:
+`update: [deleteFrom(attribute(<name>), value(new Set([1, 2])))]`
+
 ## [0.20.0] - 2025-07-20
 
 ### Added
 
-- Support for `ADD` update clause using the `add` factory method. Such as in:
+- Support for `ADD` update clause through the `add` function. Such as in:
 `update: [add(attribute(<name>), value(<value>))]`.
 
 ### Changed
@@ -275,6 +282,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.21.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.17.1...v0.18.0

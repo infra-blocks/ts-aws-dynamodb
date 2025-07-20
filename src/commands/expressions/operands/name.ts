@@ -17,6 +17,7 @@ export class AttributeOperand implements IOperand {
     this.path = path;
   }
 
+  // TODO: make the values optional
   substitute(params: {
     names: AttributeNames;
     values: AttributeValues;
