@@ -2,12 +2,12 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
   add,
-  assign,
   attribute,
   type CreateTableParams,
   ifNotExists,
   type PutItemParams,
   remove,
+  set,
   value,
   where,
 } from "../../../src/index.js";
@@ -47,7 +47,7 @@ describe(DynamoDBClient.name, () => {
         // Maybe use a generic type in the field that defaults to record?
         partitionKey: { name: "pk", value: putItemParams.item.pk },
         update: [
-          assign(attribute("stuff.kebab-field")).to(
+          set(attribute("stuff.kebab-field")).to(
             ifNotExists(attribute("default.add"), value(0)),
           ),
           remove(attribute("stuff.removeMe")),

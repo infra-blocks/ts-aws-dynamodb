@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for `ADD` update clause using the `add` factory method. Such as in:
 `update: [add(attribute(<name>), value(<value>))]`.
 
+### Changed
+
+- Renamed `assign` to `set`. Originally, it was called `assign` because it was thought
+that it was going to be part of a bigger offering of set actions. More specifically,
+I thought that `increment` and `decrement` operations might also be provided. I realized
+midway that those terms where not exact, since this: `SET x = y + 5` is perfectly legal
+and does not represent an "increment", but rather a simple addition followed by an assignment.
+`set` is better because it maps directly to the matching update clause: `SET`.
+
 ## [0.19.0] - 2025-07-18
 
 ### Added

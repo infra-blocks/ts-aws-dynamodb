@@ -82,9 +82,9 @@ export class UpdateExpression implements IExpression {
     const clauses: UpdateExpressionClauses = {};
     for (const action of params) {
       if (
-        action instanceof Assignment ||
-        action instanceof PlusAssignment ||
-        action instanceof MinusAssignment
+        action instanceof SetTo ||
+        action instanceof SetToPlus ||
+        action instanceof SetToMinus
       ) {
         clauses.set ??= [];
         clauses.set.push(action);
@@ -108,11 +108,11 @@ export interface IUpdateAction {
 
 export type UpdateAction = SetAction | RemoveAction | AddAction;
 
-export type SetAction = Assignment | PlusAssignment | MinusAssignment;
+export type SetAction = SetTo | SetToPlus | SetToMinus;
 
 export type SetOperand = Operand | IfNotExistsOperand;
 
-class Assignment implements IUpdateAction {
+class SetTo implements IUpdateAction {
   private readonly path: AttributeOperand;
   private readonly operand: SetOperand;
 
@@ -122,12 +122,12 @@ class Assignment implements IUpdateAction {
     this.operand = operand;
   }
 
-  plus(operand: SetOperand): PlusAssignment {
-    return new PlusAssignment({ inner: this, operand });
+  plus(operand: SetOperand): SetToPlus {
+    return new SetToPlus({ inner: this, operand });
   }
 
-  minus(operand: SetOperand): MinusAssignment {
-    return new MinusAssignment({ inner: this, operand });
+  minus(operand: SetOperand): SetToMinus {
+    return new SetToMinus({ inner: this, operand });
   }
 
   stringify(params: {
@@ -144,12 +144,12 @@ class Assignment implements IUpdateAction {
   }
 }
 
-export class PlusAssignment implements IUpdateAction {
-  private readonly inner: Assignment;
+export class SetToPlus implements IUpdateAction {
+  private readonly inner: SetTo;
   private readonly operand: SetOperand;
 
   constructor(params: {
-    inner: Assignment;
+    inner: SetTo;
     operand: SetOperand;
   }) {
     const { inner, operand } = params;
@@ -171,12 +171,12 @@ export class PlusAssignment implements IUpdateAction {
   }
 }
 
-export class MinusAssignment implements IUpdateAction {
-  private readonly inner: Assignment;
+export class SetToMinus implements IUpdateAction {
+  private readonly inner: SetTo;
   private readonly operand: SetOperand;
 
   constructor(params: {
-    inner: Assignment;
+    inner: SetTo;
     operand: SetOperand;
   }) {
     const { inner, operand } = params;
@@ -198,21 +198,23 @@ export class MinusAssignment implements IUpdateAction {
   }
 }
 
-class AssignmentBuilder {
+class SetToBuilder {
   private readonly path: AttributeOperand;
 
   constructor(path: AttributeOperand) {
     this.path = path;
   }
 
-  to(operand: SetOperand): Assignment {
-    return new Assignment({ path: this.path, operand });
+  to(operand: SetOperand): SetTo {
+    return new SetTo({ path: this.path, operand });
   }
 }
 
 // TODO: increment/decrement utilities built on top of the assignments.
-export function assign(path: AttributeOperand): AssignmentBuilder {
-  return new AssignmentBuilder(path);
+// TODO: review API for something more streamlined.... Imagine something like:
+// set(attribute(<name>), value(<value>)) or set(attribute(<name>), value(<first>), "+", value(<second>))
+export function set(path: AttributeOperand): SetToBuilder {
+  return new SetToBuilder(path);
 }
 
 export class RemoveAction implements IUpdateAction {
