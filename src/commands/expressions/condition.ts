@@ -387,7 +387,7 @@ export class AttributeConditionBuilder extends OperandConditionBuilder<Attribute
   isType(type: ValueOperand<AttributeType>): Condition {
     return Condition.from({
       stringify: ({ names, values }) => {
-        return `attribute_type(${this.substitute({ names, values })}, ${type.substitute({ names, values })})`;
+        return `attribute_type(${this.substitute({ names, values })}, ${type.substitute({ values })})`;
       },
     });
   }

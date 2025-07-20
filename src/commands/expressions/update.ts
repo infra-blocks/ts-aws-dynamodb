@@ -1,3 +1,11 @@
+import type { AttributeValueNumber, AttributeValueSet } from "../../types.js";
+import type { AttributeNames } from "../attributes/names.js";
+import type { AttributeValues } from "../attributes/values.js";
+import type { IExpression } from "./expression.js";
+import type { AttributeOperand } from "./operands/name.js";
+import type { IOperand, Operand } from "./operands/type.js";
+import type { ValueOperand } from "./operands/value.js";
+
 /*
 Notes: an update is made of a series of actions. Each action belongs to a clause and each clause
 can be present at least once in an update. The clauses are:
@@ -9,14 +17,6 @@ can be present at least once in an update. The clauses are:
 SET actions can use the `if_not_exists` function, which returns the value of the attribute if it exists, or a default value if it does not.
 You can also use SET to add or subtract from an attribute that is of type Number. To perform multiple SET actions, separate them with commas.
 */
-import type { AttributeValueNumber, AttributeValueSet } from "../../types.js";
-import type { AttributeNames } from "../attributes/names.js";
-import type { AttributeValues } from "../attributes/values.js";
-import type { IExpression } from "./expression.js";
-import type { AttributeOperand } from "./operands/name.js";
-import type { IOperand, Operand } from "./operands/type.js";
-import type { ValueOperand } from "./operands/value.js";
-
 /*
 The syntax would look something like this:
 set([attribute(<name>).to(value("35"), attribute(<name>).to(attribute(<name>).plus(value("5")))]) => returns an UpdateExpression with a SetClause populated.
@@ -35,6 +35,7 @@ interface UpdateExpressionClauses {
   set?: SetAction[];
   remove?: RemoveAction[];
   add?: AddAction[];
+  delete?: DeleteAction[];
 }
 
 /**
@@ -64,13 +65,20 @@ export class UpdateExpression implements IExpression {
     if (this.clauses.remove != null) {
       parts.push(
         `REMOVE ${this.clauses.remove
-          .map((action) => action.stringify({ names, values }))
+          .map((action) => action.stringify({ names }))
           .join(",")}`,
       );
     }
     if (this.clauses.add != null) {
       parts.push(
         `ADD ${this.clauses.add
+          .map((action) => action.stringify({ names, values }))
+          .join(",")}`,
+      );
+    }
+    if (this.clauses.delete != null) {
+      parts.push(
+        `DELETE ${this.clauses.delete
           .map((action) => action.stringify({ names, values }))
           .join(",")}`,
       );
@@ -91,6 +99,9 @@ export class UpdateExpression implements IExpression {
       } else if (action instanceof RemoveAction) {
         clauses.remove ??= [];
         clauses.remove.push(action);
+      } else if (action instanceof DeleteAction) {
+        clauses.delete ??= [];
+        clauses.delete.push(action);
       } else if (action instanceof AddAction) {
         clauses.add ??= [];
         clauses.add.push(action);
@@ -106,7 +117,7 @@ export interface IUpdateAction {
   stringify(params: { names: AttributeNames; values: AttributeValues }): string;
 }
 
-export type UpdateAction = SetAction | RemoveAction | AddAction;
+export type UpdateAction = AddAction | DeleteAction | RemoveAction | SetAction;
 
 export type SetAction = SetTo | SetToPlus | SetToMinus;
 
@@ -135,12 +146,10 @@ class SetTo implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names, values })} = ${this.operand.substitute(
-      {
-        names,
-        values,
-      },
-    )}`;
+    return `${this.path.substitute({ names })} = ${this.operand.substitute({
+      names,
+      values,
+    })}`;
   }
 }
 
@@ -224,12 +233,9 @@ export class RemoveAction implements IUpdateAction {
     this.path = path;
   }
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    const { names, values } = params;
-    return this.path.substitute({ names, values });
+  stringify(params: { names: AttributeNames }): string {
+    const { names } = params;
+    return this.path.substitute({ names });
   }
 
   static from(path: AttributeOperand): RemoveAction {
@@ -240,7 +246,8 @@ export class RemoveAction implements IUpdateAction {
 /**
  * Returns an action that will remove the specific attribute at the provided path.
  *
- * @param path - The path of the attribute to remove.
+ * @param path - The path of the attribute to remove. * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
+
  *
  * @returns A {@link RemoveAction} corresponding to the path provided.
  */
@@ -270,7 +277,7 @@ export class AddAction implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names, values })} ${this.value.substitute({ names, values })}`;
+    return `${this.path.substitute({ names })} ${this.value.substitute({ values })}`;
   }
 
   static from(params: {
@@ -281,11 +288,78 @@ export class AddAction implements IUpdateAction {
   }
 }
 
+/**
+ * Returns an action that will add the provided value to the attribute at the specified path.
+ *
+ * What adding means depends on the type of the attribute:
+ * - If both the attribute and the value are numbers, then an increment operation is performed.
+ * - If both the attribute and the value are sets, then a concatenation is performed.
+ *
+ * This action only supports numbers and sets as values.
+ *
+ * @param path - The attribute path to modify.
+ * @param value - The value to add to the attribute.
+ *
+ * @returns An {@link AddAction} that will add the value to the attribute at the specified path.
+ *
+ * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.ADD
+ */
 export function add(
   path: AttributeOperand,
   value: ValueOperand<NumberOrSet>,
 ): AddAction {
   return AddAction.from({ path, value });
+}
+
+export class DeleteAction implements IUpdateAction {
+  private readonly path: AttributeOperand;
+  private readonly value: ValueOperand<AttributeValueSet>;
+
+  private constructor(params: {
+    path: AttributeOperand;
+    value: ValueOperand<AttributeValueSet>;
+  }) {
+    const { path, value } = params;
+    this.path = path;
+    this.value = value;
+  }
+
+  stringify(params: {
+    names: AttributeNames;
+    values: AttributeValues;
+  }): string {
+    const { names, values } = params;
+    return `${this.path.substitute({ names })} ${this.value.substitute({
+      values,
+    })}`;
+  }
+
+  static from(params: {
+    path: AttributeOperand;
+    value: ValueOperand<AttributeValueSet>;
+  }): DeleteAction {
+    return new DeleteAction(params);
+  }
+}
+
+/**
+ * Returns an action that will delete the provided subset from the attribute at the specified path.
+ *
+ * This operation only supports sets as values. The resulting set will be the original set minus the
+ * provided subset.
+ *
+ * @param path - The attribute path to modify.
+ * @param value - The value to remove from the attribute.
+ *
+ * @returns A {@link DeleteAction} that will remove the subset from the attribute.
+ *
+ * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
+ */
+export function deleteFrom(
+  path: AttributeOperand,
+  value: ValueOperand<AttributeValueSet>,
+): DeleteAction {
+  return DeleteAction.from({ path, value });
 }
 
 export class IfNotExistsOperand implements IOperand {
@@ -303,7 +377,7 @@ export class IfNotExistsOperand implements IOperand {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `if_not_exists(${this.path.substitute({ names, values })}, ${this.defaultValue.substitute({ names, values })})`;
+    return `if_not_exists(${this.path.substitute({ names })}, ${this.defaultValue.substitute({ names, values })})`;
   }
 }
 

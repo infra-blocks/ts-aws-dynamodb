@@ -1,6 +1,5 @@
 import type { AttributePath } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
-import type { AttributeValues } from "../../attributes/values.js";
 import type { IOperand } from "./type.js";
 
 /**
@@ -17,10 +16,7 @@ export class AttributeOperand implements IOperand {
     this.path = path;
   }
 
-  substitute(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
+  substitute(params: { names: AttributeNames }): string {
     const { names } = params;
     return names.substitute(this.path);
   }

@@ -4,6 +4,7 @@ import {
   add,
   attribute,
   type CreateTableParams,
+  deleteFrom,
   ifNotExists,
   type PutItemParams,
   remove,
@@ -35,6 +36,7 @@ describe(DynamoDBClient.name, () => {
             "kebab-field": 42,
             removeMe: "please",
             addMe: new Set([1, 2, 3]),
+            deleteFromMe: new Set(["one", "two", "three"]),
           },
         },
       };
@@ -52,6 +54,7 @@ describe(DynamoDBClient.name, () => {
           ),
           remove(attribute("stuff.removeMe")),
           add(attribute("stuff.addMe"), value(new Set([4]))),
+          deleteFrom(attribute("stuff.deleteFromMe"), value(new Set(["one"]))),
         ],
         condition: where(attribute("stuff.kebab-field")).exists(),
       });
@@ -65,6 +68,7 @@ describe(DynamoDBClient.name, () => {
         stuff: {
           "kebab-field": 0,
           addMe: new Set([1, 2, 3, 4]),
+          deleteFromMe: new Set(["two", "three"]),
         },
       });
     });
