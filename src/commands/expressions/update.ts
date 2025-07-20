@@ -65,7 +65,7 @@ export class UpdateExpression implements IExpression {
     if (this.clauses.remove != null) {
       parts.push(
         `REMOVE ${this.clauses.remove
-          .map((action) => action.stringify({ names, values }))
+          .map((action) => action.stringify({ names }))
           .join(",")}`,
       );
     }
@@ -146,12 +146,10 @@ class SetTo implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names, values })} = ${this.operand.substitute(
-      {
-        names,
-        values,
-      },
-    )}`;
+    return `${this.path.substitute({ names })} = ${this.operand.substitute({
+      names,
+      values,
+    })}`;
   }
 }
 
@@ -235,12 +233,9 @@ export class RemoveAction implements IUpdateAction {
     this.path = path;
   }
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    const { names, values } = params;
-    return this.path.substitute({ names, values });
+  stringify(params: { names: AttributeNames }): string {
+    const { names } = params;
+    return this.path.substitute({ names });
   }
 
   static from(path: AttributeOperand): RemoveAction {
@@ -282,7 +277,7 @@ export class AddAction implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names, values })} ${this.value.substitute({ names, values })}`;
+    return `${this.path.substitute({ names })} ${this.value.substitute({ values })}`;
   }
 
   static from(params: {
@@ -334,8 +329,7 @@ export class DeleteAction implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names, values })} ${this.value.substitute({
-      names,
+    return `${this.path.substitute({ names })} ${this.value.substitute({
       values,
     })}`;
   }
@@ -383,7 +377,7 @@ export class IfNotExistsOperand implements IOperand {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `if_not_exists(${this.path.substitute({ names, values })}, ${this.defaultValue.substitute({ names, values })})`;
+    return `if_not_exists(${this.path.substitute({ names })}, ${this.defaultValue.substitute({ names, values })})`;
   }
 }
 

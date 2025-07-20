@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for `DELETE` update clause through the `deleteFrom` function. Such as in:
 `update: [deleteFrom(attribute(<name>), value(new Set([1, 2])))]`
 
+### Changed
+
+- Removed obsolete parameters from operand stringification methods. For example,
+the `value` operand's stringify would look like this: `value.stringify({ names, values })`.
+Now, this doesn't compile. The correct way to call it is like this: `value.stringify({ values })`.
+A similar change was made for `attribute` operands, but regarding the `values` parameter.
+
 ## [0.20.0] - 2025-07-20
 
 ### Added

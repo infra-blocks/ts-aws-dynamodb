@@ -1,5 +1,4 @@
 import type { AttributeValue } from "../../../types.js";
-import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { IOperand } from "./type.js";
 
@@ -20,10 +19,7 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
   }
 
   // TODO: make the names optional
-  substitute(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
+  substitute(params: { values: AttributeValues }): string {
     const { values } = params;
     return values.substitute(this.value);
   }
