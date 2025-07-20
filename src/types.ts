@@ -1,8 +1,26 @@
 import type { ScalarAttributeType } from "@aws-sdk/client-dynamodb";
-import type { NativeAttributeValue } from "@aws-sdk/lib-dynamodb";
+import type {
+  NativeAttributeBinary,
+  NativeAttributeValue,
+  NumberValue,
+} from "@aws-sdk/lib-dynamodb";
 
 export type AttributeName = string;
 export type AttributeValue = NativeAttributeValue;
+
+/**
+ * A type regrouping all javascript native types that correspond to a valid DynamoDB
+ * number attribute.
+ */
+export type AttributeValueNumber = number | NumberValue | bigint;
+
+/**
+ * A type regrouping all javascript native types that corerspond to a valid DynamoDB
+ * set attribute.
+ */
+export type AttributeValueSet = Set<
+  AttributeValueNumber | string | NativeAttributeBinary | undefined
+>;
 export type AttributePath = AttributeName;
 export type AttributeType =
   | "S" // String

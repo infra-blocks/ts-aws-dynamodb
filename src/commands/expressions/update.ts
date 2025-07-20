@@ -9,11 +9,13 @@ can be present at least once in an update. The clauses are:
 SET actions can use the `if_not_exists` function, which returns the value of the attribute if it exists, or a default value if it does not.
 You can also use SET to add or subtract from an attribute that is of type Number. To perform multiple SET actions, separate them with commas.
 */
+import type { AttributeValueNumber, AttributeValueSet } from "../../types.js";
 import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
 import type { IExpression } from "./expression.js";
 import type { AttributeOperand } from "./operands/name.js";
 import type { IOperand, Operand } from "./operands/type.js";
+import type { ValueOperand } from "./operands/value.js";
 
 /*
 The syntax would look something like this:
@@ -32,8 +34,13 @@ export type UpdateExpressionParams = ReadonlyArray<UpdateAction>;
 interface UpdateExpressionClauses {
   set?: SetAction[];
   remove?: RemoveAction[];
+  add?: AddAction[];
 }
 
+/**
+ *
+ * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html
+ */
 export class UpdateExpression implements IExpression {
   private readonly clauses: UpdateExpressionClauses;
 
@@ -61,6 +68,13 @@ export class UpdateExpression implements IExpression {
           .join(",")}`,
       );
     }
+    if (this.clauses.add != null) {
+      parts.push(
+        `ADD ${this.clauses.add
+          .map((action) => action.stringify({ names, values }))
+          .join(",")}`,
+      );
+    }
     return parts.join("\n");
   }
 
@@ -68,15 +82,18 @@ export class UpdateExpression implements IExpression {
     const clauses: UpdateExpressionClauses = {};
     for (const action of params) {
       if (
-        action instanceof Assignment ||
-        action instanceof PlusAssignment ||
-        action instanceof MinusAssignment
+        action instanceof SetTo ||
+        action instanceof SetToPlus ||
+        action instanceof SetToMinus
       ) {
         clauses.set ??= [];
         clauses.set.push(action);
       } else if (action instanceof RemoveAction) {
         clauses.remove ??= [];
         clauses.remove.push(action);
+      } else if (action instanceof AddAction) {
+        clauses.add ??= [];
+        clauses.add.push(action);
       } else {
         throw new Error("unknown action type in update expression");
       }
@@ -89,13 +106,13 @@ export interface IUpdateAction {
   stringify(params: { names: AttributeNames; values: AttributeValues }): string;
 }
 
-export type UpdateAction = SetAction | RemoveAction;
+export type UpdateAction = SetAction | RemoveAction | AddAction;
 
-export type SetAction = Assignment | PlusAssignment | MinusAssignment;
+export type SetAction = SetTo | SetToPlus | SetToMinus;
 
 export type SetOperand = Operand | IfNotExistsOperand;
 
-class Assignment implements IUpdateAction {
+class SetTo implements IUpdateAction {
   private readonly path: AttributeOperand;
   private readonly operand: SetOperand;
 
@@ -105,12 +122,12 @@ class Assignment implements IUpdateAction {
     this.operand = operand;
   }
 
-  plus(operand: SetOperand): PlusAssignment {
-    return new PlusAssignment({ inner: this, operand });
+  plus(operand: SetOperand): SetToPlus {
+    return new SetToPlus({ inner: this, operand });
   }
 
-  minus(operand: SetOperand): MinusAssignment {
-    return new MinusAssignment({ inner: this, operand });
+  minus(operand: SetOperand): SetToMinus {
+    return new SetToMinus({ inner: this, operand });
   }
 
   stringify(params: {
@@ -127,12 +144,12 @@ class Assignment implements IUpdateAction {
   }
 }
 
-export class PlusAssignment implements IUpdateAction {
-  private readonly inner: Assignment;
+export class SetToPlus implements IUpdateAction {
+  private readonly inner: SetTo;
   private readonly operand: SetOperand;
 
   constructor(params: {
-    inner: Assignment;
+    inner: SetTo;
     operand: SetOperand;
   }) {
     const { inner, operand } = params;
@@ -154,12 +171,12 @@ export class PlusAssignment implements IUpdateAction {
   }
 }
 
-export class MinusAssignment implements IUpdateAction {
-  private readonly inner: Assignment;
+export class SetToMinus implements IUpdateAction {
+  private readonly inner: SetTo;
   private readonly operand: SetOperand;
 
   constructor(params: {
-    inner: Assignment;
+    inner: SetTo;
     operand: SetOperand;
   }) {
     const { inner, operand } = params;
@@ -181,21 +198,23 @@ export class MinusAssignment implements IUpdateAction {
   }
 }
 
-class AssignmentBuilder {
+class SetToBuilder {
   private readonly path: AttributeOperand;
 
   constructor(path: AttributeOperand) {
     this.path = path;
   }
 
-  to(operand: SetOperand): Assignment {
-    return new Assignment({ path: this.path, operand });
+  to(operand: SetOperand): SetTo {
+    return new SetTo({ path: this.path, operand });
   }
 }
 
 // TODO: increment/decrement utilities built on top of the assignments.
-export function assign(path: AttributeOperand): AssignmentBuilder {
-  return new AssignmentBuilder(path);
+// TODO: review API for something more streamlined.... Imagine something like:
+// set(attribute(<name>), value(<value>)) or set(attribute(<name>), value(<first>), "+", value(<second>))
+export function set(path: AttributeOperand): SetToBuilder {
+  return new SetToBuilder(path);
 }
 
 export class RemoveAction implements IUpdateAction {
@@ -227,6 +246,46 @@ export class RemoveAction implements IUpdateAction {
  */
 export function remove(path: AttributeOperand): RemoveAction {
   return RemoveAction.from(path);
+}
+
+type NumberOrSet = AttributeValueNumber | AttributeValueSet;
+
+// Note: the first operand *must* be an attribute name, and the second operand *must* be a value.
+// This action only makes sense for sets and numbers.
+export class AddAction implements IUpdateAction {
+  private readonly path: AttributeOperand;
+  private readonly value: ValueOperand<NumberOrSet>;
+
+  private constructor(params: {
+    path: AttributeOperand;
+    value: ValueOperand<NumberOrSet>;
+  }) {
+    const { path, value } = params;
+    this.path = path;
+    this.value = value;
+  }
+
+  stringify(params: {
+    names: AttributeNames;
+    values: AttributeValues;
+  }): string {
+    const { names, values } = params;
+    return `${this.path.substitute({ names, values })} ${this.value.substitute({ names, values })}`;
+  }
+
+  static from(params: {
+    path: AttributeOperand;
+    value: ValueOperand<NumberOrSet>;
+  }): AddAction {
+    return new AddAction(params);
+  }
+}
+
+export function add(
+  path: AttributeOperand,
+  value: ValueOperand<NumberOrSet>,
+): AddAction {
+  return AddAction.from({ path, value });
 }
 
 export class IfNotExistsOperand implements IOperand {

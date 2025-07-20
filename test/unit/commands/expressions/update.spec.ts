@@ -3,10 +3,11 @@ import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import {
-  assign,
+  add,
   attribute,
   ifNotExists,
   remove,
+  set,
   type UpdateAction,
   value,
 } from "../../../../src/index.js";
@@ -30,12 +31,58 @@ describe("commands.expressions.update", () => {
     };
   }
 
-  describe(assign.name, () => {
+  describe(add.name, () => {
+    it("should not work with an attribute name and a string", () => {
+      // @ts-expect-error
+      add(attribute("name"), value("toto"));
+    });
+    it("should not work with an attribute name and a boolean", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(true));
+    });
+    it("should not work with an attribute name and null", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(null));
+    });
+    it("should not work with an attribute name and undefined", () => {
+      // @ts-expect-error
+      add(attribute("name"), value(undefined));
+    });
+    it("should not work with an attribute name and a record", () => {
+      // Records are maps, which aren't sets or numbers.
+      // @ts-expect-error
+      add(attribute("name"), value({}));
+    });
+    it("should not work with an attribute name and an array", () => {
+      // Arrays are lists, which aren't sets or numbers.
+      // @ts-expect-error
+      add(attribute("name"), value([]));
+    });
+    it("should work with an attribute name and a number", () => {
+      const { match, names, values } = actionMatch({
+        action: add(attribute("attr.name"), value(42)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(42));
+    });
+    it("should work with an attribute name and a set", () => {
+      const added = new Set(["toto", "tata", "tutu"]);
+      const { match, names, values } = actionMatch({
+        action: add(attribute("attr.name"), value(added)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(added));
+    });
+  });
+
+  describe(set.name, () => {
     it("should work with an attribute name", () => {
       const path = "attr.path";
       const operand = "attr.operand";
       const { match, names } = actionMatch({
-        action: assign(attribute(path)).to(attribute(operand)),
+        action: set(attribute(path)).to(attribute(operand)),
         matcher: /(#\S+)\s+=\s+(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -45,7 +92,7 @@ describe("commands.expressions.update", () => {
       const path = "attr.path";
       const operand = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path)).to(value(operand)),
+        action: set(attribute(path)).to(value(operand)),
         matcher: /(#\S+)\s+=\s+(:\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -55,7 +102,7 @@ describe("commands.expressions.update", () => {
       const path = "attr.path";
       const operand = "attr.operand";
       const { match, names } = actionMatch({
-        action: assign(attribute(path)).to(
+        action: set(attribute(path)).to(
           ifNotExists(attribute(path), attribute(operand)),
         ),
         matcher: /(#\S+)\s+=\s+if_not_exists\((#\S+),\s+(#\S+)\)/,
@@ -69,7 +116,7 @@ describe("commands.expressions.update", () => {
       const otherPath = "attr.otherPath";
       const defaultValue = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path)).to(
+        action: set(attribute(path)).to(
           ifNotExists(attribute(otherPath), value(defaultValue)),
         ),
         matcher: /(#\S+)\s+=\s+if_not_exists\((#\S+),\s+(:\S+)\)/,
@@ -83,7 +130,7 @@ describe("commands.expressions.update", () => {
       const lhs = "attr.lhs";
       const rhs = "attr.rhs";
       const { match, names } = actionMatch({
-        action: assign(attribute(path)).to(attribute(lhs)).plus(attribute(rhs)),
+        action: set(attribute(path)).to(attribute(lhs)).plus(attribute(rhs)),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+\+\s+(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -95,7 +142,7 @@ describe("commands.expressions.update", () => {
       const lhs = "attr.lhs";
       const rhs = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path)).to(attribute(lhs)).plus(value(rhs)),
+        action: set(attribute(path)).to(attribute(lhs)).plus(value(rhs)),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+\+\s+(:\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -108,7 +155,7 @@ describe("commands.expressions.update", () => {
       const rhs = "attr.rhs";
       const defaultValue = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path))
+        action: set(attribute(path))
           .to(attribute(lhs))
           .plus(ifNotExists(attribute(rhs), value(defaultValue))),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+\+\s+if_not_exists\((#\S+),\s+(:\S+)\)/,
@@ -123,9 +170,7 @@ describe("commands.expressions.update", () => {
       const lhs = "attr.lhs";
       const rhs = "attr.rhs";
       const { match, names } = actionMatch({
-        action: assign(attribute(path))
-          .to(attribute(lhs))
-          .minus(attribute(rhs)),
+        action: set(attribute(path)).to(attribute(lhs)).minus(attribute(rhs)),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+-\s+(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -137,7 +182,7 @@ describe("commands.expressions.update", () => {
       const lhs = "attr.lhs";
       const rhs = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path)).to(attribute(lhs)).minus(value(rhs)),
+        action: set(attribute(path)).to(attribute(lhs)).minus(value(rhs)),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+-\s+(:\S+)/,
       });
       expect(match[1]).to.equal(names.substitute(path));
@@ -150,7 +195,7 @@ describe("commands.expressions.update", () => {
       const rhs = "attr.rhs";
       const defaultValue = 42;
       const { match, names, values } = actionMatch({
-        action: assign(attribute(path))
+        action: set(attribute(path))
           .to(attribute(lhs))
           .minus(ifNotExists(attribute(rhs), value(defaultValue))),
         matcher: /(#\S+)\s+=\s+(#\S+)\s+-\s+if_not_exists\((#\S+),\s+(:\S+)\)/,

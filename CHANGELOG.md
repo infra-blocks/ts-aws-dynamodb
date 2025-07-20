@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2025-07-20
+
+### Added
+
+- Support for `ADD` update clause using the `add` factory method. Such as in:
+`update: [add(attribute(<name>), value(<value>))]`.
+
+### Changed
+
+- Renamed `assign` to `set`. Originally, it was called `assign` because it was thought
+that it was going to be part of a bigger offering of set actions. More specifically,
+I thought that `increment` and `decrement` operations might also be provided. I realized
+midway that those terms where not exact, since this: `SET x = y + 5` is perfectly legal
+and does not represent an "increment", but rather a simple addition followed by an assignment.
+`set` is better because it maps directly to the matching update clause: `SET`.
+
 ## [0.19.0] - 2025-07-18
 
 ### Added
@@ -259,6 +275,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.20.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.17.1...v0.18.0
 [0.17.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.17.0...v0.17.1
