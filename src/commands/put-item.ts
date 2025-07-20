@@ -24,23 +24,21 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
   }
 
   toAwsCommandInput(): PutCommandInput {
-    const { table, item, condition } = this;
-
     const input: PutCommandInput = {
-      TableName: table,
-      Item: item,
+      TableName: this.table,
+      Item: this.item,
     };
 
     // Expression attribute names and values can only be specified when a condition is provided,
     // which is optional.
-    if (condition == null) {
+    if (this.condition == null) {
       return input;
     }
 
     const names = AttributeNames.create();
     const values = AttributeValues.create();
     // Ask the expression to stringify itself, applying the substitutions by itself.
-    const expression = condition.stringify({ names, values });
+    const expression = this.condition.stringify({ names, values });
 
     return {
       ...input,

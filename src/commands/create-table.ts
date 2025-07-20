@@ -32,7 +32,6 @@ export class CreateTable
   }
 
   toAwsCommandInput(): CreateTableCommandInput {
-    const { name } = this;
     const attributeDefinitions: Map<string, IndexFieldType> = new Map();
     const primaryKeySchema = keySchema({
       attributeDefinitions,
@@ -51,7 +50,7 @@ export class CreateTable
           AttributeType: type,
         }),
       ),
-      TableName: name,
+      TableName: this.name,
       KeySchema: primaryKeySchema,
       GlobalSecondaryIndexes:
         globalSecondaryIndexes.length > 0 ? globalSecondaryIndexes : undefined,
@@ -68,7 +67,7 @@ export class CreateTable
   private gsiInput(
     attributeDefinitions: Map<string, IndexFieldType>,
   ): Array<GlobalSecondaryIndex> {
-    const { gsis = {} } = this;
+    const gsis = this.gsis ?? {};
 
     const globalSecondaryIndexes: Array<GlobalSecondaryIndex> = [];
     for (const [indexName, field] of Object.entries(gsis)) {
@@ -90,7 +89,7 @@ export class CreateTable
   private lsiInput(
     attributeDefinitions: Map<string, IndexFieldType>,
   ): Array<LocalSecondaryIndex> {
-    const { lsis = {} } = this;
+    const lsis = this.lsis ?? {};
 
     const localSecondaryIndexes: Array<LocalSecondaryIndex> = [];
     for (const [indexName, field] of Object.entries(lsis)) {
