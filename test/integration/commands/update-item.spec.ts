@@ -49,7 +49,8 @@ describe(DynamoDBClient.name, () => {
         // Maybe use a generic type in the field that defaults to record?
         partitionKey: { name: "pk", value: putItemParams.item.pk },
         update: [
-          set(attribute("stuff.kebab-field")).to(
+          set(
+            attribute("stuff.kebab-field"),
             ifNotExists(attribute("default.add"), value(0)),
           ),
           remove(attribute("stuff.removeMe")),

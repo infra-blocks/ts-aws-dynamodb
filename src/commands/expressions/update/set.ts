@@ -2,59 +2,31 @@ import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { AttributeOperand } from "../operands/name.js";
 import type { Operand } from "../operands/type.js";
-import type { IUpdateAction } from "./action.js";
+import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 import type { IfNotExistsOperand } from "./if-not-exists.js";
 
-export type SetAction = SetTo | SetToPlus | SetToMinus;
-
 export type SetOperand = Operand | IfNotExistsOperand;
 
-export class SetTo implements IUpdateAction {
-  private readonly path: AttributeOperand;
-  private readonly operand: SetOperand;
+export type SetOperator = "+" | "-";
 
-  constructor(params: { path: AttributeOperand; operand: SetOperand }) {
-    const { path, operand } = params;
-    this.path = path;
-    this.operand = operand;
-  }
+type SetActionParams = SetToParams | SetToExpressionParams;
 
-  plus(operand: SetOperand): SetToPlus {
-    return new SetToPlus({ inner: this, operand });
-  }
+type SetToParams = {
+  path: AttributeOperand;
+  operand: SetOperand;
+};
 
-  minus(operand: SetOperand): SetToMinus {
-    return new SetToMinus({ inner: this, operand });
-  }
+type SetToExpressionParams = SetToParams & {
+  operator: SetOperator;
+  secondOperand: SetOperand;
+};
 
-  register(clauses: UpdateExpressionClauses): void {
-    clauses.pushSetAction(this);
-  }
+export class SetAction implements IUpdateAction {
+  private readonly params: SetActionParams;
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    const { names, values } = params;
-    return `${this.path.substitute({ names })} = ${this.operand.substitute({
-      names,
-      values,
-    })}`;
-  }
-}
-
-export class SetToPlus implements IUpdateAction {
-  private readonly inner: SetTo;
-  private readonly operand: SetOperand;
-
-  constructor(params: {
-    inner: SetTo;
-    operand: SetOperand;
-  }) {
-    const { inner, operand } = params;
-    this.inner = inner;
-    this.operand = operand;
+  private constructor(params: SetActionParams) {
+    this.params = params;
   }
 
   register(clauses: UpdateExpressionClauses): void {
@@ -66,61 +38,46 @@ export class SetToPlus implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.inner.stringify({ names, values })} + ${this.operand.substitute(
+    let result = `${this.params.path.substitute({ names })} = ${this.params.operand.substitute(
       {
         names,
         values,
       },
     )}`;
-  }
-}
-
-export class SetToMinus implements IUpdateAction {
-  private readonly inner: SetTo;
-  private readonly operand: SetOperand;
-
-  constructor(params: {
-    inner: SetTo;
-    operand: SetOperand;
-  }) {
-    const { inner, operand } = params;
-    this.inner = inner;
-    this.operand = operand;
+    if ("operator" in this.params && this.params.operator != null) {
+      result += ` ${this.params.operator} ${this.params.secondOperand.substitute(
+        {
+          names,
+          values,
+        },
+      )}`;
+    }
+    return result;
   }
 
-  register(clauses: UpdateExpressionClauses): void {
-    clauses.pushSetAction(this);
-  }
-
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    const { names, values } = params;
-    return `${this.inner.stringify({ names, values })} - ${this.operand.substitute(
-      {
-        names,
-        values,
-      },
-    )}`;
-  }
-}
-
-class SetToBuilder {
-  private readonly path: AttributeOperand;
-
-  constructor(path: AttributeOperand) {
-    this.path = path;
-  }
-
-  to(operand: SetOperand): SetTo {
-    return new SetTo({ path: this.path, operand });
+  static from(params: SetActionParams): SetAction {
+    return new SetAction(params);
   }
 }
 
 // TODO: increment/decrement utilities built on top of the assignments.
-// TODO: review API for something more streamlined.... Imagine something like:
-// set(attribute(<name>), value(<value>)) or set(attribute(<name>), value(<first>), "+", value(<second>))
-export function set(path: AttributeOperand): SetToBuilder {
-  return new SetToBuilder(path);
+export function set(path: AttributeOperand, operand: SetOperand): UpdateAction;
+export function set(
+  path: AttributeOperand,
+  operand: SetOperand,
+  operator: SetOperator,
+  secondOperand: SetOperand,
+): UpdateAction;
+export function set(
+  path: AttributeOperand,
+  operand: SetOperand,
+  operator?: SetOperator,
+  secondOperand?: SetOperand,
+): UpdateAction {
+  return SetAction.from({
+    path,
+    operand,
+    operator,
+    secondOperand,
+  });
 }

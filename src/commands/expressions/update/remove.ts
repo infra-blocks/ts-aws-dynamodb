@@ -33,7 +33,6 @@ export class RemoveAction implements IUpdateAction {
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
  */
-
 export function remove(path: AttributeOperand): UpdateAction {
   return RemoveAction.from(path);
 }
