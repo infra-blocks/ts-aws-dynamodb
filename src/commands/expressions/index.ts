@@ -1,7 +1,7 @@
 export * from "./condition.js";
 export * from "./key-condition.js";
 export * from "./operands/index.js";
-export * from "./update.js";
+export * from "./update/index.js";
 
 /*
 TODO: In the expression interfaces, a slight QoL improvement would be to assume that
