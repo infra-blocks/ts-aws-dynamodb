@@ -1,13 +1,17 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeOperand } from "../operands/name.js";
-import type { IUpdateAction } from "./expression.js";
+import type { IUpdateAction, UpdateAction } from "./action.js";
+import type { UpdateExpressionClauses } from "./clauses.js";
 
-// TODO: add the "addInClause" method to all update actions.
 export class RemoveAction implements IUpdateAction {
   private readonly path: AttributeOperand;
 
   private constructor(path: AttributeOperand) {
     this.path = path;
+  }
+
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushRemoveAction(this);
   }
 
   stringify(params: { names: AttributeNames }): string {
@@ -30,6 +34,6 @@ export class RemoveAction implements IUpdateAction {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
  */
 
-export function remove(path: AttributeOperand): RemoveAction {
+export function remove(path: AttributeOperand): UpdateAction {
   return RemoveAction.from(path);
 }

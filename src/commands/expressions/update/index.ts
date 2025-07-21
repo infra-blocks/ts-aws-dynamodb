@@ -1,6 +1,7 @@
-export * from "./add.js";
-export * from "./delete.js";
+export type { UpdateAction } from "./action.js";
+export { add } from "./add.js";
+export { deleteFrom } from "./delete.js";
 export * from "./expression.js";
-export * from "./if-not-exists.js";
-export * from "./remove.js";
-export * from "./set.js";
+export { ifNotExists } from "./if-not-exists.js";
+export { remove } from "./remove.js";
+export { set } from "./set.js";

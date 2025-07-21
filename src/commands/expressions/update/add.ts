@@ -6,7 +6,8 @@ import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { AttributeOperand } from "../operands/name.js";
 import type { ValueOperand } from "../operands/value.js";
-import type { IUpdateAction } from "./expression.js";
+import type { IUpdateAction, UpdateAction } from "./action.js";
+import type { UpdateExpressionClauses } from "./clauses.js";
 
 type NumberOrSet = AttributeValueNumber | AttributeValueSet;
 
@@ -22,6 +23,10 @@ export class AddAction implements IUpdateAction {
     const { path, value } = params;
     this.path = path;
     this.value = value;
+  }
+
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushAddAction(this);
   }
 
   stringify(params: {
@@ -60,6 +65,6 @@ export class AddAction implements IUpdateAction {
 export function add(
   path: AttributeOperand,
   value: ValueOperand<NumberOrSet>,
-): AddAction {
+): UpdateAction {
   return AddAction.from({ path, value });
 }

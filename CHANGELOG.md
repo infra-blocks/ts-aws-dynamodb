@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] - 2025-07-21
+
+### Changed
+
+- Reduced the footprint of the visible classes related to update expressions. Most
+of the action classes are not exported anymore and only their factory functions are.
+For example, `add` now returns an `UpdateAction` instead of an `AddAction`. `set`
+is currently the only exception to this rule, since the behavior is in the returned
+type.
+
 ## [0.21.0] - 2025-07-20
 
 ### Added
@@ -289,6 +299,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.22.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.18.0...v0.19.0

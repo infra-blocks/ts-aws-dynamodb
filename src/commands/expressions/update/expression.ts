@@ -1,10 +1,8 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { IExpression } from "../expression.js";
-import { AddAction } from "./add.js";
-import { DeleteAction } from "./delete.js";
-import { RemoveAction } from "./remove.js";
-import { type SetAction, SetTo, SetToMinus, SetToPlus } from "./set.js";
+import type { UpdateAction } from "./action.js";
+import { UpdateExpressionClauses } from "./clauses.js";
 
 /*
 Notes: an update is made of a series of actions. Each action belongs to a clause and each clause
@@ -30,12 +28,7 @@ sense.
 */
 
 export type UpdateExpressionParams = ReadonlyArray<UpdateAction>;
-interface UpdateExpressionClauses {
-  set?: SetAction[];
-  remove?: RemoveAction[];
-  add?: AddAction[];
-  delete?: DeleteAction[];
-}
+
 /**
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html
@@ -54,66 +47,83 @@ export class UpdateExpression implements IExpression {
   }): string {
     const { names, values } = params;
     const parts: string[] = [];
-    if (this.clauses.set != null) {
-      parts.push(
-        `SET ${this.clauses.set
-          .map((action) => action.stringify({ names, values }))
-          .join(",")}`,
-      );
-    }
-    if (this.clauses.remove != null) {
-      parts.push(
-        `REMOVE ${this.clauses.remove
-          .map((action) => action.stringify({ names }))
-          .join(",")}`,
-      );
-    }
-    if (this.clauses.add != null) {
-      parts.push(
-        `ADD ${this.clauses.add
-          .map((action) => action.stringify({ names, values }))
-          .join(",")}`,
-      );
-    }
-    if (this.clauses.delete != null) {
-      parts.push(
-        `DELETE ${this.clauses.delete
-          .map((action) => action.stringify({ names, values }))
-          .join(",")}`,
-      );
-    }
+    this.pushAddActions({ parts, names, values });
+    this.pushDeleteActions({ parts, names, values });
+    this.pushRemoveActions({ parts, names });
+    this.pushSetActions({ parts, names, values });
     return parts.join("\n");
   }
 
-  static from(params: UpdateExpressionParams): UpdateExpression {
-    const clauses: UpdateExpressionClauses = {};
-    for (const action of params) {
-      if (
-        action instanceof SetTo ||
-        action instanceof SetToPlus ||
-        action instanceof SetToMinus
-      ) {
-        clauses.set ??= [];
-        clauses.set.push(action);
-      } else if (action instanceof RemoveAction) {
-        clauses.remove ??= [];
-        clauses.remove.push(action);
-      } else if (action instanceof DeleteAction) {
-        clauses.delete ??= [];
-        clauses.delete.push(action);
-      } else if (action instanceof AddAction) {
-        clauses.add ??= [];
-        clauses.add.push(action);
-      } else {
-        throw new Error("unknown action type in update expression");
-      }
+  private pushAddActions(params: {
+    parts: Array<string>;
+    names: AttributeNames;
+    values: AttributeValues;
+  }): void {
+    const { parts, names, values } = params;
+    const actions = this.clauses.getAddActions();
+    if (actions == null || actions.length === 0) {
+      return;
     }
+    parts.push(
+      `ADD ${actions
+        .map((action) => action.stringify({ names, values }))
+        .join(",")}`,
+    );
+  }
+
+  private pushDeleteActions(params: {
+    parts: Array<string>;
+    names: AttributeNames;
+    values: AttributeValues;
+  }): void {
+    const { parts, names, values } = params;
+    const actions = this.clauses.getDeleteActions();
+    if (actions == null || actions.length === 0) {
+      return;
+    }
+    parts.push(
+      `DELETE ${actions
+        .map((action) => action.stringify({ names, values }))
+        .join(",")}`,
+    );
+  }
+
+  private pushRemoveActions(params: {
+    parts: Array<string>;
+    names: AttributeNames;
+  }): void {
+    const { parts, names } = params;
+    const actions = this.clauses.getRemoveActions();
+    if (actions == null || actions.length === 0) {
+      return;
+    }
+    parts.push(
+      `REMOVE ${actions
+        .map((action) => action.stringify({ names }))
+        .join(",")}`,
+    );
+  }
+
+  private pushSetActions(params: {
+    parts: Array<string>;
+    names: AttributeNames;
+    values: AttributeValues;
+  }): void {
+    const { parts, names, values } = params;
+    const actions = this.clauses.getSetActions();
+    if (actions == null || actions.length === 0) {
+      return;
+    }
+    parts.push(
+      `SET ${actions
+        .map((action) => action.stringify({ names, values }))
+        .join(",")}`,
+    );
+  }
+
+  static from(params: UpdateExpressionParams): UpdateExpression {
+    const clauses: UpdateExpressionClauses =
+      UpdateExpressionClauses.from(params);
     return new UpdateExpression(clauses);
   }
 }
-
-export interface IUpdateAction {
-  stringify(params: { names: AttributeNames; values: AttributeValues }): string;
-}
-
-export type UpdateAction = AddAction | DeleteAction | RemoveAction | SetAction;

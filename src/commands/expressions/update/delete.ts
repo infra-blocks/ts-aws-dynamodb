@@ -3,7 +3,8 @@ import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { AttributeOperand } from "../operands/name.js";
 import type { ValueOperand } from "../operands/value.js";
-import type { IUpdateAction } from "./expression.js";
+import type { IUpdateAction, UpdateAction } from "./action.js";
+import type { UpdateExpressionClauses } from "./clauses.js";
 
 export class DeleteAction implements IUpdateAction {
   private readonly path: AttributeOperand;
@@ -16,6 +17,10 @@ export class DeleteAction implements IUpdateAction {
     const { path, value } = params;
     this.path = path;
     this.value = value;
+  }
+
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushDeleteAction(this);
   }
 
   stringify(params: {
@@ -53,6 +58,6 @@ export class DeleteAction implements IUpdateAction {
 export function deleteFrom(
   path: AttributeOperand,
   value: ValueOperand<AttributeValueSet>,
-): DeleteAction {
+): UpdateAction {
   return DeleteAction.from({ path, value });
 }

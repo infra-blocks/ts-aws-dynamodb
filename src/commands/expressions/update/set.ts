@@ -2,12 +2,14 @@ import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { AttributeOperand } from "../operands/name.js";
 import type { Operand } from "../operands/type.js";
-import type { IUpdateAction } from "./expression.js";
+import type { IUpdateAction } from "./action.js";
+import type { UpdateExpressionClauses } from "./clauses.js";
 import type { IfNotExistsOperand } from "./if-not-exists.js";
 
 export type SetAction = SetTo | SetToPlus | SetToMinus;
 
 export type SetOperand = Operand | IfNotExistsOperand;
+
 export class SetTo implements IUpdateAction {
   private readonly path: AttributeOperand;
   private readonly operand: SetOperand;
@@ -24,6 +26,10 @@ export class SetTo implements IUpdateAction {
 
   minus(operand: SetOperand): SetToMinus {
     return new SetToMinus({ inner: this, operand });
+  }
+
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushSetAction(this);
   }
 
   stringify(params: {
@@ -51,6 +57,10 @@ export class SetToPlus implements IUpdateAction {
     this.operand = operand;
   }
 
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushSetAction(this);
+  }
+
   stringify(params: {
     names: AttributeNames;
     values: AttributeValues;
@@ -76,6 +86,10 @@ export class SetToMinus implements IUpdateAction {
     const { inner, operand } = params;
     this.inner = inner;
     this.operand = operand;
+  }
+
+  register(clauses: UpdateExpressionClauses): void {
+    clauses.pushSetAction(this);
   }
 
   stringify(params: {
