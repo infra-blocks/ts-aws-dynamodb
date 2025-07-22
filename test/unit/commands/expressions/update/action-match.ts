@@ -1,7 +1,8 @@
 import { checkNotNull } from "@infra-blocks/checks";
 import { AttributeNames } from "../../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../../src/commands/attributes/values.js";
-import type { IOperand, UpdateAction } from "../../../../../src/index.js";
+import type { IOperand } from "../../../../../src/commands/expressions/operands/interface.js";
+import type { UpdateAction } from "../../../../../src/index.js";
 
 export function actionMatch(params: {
   action: UpdateAction;

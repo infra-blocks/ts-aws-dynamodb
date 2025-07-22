@@ -3,24 +3,18 @@ import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
 import type { IExpression } from "./expression.js";
 import {
-  type IOperand,
+  type LoosePath,
   type Operand,
+  operand,
   PathOperand,
   type ValueOperand,
 } from "./operands/index.js";
-
-// NOTES:
-// A string literal in a condition is *always* a reference to an attribute path, and seems to be always valid syntax.
-// For example, `begins_with(toto, tata)` is valid and checks that the attribute value toto begins with the content of the attribute tata.
-// Obviously, this particular case is not useful, but there could be edge cases where this type of function call is, so we should support it.
+import type { IOperand } from "./operands/interface.js";
 
 export type ConditionOperand = Operand | SizeOperand;
 
 // TODO: rename for serializer, and the method to be serialize.
-export type Stringifier = (params: {
-  names: AttributeNames;
-  values: AttributeValues;
-}) => string;
+export type Stringifier = IExpression["stringify"];
 
 export interface ConditionParams {
   stringify: Stringifier;
@@ -111,6 +105,8 @@ export function not(inner: Condition): Condition {
   });
 }
 
+export type BeginsWithParams = LoosePath | PathOperand | ValueOperand<string>;
+
 // NOTE: methods here means that both sides of the conditions can either be attribute names or attribute values.
 export class OperandConditionBuilder<T extends Operand> {
   protected readonly operand: T;
@@ -128,10 +124,11 @@ export class OperandConditionBuilder<T extends Operand> {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
    */
-  beginsWith(rhs: Operand<string>): Condition {
+  beginsWith(rhs: BeginsWithParams): Condition {
+    const rhsOperand = operand(rhs);
     return Condition.from({
       stringify: ({ names, values }) => {
-        return `begins_with(${this.substitute({ names, values })}, ${rhs.substitute({ names, values })})`;
+        return `begins_with(${this.substitute({ names, values })}, ${rhsOperand.substitute({ names, values })})`;
       },
     });
   }

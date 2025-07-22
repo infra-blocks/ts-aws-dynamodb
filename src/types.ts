@@ -1,3 +1,6 @@
+// TODO: split this type module into 2 and find a better place for DynamoDB types?
+import { isBigint, isBoolean, isNumber, isString } from "@infra-blocks/types";
+
 // DynamoDB supported types and their TypeScript representations
 export type NativeBinary = Buffer;
 export type NativeBinarySet = Set<NativeBinary>;
@@ -7,15 +10,29 @@ export type NativeMap = { [key: AttributeName]: AttributeValue };
 export type NativeNull = null;
 export type NativeNumber = bigint | number;
 export type NativeNumberSet = Set<NativeNumber>;
-export type NativeScalar =
-  | NativeBinary
-  | NativeBoolean
-  | NativeNull
-  | NativeNumber
-  | NativeString;
 export type NativeSet = NativeNumberSet | NativeStringSet | NativeBinarySet;
 export type NativeString = string;
 export type NativeStringSet = Set<NativeString>;
+
+export function isNativeBinary(value: unknown): value is NativeBinary {
+  return Buffer.isBuffer(value);
+}
+
+export function isNativeBoolean(value: unknown): value is NativeBoolean {
+  return isBoolean(value);
+}
+
+export function isNativeNull(value: unknown): value is NativeNull {
+  return value === null;
+}
+
+export function isNativeNumber(value: unknown): value is NativeNumber {
+  return isNumber(value) || isBigint(value);
+}
+
+export function isNativeString(value: unknown): value is NativeString {
+  return isString(value);
+}
 
 // Package wide types used to interact with the APIs.
 
