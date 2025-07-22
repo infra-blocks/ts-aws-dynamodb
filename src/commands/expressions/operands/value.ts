@@ -14,19 +14,27 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
 {
   private readonly value: T;
 
-  constructor(value: T) {
+  private constructor(value: T) {
     this.value = value;
   }
 
-  // TODO: make the names optional
   substitute(params: { values: AttributeValues }): string {
     const { values } = params;
     return values.substitute(this.value);
   }
+
+  /**
+   * @private
+   */
+  static from<T extends AttributeValue = AttributeValue>(
+    value: T,
+  ): ValueOperand<T> {
+    return new ValueOperand(value);
+  }
 }
 
 /**
- * Factory function to create a `ValueOperand` with fewer characters.
+ * Factory function to create a value operand.
  *
  * @param value - The value this operand represents.
  *
@@ -35,5 +43,5 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
 export function value<T extends AttributeValue = AttributeValue>(
   value: T,
 ): ValueOperand<T> {
-  return new ValueOperand(value);
+  return ValueOperand.from(value);
 }

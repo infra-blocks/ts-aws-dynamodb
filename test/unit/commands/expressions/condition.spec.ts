@@ -3,10 +3,10 @@ import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import {
-  AttributeOperand,
   attribute,
   Condition,
   not,
+  PathOperand,
   size,
   ValueOperand,
   value,
@@ -33,7 +33,7 @@ describe("commands.expressions.condition", () => {
   }
 
   // TODO: test manually how to reference `.` paths (i.e is it #path or #path.#subpath)
-  describe(AttributeOperand.name, () => {
+  describe(PathOperand.name, () => {
     describe("beginsWith", () => {
       it("should work with attribute rhs", () => {
         const lhs = "test.attribute.lhs";

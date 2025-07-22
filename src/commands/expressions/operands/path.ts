@@ -3,16 +3,16 @@ import type { AttributeNames } from "../../attributes/names.js";
 import type { IOperand } from "./type.js";
 
 /**
- * Represents an attribute by name operand in an expression.
+ * Represents an attribute path operand in an expression.
  *
  * When this operand is stringified, it first registers the
  * attribute name in the {@link AttributeNames} registry and substitutes
  * it with the returned value.
  */
-export class AttributeOperand implements IOperand {
+export class PathOperand implements IOperand {
   private readonly path: AttributePath;
 
-  constructor(path: AttributePath) {
+  private constructor(path: AttributePath) {
     this.path = path;
   }
 
@@ -20,15 +20,22 @@ export class AttributeOperand implements IOperand {
     const { names } = params;
     return names.substitute(this.path);
   }
+
+  /**
+   * @private
+   */
+  static from(path: AttributePath): PathOperand {
+    return new PathOperand(path);
+  }
 }
 
 /**
- * Factory function to create an `AttributeOperand` with fewer characters.
+ * Factory function to create a path operand.
  *
  * @param path - The path of the attribute this operand represents.
  *
- * @returns A new {@link AttributeOperand} instance for the provided path.
+ * @returns A new {@link PathOperand} instance for the provided path.
  */
-export function attribute(path: AttributePath): AttributeOperand {
-  return new AttributeOperand(path);
+export function attribute(path: AttributePath): PathOperand {
+  return PathOperand.from(path);
 }
