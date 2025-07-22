@@ -1,6 +1,18 @@
+import { isString } from "@infra-blocks/types";
 import type { AttributePath } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
-import type { IOperand } from "./type.js";
+import type { IOperand } from "./interface.js";
+
+/**
+ * This type regroups the types that are considered path operands by default.
+ *
+ * It includes the proper typed value, the {@link AttributePath}, but also
+ * includes {@link AttributePath} as a loose type. The native scalar string
+ * is considered a path operand by default.
+ */
+export type LoosePathOperand = AttributePath | PathOperand;
+
+export type PathOperandParams = LoosePathOperand; // They are the same here.
 
 /**
  * Represents an attribute path operand in an expression.
@@ -30,12 +42,39 @@ export class PathOperand implements IOperand {
 }
 
 /**
- * Factory function to create a path operand.
+ * This function transforms a loose path operand into a strict {@link PathOperand}.
  *
- * @param path - The path of the attribute this operand represents.
+ * @param path - The path of the attribute this operand represents. If it is a string,
+ * then it is converted to a {@link PathOperand}. If it is already a {@link PathOperand},
+ * then it is returned as is.
  *
- * @returns A new {@link PathOperand} instance for the provided path.
+ * @returns The corresponding {@link PathOperand} instance for the provided path.
  */
-export function attribute(path: AttributePath): PathOperand {
-  return PathOperand.from(path);
+export function path(path: PathOperandParams): PathOperand {
+  if (isPathOperand(path)) {
+    return path;
+  }
+  return PathOperand.from(path as AttributePath);
+}
+
+/**
+ * A type guard for detecting loose path operands.
+ *
+ * @param value - The value to check.
+ *
+ * @returns True if the operand is a loose path operand, false otherwise.
+ */
+export function isLoosePathOperand(value: unknown): value is LoosePathOperand {
+  return isString(value) || isPathOperand(value);
+}
+
+/**
+ * A type guard for detecting path operands.
+ *
+ * @param value - The value to check.
+ *
+ * @returns True if the operand is a path operand, false otherwise.
+ */
+export function isPathOperand(value: unknown): value is PathOperand {
+  return value instanceof PathOperand;
 }

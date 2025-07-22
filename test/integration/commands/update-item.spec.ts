@@ -2,11 +2,11 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
   add,
-  attribute,
   type CreateTableParams,
   deleteFrom,
   ifNotExists,
   type PutItemParams,
+  path,
   remove,
   set,
   value,
@@ -47,14 +47,14 @@ describe(DynamoDBClient.name, () => {
         key: { pk: putItemParams.item.pk },
         update: [
           set(
-            attribute("stuff.kebab-field"),
-            ifNotExists(attribute("default.add"), value(0)),
+            path("stuff.kebab-field"),
+            ifNotExists(path("default.add"), value(0)),
           ),
-          remove(attribute("stuff.removeMe")),
-          add(attribute("stuff.addMe"), value(new Set([4]))),
-          deleteFrom(attribute("stuff.deleteFromMe"), value(new Set(["one"]))),
+          remove(path("stuff.removeMe")),
+          add(path("stuff.addMe"), value(new Set([4]))),
+          deleteFrom(path("stuff.deleteFromMe"), value(new Set(["one"]))),
         ],
-        condition: where(attribute("stuff.kebab-field")).exists(),
+        condition: where(path("stuff.kebab-field")).exists(),
       });
       // Check the result.
       const item = await client.getItem({
