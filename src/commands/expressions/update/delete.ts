@@ -1,4 +1,4 @@
-import type { AttributeValueSet } from "../../../types.js";
+import type { NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { AttributeOperand } from "../operands/name.js";
@@ -8,11 +8,11 @@ import type { UpdateExpressionClauses } from "./clauses.js";
 
 export class DeleteAction implements IUpdateAction {
   private readonly path: AttributeOperand;
-  private readonly value: ValueOperand<AttributeValueSet>;
+  private readonly value: ValueOperand<NativeSet>;
 
   private constructor(params: {
     path: AttributeOperand;
-    value: ValueOperand<AttributeValueSet>;
+    value: ValueOperand<NativeSet>;
   }) {
     const { path, value } = params;
     this.path = path;
@@ -35,7 +35,7 @@ export class DeleteAction implements IUpdateAction {
 
   static from(params: {
     path: AttributeOperand;
-    value: ValueOperand<AttributeValueSet>;
+    value: ValueOperand<NativeSet>;
   }): DeleteAction {
     return new DeleteAction(params);
   }
@@ -57,7 +57,7 @@ export class DeleteAction implements IUpdateAction {
 
 export function deleteFrom(
   path: AttributeOperand,
-  value: ValueOperand<AttributeValueSet>,
+  value: ValueOperand<NativeSet>,
 ): UpdateAction {
   return DeleteAction.from({ path, value });
 }

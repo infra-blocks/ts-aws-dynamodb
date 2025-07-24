@@ -1,27 +1,44 @@
-import type { ScalarAttributeType } from "@aws-sdk/client-dynamodb";
-import type {
-  NativeAttributeBinary,
-  NativeAttributeValue,
-  NumberValue,
-} from "@aws-sdk/lib-dynamodb";
+// DynamoDB supported types and their TypeScript representations
+export type NativeBinary = Buffer;
+export type NativeBinarySet = Set<NativeBinary>;
+export type NativeBoolean = boolean;
+export type NativeList = Array<AttributeValue>;
+export type NativeMap = { [key: AttributeName]: AttributeValue };
+export type NativeNull = null;
+export type NativeNumber = bigint | number;
+export type NativeNumberSet = Set<NativeNumber>;
+export type NativeScalar =
+  | NativeBinary
+  | NativeBoolean
+  | NativeNull
+  | NativeNumber
+  | NativeString;
+export type NativeSet = NativeNumberSet | NativeStringSet | NativeBinarySet;
+export type NativeString = string;
+export type NativeStringSet = Set<NativeString>;
 
+// Package wide types used to interact with the APIs.
+
+/**
+ * The type of an attribute name in DynamoDB.
+ *
+ * This is an alias for string. This type is used in preference
+ * to {@link AttributePath} when the API does not expect a document path.
+ *
+ * @see AttributePath
+ */
 export type AttributeName = string;
-export type AttributeValue = NativeAttributeValue;
 
 /**
- * A type regrouping all javascript native types that correspond to a valid DynamoDB
- * number attribute.
+ * The path to an attribute in DynamoDB.
+ *
+ * This is also an alias for string, like {@link AttributeName}, but it is
+ * used in APIs where document paths are supported.
+ *
+ * @see AttributeName
  */
-export type AttributeValueNumber = number | NumberValue | bigint;
-
-/**
- * A type regrouping all javascript native types that corerspond to a valid DynamoDB
- * set attribute.
- */
-export type AttributeValueSet = Set<
-  AttributeValueNumber | string | NativeAttributeBinary | undefined
->;
 export type AttributePath = AttributeName;
+
 export type AttributeType =
   | "S" // String
   | "N" // Number
@@ -33,20 +50,34 @@ export type AttributeType =
   | "SS" // String Set
   | "NS" // Number Set
   | "BS"; // Binary Set
+export type AttributeValue =
+  | NativeBinary
+  | NativeBinarySet
+  | NativeBoolean
+  | NativeList
+  | NativeMap
+  | NativeNull
+  | NativeNumber
+  | NativeNumberSet
+  | NativeSet
+  | NativeString
+  | NativeStringSet;
+
+// TODO: remove when we review the query interfaces to use "key" instead of pk/sk bullshat.
 export interface Attribute {
   name: AttributeName;
   value: AttributeValue;
 }
 export type Attributes = Record<AttributeName, AttributeValue>;
 
-export type IndexFieldType = ScalarAttributeType;
+export type IndexAttributeType = Extract<AttributeType, "B" | "N" | "S">;
 
-export interface IndexField {
+export interface IndexAttributeDefinition {
   name: string;
-  type: IndexFieldType;
+  type: IndexAttributeType;
 }
 
 export interface Index {
-  partitionKey: IndexField;
-  sortKey?: IndexField;
+  partitionKey: IndexAttributeDefinition;
+  sortKey?: IndexAttributeDefinition;
 }

@@ -1,15 +1,15 @@
-import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
   attribute,
   type CreateTableParams,
+  DynamoDbClient,
   type PutItemParams,
   value,
   where,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
-describe(DynamoDBClient.name, () => {
+describe(DynamoDbClient.name, () => {
   afterEach("clean up", dropAllTables());
 
   describe("putItem", () => {
@@ -30,16 +30,11 @@ describe(DynamoDBClient.name, () => {
       };
       await client.putItem(putItemParams);
 
-      const testClient = this.createTestClient();
-      const response = await testClient.send(
-        new GetItemCommand({
-          TableName: createTableParams.name,
-          Key: { pk: { S: putItemParams.item.pk } },
-        }),
-      );
-      expect(response.Item).to.deep.include({
-        pk: { S: putItemParams.item.pk },
+      const item = await client.getItem({
+        table: createTableParams.name,
+        partitionKey: { name: "pk", value: putItemParams.item.pk },
       });
+      expect(item).to.deep.include(putItemParams.item);
     });
     it("should work on table with sort key", async function () {
       const client = this.createClient();
@@ -60,20 +55,12 @@ describe(DynamoDBClient.name, () => {
       };
       await client.putItem(putItemParams);
 
-      const testClient = this.createTestClient();
-      const response = await testClient.send(
-        new GetItemCommand({
-          TableName: createTableParams.name,
-          Key: {
-            pk: { S: putItemParams.item.pk },
-            sk: { N: String(putItemParams.item.sk) },
-          },
-        }),
-      );
-      expect(response.Item).to.deep.include({
-        pk: { S: putItemParams.item.pk },
-        sk: { N: String(putItemParams.item.sk) },
+      const item = await client.getItem({
+        table: createTableParams.name,
+        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        sortKey: { name: "sk", value: putItemParams.item.sk },
       });
+      expect(item).to.deep.include(putItemParams.item);
     });
     it("should work with expression", async function () {
       const client = this.createClient();
@@ -97,20 +84,12 @@ describe(DynamoDBClient.name, () => {
       };
       await client.putItem(putItemParams);
 
-      const testClient = this.createTestClient();
-      const response = await testClient.send(
-        new GetItemCommand({
-          TableName: createTableParams.name,
-          Key: {
-            pk: { S: putItemParams.item.pk },
-            sk: { N: String(putItemParams.item.sk) },
-          },
-        }),
-      );
-      expect(response.Item).to.deep.include({
-        pk: { S: putItemParams.item.pk },
-        sk: { N: String(putItemParams.item.sk) },
+      const item = await client.getItem({
+        table: createTableParams.name,
+        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        sortKey: { name: "sk", value: putItemParams.item.sk },
       });
+      expect(item).to.deep.include(putItemParams.item);
     });
   });
 });

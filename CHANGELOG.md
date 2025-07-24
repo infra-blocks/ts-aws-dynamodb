@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2025-07-25
+
+### Added
+
+- Several convenient type definitions were added. In particular, a bunch of `Native<...>`
+types were added to map every supported DynamoDB type with its typescript equivalent(s).
+For example, `NativeNumber` maps to `bigint | number` to showcase that the API will accept
+both and marshall them to DynamoDB numbers.
+
+### Changed
+
+- Minimized the types covered by `AttributeValue`. Instead of trying to match `lib-dynamodb`'s
+type definition one for one, we just focus on the types we think will be useful in our context.
+Most notably, the binary type is trimmed down to only `Buffer` and the `NumberValue` number
+type has been removed for now (the user can just pass the numbers as string in the meantime,
+where required).
+
 ## [0.23.0] - 2025-07-21
 
 ### Changed
@@ -310,6 +327,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.24.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.20.0...v0.21.0
