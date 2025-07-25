@@ -1,5 +1,5 @@
 import { GetCommand, type GetCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { Attribute } from "../types.js";
+import type { Attributes } from "../types.js";
 import type { Command } from "./types.js";
 
 /**
@@ -12,39 +12,25 @@ export interface GetItemParams {
    */
   table: string;
   /**
-   * The partition key value of the item to retrieve.
-   */
-  partitionKey: Attribute;
-  /**
-   * The optional sort key value of the item to retrieve.
+   * The primary key values of the item to retrieve.
    *
-   * Note that this is only optional if the table's primary key is made only of the partition key.
-   * It's mandatory otherwise.
+   * This should always include at least the partition key, and the sort key if one
+   * is part of the table's primary key. No more than 2 fields are expected here.
    */
-  sortKey?: Attribute;
+  key: Attributes;
 }
 
 export class GetItem implements Command<GetCommandInput, GetCommand> {
-  private readonly table: string;
-  private readonly partitionKey: Attribute;
-  private readonly sortKey?: Attribute;
+  private readonly params: GetItemParams;
 
   private constructor(params: GetItemParams) {
-    const { table, partitionKey, sortKey } = params;
-    this.table = table;
-    this.partitionKey = partitionKey;
-    this.sortKey = sortKey;
+    this.params = params;
   }
 
   toAwsCommandInput(): GetCommandInput {
-    const key = {
-      [this.partitionKey.name]: this.partitionKey.value,
-    };
-    if (this.sortKey != null) {
-      key[this.sortKey.name] = this.sortKey.value;
-    }
+    const key = this.params.key;
     return {
-      TableName: this.table,
+      TableName: this.params.table,
       Key: key,
     };
   }

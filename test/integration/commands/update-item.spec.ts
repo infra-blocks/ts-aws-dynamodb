@@ -44,10 +44,7 @@ describe(DynamoDBClient.name, () => {
       // Test the update.
       await client.updateItem({
         table: createTableParams.name,
-        // TODO: review this design to be more concise? Like call it just key with two fields?
-        // The native implementation uses a record, which is good enough. This can only fail at runtime for now anyway.
-        // Maybe use a generic type in the field that defaults to record?
-        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        key: { pk: putItemParams.item.pk },
         update: [
           set(
             attribute("stuff.kebab-field"),
@@ -62,7 +59,7 @@ describe(DynamoDBClient.name, () => {
       // Check the result.
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        key: { pk: putItemParams.item.pk },
       });
       expect(item).to.deep.include({
         pk: putItemParams.item.pk,

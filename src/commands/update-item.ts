@@ -1,5 +1,5 @@
 import { UpdateCommand, type UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { Attribute } from "../types.js";
+import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import {
@@ -11,8 +11,8 @@ import type { Command } from "./types.js";
 
 export interface UpdateItemParams {
   table: string;
-  partitionKey: Attribute;
-  sortKey?: Attribute;
+  // TODO: specific type def for primary key attributes (subset of types)
+  key: Attributes;
   condition?: Condition;
   update: UpdateExpressionParams;
 }
@@ -25,14 +25,7 @@ export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
   }
 
   toAwsCommandInput(): UpdateCommandInput {
-    const { table, partitionKey, sortKey, condition, update } = this.params;
-
-    const key = {
-      [partitionKey.name]: partitionKey.value,
-    };
-    if (sortKey != null) {
-      key[sortKey.name] = sortKey.value;
-    }
+    const { table, key, condition, update } = this.params;
 
     const input: UpdateCommandInput = {
       TableName: table,

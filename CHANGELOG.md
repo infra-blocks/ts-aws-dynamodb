@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.0] - 2025-07-26
+
+### Changed
+
+- The `getItem` and `updateItem` client methods now take a `key` parameter instead
+of a combination of `partitionKey` and optional `sortKey` parameters. This new
+design is a little more concise and more aligned with what the native implementation
+requires. The drawback is that user code could make a mistake a put three fields in
+the key, for example.
+
 ## [0.24.0] - 2025-07-25
 
 ### Added
@@ -327,6 +337,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.25.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.21.0...v0.22.0
