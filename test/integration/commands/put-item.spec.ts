@@ -32,7 +32,7 @@ describe(DynamoDbClient.name, () => {
 
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: putItemParams.item.pk },
+        key: { pk: putItemParams.item.pk },
       });
       expect(item).to.deep.include(putItemParams.item);
     });
@@ -57,8 +57,7 @@ describe(DynamoDbClient.name, () => {
 
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: putItemParams.item.pk },
-        sortKey: { name: "sk", value: putItemParams.item.sk },
+        key: { pk: putItemParams.item.pk, sk: putItemParams.item.sk },
       });
       expect(item).to.deep.include(putItemParams.item);
     });
@@ -86,8 +85,7 @@ describe(DynamoDbClient.name, () => {
 
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: putItemParams.item.pk },
-        sortKey: { name: "sk", value: putItemParams.item.sk },
+        key: { pk: putItemParams.item.pk, sk: putItemParams.item.sk },
       });
       expect(item).to.deep.include(putItemParams.item);
     });

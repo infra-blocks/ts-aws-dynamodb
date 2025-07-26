@@ -63,11 +63,6 @@ export type AttributeValue =
   | NativeString
   | NativeStringSet;
 
-// TODO: remove when we review the query interfaces to use "key" instead of pk/sk bullshat.
-export interface Attribute {
-  name: AttributeName;
-  value: AttributeValue;
-}
 export type Attributes = Record<AttributeName, AttributeValue>;
 
 export type IndexAttributeType = Extract<AttributeType, "B" | "N" | "S">;

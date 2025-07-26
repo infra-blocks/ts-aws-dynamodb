@@ -26,7 +26,7 @@ describe(DynamoDBClient.name, () => {
 
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: "User#BigToto" },
+        key: { pk: "User#BigToto" },
       });
       expect(item).to.deep.include({
         pk: "User#BigToto",
@@ -52,8 +52,7 @@ describe(DynamoDBClient.name, () => {
 
       const item = await client.getItem({
         table: createTableParams.name,
-        partitionKey: { name: "pk", value: "User#BigToto" },
-        sortKey: { name: "sk", value: 42 },
+        key: { pk: "User#BigToto", sk: 42 },
       });
       expect(item).to.deep.include({
         pk: "User#BigToto",

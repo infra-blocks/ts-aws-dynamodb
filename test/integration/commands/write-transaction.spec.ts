@@ -41,7 +41,7 @@ describe(DynamoDbClient.name, () => {
         writeTransactionParams.writes.map(async (transactItem) => {
           const item = await client.getItem({
             table: createTableParams.name,
-            partitionKey: { name: "pk", value: transactItem.item.pk },
+            key: { pk: transactItem.item.pk },
           });
           expect(item).to.deep.include(transactItem.item);
         }),
