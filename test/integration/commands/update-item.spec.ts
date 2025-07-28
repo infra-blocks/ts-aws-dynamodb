@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
   add,
+  attributeExists,
   type CreateTableParams,
   deleteFrom,
   ifNotExists,
@@ -10,7 +11,6 @@ import {
   remove,
   set,
   value,
-  where,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -54,7 +54,7 @@ describe(DynamoDBClient.name, () => {
           add(path("stuff.addMe"), value(new Set([4]))),
           deleteFrom(path("stuff.deleteFromMe"), value(new Set(["one"]))),
         ],
-        condition: where(path("stuff.kebab-field")).exists(),
+        condition: attributeExists(path("stuff.kebab-field")),
       });
       // Check the result.
       const item = await client.getItem({

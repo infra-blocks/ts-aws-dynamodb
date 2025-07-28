@@ -2,19 +2,20 @@ import { PutCommand, type PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
-import type { Condition } from "./expressions/condition.js";
+import { conditionExpression } from "./expressions/condition/expression.js";
+import type { ConditionParams } from "./expressions/index.js";
 import type { Command } from "./types.js";
 
 export interface PutItemParams {
   table: string;
   item: Attributes;
-  condition?: Condition;
+  condition?: ConditionParams;
 }
 
 export class PutItem implements Command<PutCommandInput, PutCommand> {
   private readonly table: string;
   private readonly item: Attributes;
-  private readonly condition?: Condition;
+  private readonly condition?: ConditionParams;
 
   private constructor(params: PutItemParams) {
     const { table, item, condition } = params;
@@ -38,7 +39,10 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
     const names = AttributeNames.create();
     const values = AttributeValues.create();
     // Ask the expression to stringify itself, applying the substitutions by itself.
-    const expression = this.condition.stringify({ names, values });
+    const expression = conditionExpression(this.condition).stringify({
+      names,
+      values,
+    });
 
     return {
       ...input,

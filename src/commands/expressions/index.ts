@@ -1,4 +1,4 @@
-export * from "./condition.js";
+export * from "./condition/index.js";
 export * from "./key-condition.js";
 export * from "./operands/index.js";
 export * from "./update/index.js";
