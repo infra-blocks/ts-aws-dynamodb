@@ -1,7 +1,7 @@
 import type { NativeNumber, NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { PathOperand } from "../operands/name.js";
+import type { PathOperand } from "../operands/path.js";
 import type { ValueOperand } from "../operands/value.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";

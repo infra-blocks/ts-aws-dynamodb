@@ -1,6 +1,6 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { PathOperand } from "../operands/name.js";
+import type { PathOperand } from "../operands/path.js";
 import type { IOperand, Operand } from "../operands/type.js";
 
 export class IfNotExistsOperand implements IOperand {
