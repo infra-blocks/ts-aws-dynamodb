@@ -1,5 +1,5 @@
 import type { AttributeNames } from "../../attributes/names.js";
-import type { PathOperand } from "../operands/name.js";
+import type { PathOperand } from "../operands/path.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
