@@ -26,7 +26,7 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
 }
 
 /**
- * Factory function to create a `ValueOperand` with fewer characters.
+ * Factory function to create a {@link ValueOperand}.
  *
  * @param value - The value this operand represents.
  *

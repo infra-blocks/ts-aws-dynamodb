@@ -3,9 +3,9 @@ import type { AttributeNames } from "../attributes/names.js";
 import type { AttributeValues } from "../attributes/values.js";
 import type { IExpression } from "./expression.js";
 import {
-  AttributeOperand,
   type IOperand,
   type Operand,
+  PathOperand,
   type ValueOperand,
 } from "./operands/index.js";
 
@@ -352,7 +352,7 @@ export class OperandConditionBuilder<T extends Operand> {
 }
 
 // A specialized class with more capabilities.
-export class AttributeConditionBuilder extends OperandConditionBuilder<AttributeOperand> {
+export class AttributeConditionBuilder extends OperandConditionBuilder<PathOperand> {
   /**
    * @returns A {@link Condition} that evaluates to true if the provided attribute path exists.
    */
@@ -393,12 +393,12 @@ export class AttributeConditionBuilder extends OperandConditionBuilder<Attribute
   }
 }
 
-export function where(attrribute: AttributeOperand): AttributeConditionBuilder;
+export function where(attrribute: PathOperand): AttributeConditionBuilder;
 export function where(
-  operand: Exclude<Operand, AttributeOperand>,
-): OperandConditionBuilder<Exclude<Operand, AttributeOperand>>;
+  operand: Exclude<Operand, PathOperand>,
+): OperandConditionBuilder<Exclude<Operand, PathOperand>>;
 export function where(operand: Operand): OperandConditionBuilder<Operand> {
-  if (operand instanceof AttributeOperand) {
+  if (operand instanceof PathOperand) {
     return new AttributeConditionBuilder(operand);
   }
   return new OperandConditionBuilder(operand);

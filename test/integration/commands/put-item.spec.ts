@@ -1,9 +1,9 @@
 import { expect } from "@infra-blocks/test";
 import {
-  attribute,
   type CreateTableParams,
   DynamoDbClient,
   type PutItemParams,
+  path,
   value,
   where,
 } from "../../../src/index.js";
@@ -77,9 +77,9 @@ describe(DynamoDbClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: where(attribute("sk"))
+        condition: where(path("sk"))
           .isType(value("N"))
-          .or(where(attribute("pk")).notExists()),
+          .or(where(path("pk")).notExists()),
       };
       await client.putItem(putItemParams);
 
