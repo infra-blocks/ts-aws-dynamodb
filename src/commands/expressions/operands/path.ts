@@ -9,7 +9,7 @@ import type { IOperand } from "./type.js";
  * attribute path in the {@link AttributeNames} registry and substitutes
  * it with the returned value.
  */
-export class PathOperand implements IOperand {
+export class Path implements IOperand {
   private readonly path: AttributePath;
 
   constructor(path: AttributePath) {
@@ -23,12 +23,12 @@ export class PathOperand implements IOperand {
 }
 
 /**
- * Factory function to create a {@link PathOperand}.
+ * Factory function to create a {@link Path}.
  *
  * @param path - The path of the attribute this operand represents.
  *
- * @returns A new {@link PathOperand} instance for the provided path.
+ * @returns A new {@link Path} instance for the provided path.
  */
-export function path(path: AttributePath): PathOperand {
-  return new PathOperand(path);
+export function path(path: AttributePath): Path {
+  return new Path(path);
 }

@@ -1,6 +1,6 @@
 import type { NativeBinary, NativeString, NativeType } from "../../../types.js";
-import type { PathOperand } from "../operands/path.js";
-import type { ValueOperand } from "../operands/value.js";
+import type { Path } from "../operands/path.js";
+import type { Value } from "../operands/value.js";
 import { ConditionExpression } from "./expression.js";
 import type { Size } from "./size.js";
 
@@ -12,7 +12,7 @@ import type { Size } from "./size.js";
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export function attributeExists(attribute: PathOperand): ConditionExpression {
+export function attributeExists(attribute: Path): ConditionExpression {
   return ConditionExpression.from({
     stringify: ({ names }) =>
       `attribute_exists(${attribute.substitute({ names })})`,
@@ -27,9 +27,7 @@ export function attributeExists(attribute: PathOperand): ConditionExpression {
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export function attributeNotExists(
-  attribute: PathOperand,
-): ConditionExpression {
+export function attributeNotExists(attribute: Path): ConditionExpression {
   return ConditionExpression.from({
     stringify: ({ names }) =>
       `attribute_not_exists(${attribute.substitute({ names })})`,
@@ -47,8 +45,8 @@ export function attributeNotExists(
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
 export function attributeType(
-  attribute: PathOperand,
-  type: ValueOperand<NativeType>,
+  attribute: Path,
+  type: Value<NativeType>,
 ): ConditionExpression {
   return ConditionExpression.from({
     stringify: ({ names, values }) =>
@@ -61,9 +59,7 @@ export function attributeType(
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export type BeginsWithOperand =
-  | PathOperand
-  | ValueOperand<NativeString | NativeBinary>;
+export type BeginsWithOperand = Path | Value<NativeString | NativeBinary>;
 
 /**
  * Returns a condition that uses the `begins_with` function.
@@ -88,11 +84,11 @@ export function beginsWith(
 /**
  * This type aggregates the types of operands that can be used as the first operand of the {@link contains} function.
  */
-export type ContainsFirstOperand = PathOperand | ValueOperand;
+export type ContainsFirstOperand = Path | Value;
 /**
  * This type aggregates the types of operands that can be used as the second operand of the {@link contains} function.
  */
-export type ContainsSecondOperand = PathOperand | ValueOperand | Size;
+export type ContainsSecondOperand = Path | Value | Size;
 
 /**
  * Returns a condition that uses the `contains` function.

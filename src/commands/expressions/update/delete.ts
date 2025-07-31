@@ -1,18 +1,18 @@
 import type { NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { PathOperand } from "../operands/path.js";
-import type { ValueOperand } from "../operands/value.js";
+import type { Path } from "../operands/path.js";
+import type { Value } from "../operands/value.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
 export class DeleteAction implements IUpdateAction {
-  private readonly path: PathOperand;
-  private readonly value: ValueOperand<NativeSet>;
+  private readonly path: Path;
+  private readonly value: Value<NativeSet>;
 
   private constructor(params: {
-    path: PathOperand;
-    value: ValueOperand<NativeSet>;
+    path: Path;
+    value: Value<NativeSet>;
   }) {
     const { path, value } = params;
     this.path = path;
@@ -33,10 +33,7 @@ export class DeleteAction implements IUpdateAction {
     })}`;
   }
 
-  static from(params: {
-    path: PathOperand;
-    value: ValueOperand<NativeSet>;
-  }): DeleteAction {
+  static from(params: { path: Path; value: Value<NativeSet> }): DeleteAction {
     return new DeleteAction(params);
   }
 }
@@ -55,9 +52,6 @@ export class DeleteAction implements IUpdateAction {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
  */
 
-export function deleteFrom(
-  path: PathOperand,
-  value: ValueOperand<NativeSet>,
-): UpdateAction {
+export function deleteFrom(path: Path, value: Value<NativeSet>): UpdateAction {
   return DeleteAction.from({ path, value });
 }
