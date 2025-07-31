@@ -2,6 +2,7 @@ import { QueryCommand, type QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { AttributeValue } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
+import { conditionExpression } from "./expressions/condition/expression.js";
 import type { KeyConditionExpression } from "./expressions/key-condition.js";
 import type { Command } from "./types.js";
 
@@ -29,7 +30,10 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
   toAwsCommandInput(): QueryCommandInput {
     const names = AttributeNames.create();
     const values = AttributeValues.create();
-    const expression = this.condition.stringify({ names, values });
+    const expression = conditionExpression(this.condition).stringify({
+      names,
+      values,
+    });
     return {
       TableName: this.table,
       IndexName: this.index,

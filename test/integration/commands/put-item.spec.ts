@@ -1,11 +1,13 @@
 import { expect } from "@infra-blocks/test";
 import {
+  attributeNotExists,
+  attributeType,
   type CreateTableParams,
   DynamoDbClient,
+  or,
   type PutItemParams,
   path,
   value,
-  where,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -77,9 +79,10 @@ describe(DynamoDbClient.name, () => {
           pk: "BigIron#1",
           sk: 42,
         },
-        condition: where(path("sk"))
-          .isType(value("N"))
-          .or(where(path("pk")).notExists()),
+        condition: or(
+          attributeType(path("sk"), value("N")),
+          attributeNotExists(path("pk")),
+        ),
       };
       await client.putItem(putItemParams);
 

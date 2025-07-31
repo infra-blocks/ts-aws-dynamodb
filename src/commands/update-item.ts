@@ -2,8 +2,9 @@ import { UpdateCommand, type UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
+import { conditionExpression } from "./expressions/condition/expression.js";
 import {
-  type Condition,
+  type ConditionParams,
   UpdateExpression,
   type UpdateExpressionParams,
 } from "./expressions/index.js";
@@ -13,7 +14,7 @@ export interface UpdateItemParams {
   table: string;
   // TODO: specific type def for primary key attributes (subset of types)
   key: Attributes;
-  condition?: Condition;
+  condition?: ConditionParams;
   update: UpdateExpressionParams;
 }
 
@@ -51,7 +52,10 @@ export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
 
     // Otherwise, we need to stringify the condition, reusing the same names and values
     // as before.
-    input.ConditionExpression = condition.stringify({ names, values });
+    input.ConditionExpression = conditionExpression(condition).stringify({
+      names,
+      values,
+    });
     input.ExpressionAttributeNames = names.getSubstitutions();
     input.ExpressionAttributeValues = values.getSubstitutions();
     return input;

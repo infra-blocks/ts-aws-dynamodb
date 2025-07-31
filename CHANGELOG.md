@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2025-07-31
+
+### Changed
+
+- Big condition refactoring. The new syntax allows more flexibility in terms of operands
+and is required for the planned changed regarding "loose" types. For example, the previous
+`path("toto").exists()` syntax would work poorly to support using strings directly as
+the default path type: `"toto".exists() # NOPE!`. So, functions were reworked to be
+free floating and not methods. `.exists()` became `attributeExists(<lhs>, <rhs>)` for example.
+This will work just fine with strings instead of operand types.
+- The refactoring not only affected functions, but also reworked how *comparisons* are
+handled. Before, to express a comparison such as "lower than", the user had to call a
+`lowerThan` method on an operand object. This has been changed in favor of a more intuitive
+syntax using arrays and tokens. `lowerThan` is now expressed as `[<lhs>, "<", <rhs>]`.
+- These new functions and comparisons are overall better typed. Every function has been examined
+to support exactly and only the types that DynamoDB supports. For example, going back to
+comparisons, operators are not supported for just about every type. There is a specific subset
+of values that can be used in comparisons. Those have been typed properly such that some
+errors that can be caught at compile time will. For example, trying to compare to compare
+sets with the `<` operator will not compile. At the time of this writing, however, no checks
+are made to verify that a `number` is compared with another `number`, for example. This may
+come in a future edition.
+
 ## [0.26.0] - 2025-07-28
 
 ### Changed
@@ -344,6 +367,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.27.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.25.0...v0.26.0
 [0.25.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.23.0...v0.24.0

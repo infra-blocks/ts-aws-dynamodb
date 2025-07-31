@@ -1,4 +1,28 @@
 // DynamoDB supported types and their TypeScript representations
+export type NativeType =
+  | "B" // Binary
+  | "BS" // Binary Set
+  | "BOOL" // Boolean
+  | "L" // List
+  | "M" // Map
+  | "N" // Number
+  | "NS" // Number Set
+  | "NULL" // Null
+  | "S" // String
+  | "SS"; // String Set
+export const NATIVE_TYPES = [
+  "B",
+  "BS",
+  "BOOL",
+  "L",
+  "M",
+  "N",
+  "NS",
+  "NULL",
+  "S",
+  "SS",
+] as const;
+
 export type NativeBinary = Buffer;
 export type NativeBinarySet = Set<NativeBinary>;
 export type NativeBoolean = boolean;
@@ -39,17 +63,6 @@ export type AttributeName = string;
  */
 export type AttributePath = AttributeName;
 
-export type AttributeType =
-  | "S" // String
-  | "N" // Number
-  | "B" // Binary
-  | "BOOL" // Boolean
-  | "NULL" // Null
-  | "M" // Map
-  | "L" // List
-  | "SS" // String Set
-  | "NS" // Number Set
-  | "BS"; // Binary Set
 export type AttributeValue =
   | NativeBinary
   | NativeBinarySet
@@ -65,7 +78,7 @@ export type AttributeValue =
 
 export type Attributes = Record<AttributeName, AttributeValue>;
 
-export type IndexAttributeType = Extract<AttributeType, "B" | "N" | "S">;
+export type IndexAttributeType = Extract<NativeType, "B" | "N" | "S">;
 
 export interface IndexAttributeDefinition {
   name: string;
