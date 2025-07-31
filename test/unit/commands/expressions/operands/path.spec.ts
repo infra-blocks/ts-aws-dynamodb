@@ -1,9 +1,9 @@
 import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../../src/commands/attributes/names.js";
-import { PathOperand, path } from "../../../../../src/index.js";
+import { Path, path } from "../../../../../src/index.js";
 
 describe("commands.expressions.operands.path", () => {
-  describe(PathOperand.name, () => {
+  describe(Path.name, () => {
     it("should be correctly substitute the value", () => {
       const operand = path("big.toto");
       const names = AttributeNames.create();

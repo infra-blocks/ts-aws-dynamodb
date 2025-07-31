@@ -1,12 +1,12 @@
 import type { AttributeNames } from "../../attributes/names.js";
-import type { PathOperand } from "../operands/path.js";
+import type { Path } from "../operands/path.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
 export class RemoveAction implements IUpdateAction {
-  private readonly path: PathOperand;
+  private readonly path: Path;
 
-  private constructor(path: PathOperand) {
+  private constructor(path: Path) {
     this.path = path;
   }
 
@@ -19,7 +19,7 @@ export class RemoveAction implements IUpdateAction {
     return this.path.substitute({ names });
   }
 
-  static from(path: PathOperand): RemoveAction {
+  static from(path: Path): RemoveAction {
     return new RemoveAction(path);
   }
 }
@@ -33,6 +33,6 @@ export class RemoveAction implements IUpdateAction {
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
  */
-export function remove(path: PathOperand): UpdateAction {
+export function remove(path: Path): UpdateAction {
   return RemoveAction.from(path);
 }

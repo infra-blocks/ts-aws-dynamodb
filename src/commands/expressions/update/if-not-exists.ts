@@ -1,13 +1,13 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { PathOperand } from "../operands/path.js";
+import type { Path } from "../operands/path.js";
 import type { IOperand, Operand } from "../operands/type.js";
 
 export class IfNotExistsOperand implements IOperand {
-  private readonly path: PathOperand;
+  private readonly path: Path;
   private readonly defaultValue: Operand;
 
-  constructor(params: { path: PathOperand; defaultValue: Operand }) {
+  constructor(params: { path: Path; defaultValue: Operand }) {
     const { path, defaultValue } = params;
     this.path = path;
     this.defaultValue = defaultValue;
@@ -23,7 +23,7 @@ export class IfNotExistsOperand implements IOperand {
 }
 
 export function ifNotExists(
-  path: PathOperand,
+  path: Path,
   defaultValue: Operand,
 ): IfNotExistsOperand {
   return new IfNotExistsOperand({ path, defaultValue });

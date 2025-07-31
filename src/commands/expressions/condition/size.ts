@@ -9,22 +9,20 @@ import type {
   AttributeNames,
   AttributeValues,
 } from "../../attributes/index.js";
-import type { PathOperand } from "../operands/path.js";
+import type { Path } from "../operands/path.js";
 import type { IOperand } from "../operands/type.js";
-import type { ValueOperand } from "../operands/value.js";
+import type { Value } from "../operands/value.js";
 
 /**
  * This type aggregates the types of operands that can be used with the {@link size} function.
  *
  * @see size
- * @see PathOperand
- * @see ValueOperand
+ * @see Path
+ * @see Value
  */
 export type SizeOperand =
-  | PathOperand
-  | ValueOperand<
-      NativeBinary | NativeList | NativeMap | NativeSet | NativeString
-    >;
+  | Path
+  | Value<NativeBinary | NativeList | NativeMap | NativeSet | NativeString>;
 
 /**
  * A type representing the result of the {@link size} function as an operand to be used in expressions.

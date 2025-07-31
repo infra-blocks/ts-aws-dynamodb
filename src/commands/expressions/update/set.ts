@@ -1,6 +1,6 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { PathOperand } from "../operands/path.js";
+import type { Path } from "../operands/path.js";
 import type { Operand } from "../operands/type.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
@@ -13,7 +13,7 @@ export type SetOperator = "+" | "-";
 type SetActionParams = SetToParams | SetToExpressionParams;
 
 type SetToParams = {
-  path: PathOperand;
+  path: Path;
   operand: SetOperand;
 };
 
@@ -61,15 +61,15 @@ export class SetAction implements IUpdateAction {
 }
 
 // TODO: increment/decrement utilities built on top of the assignments.
-export function set(path: PathOperand, operand: SetOperand): UpdateAction;
+export function set(path: Path, operand: SetOperand): UpdateAction;
 export function set(
-  path: PathOperand,
+  path: Path,
   operand: SetOperand,
   operator: SetOperator,
   secondOperand: SetOperand,
 ): UpdateAction;
 export function set(
-  path: PathOperand,
+  path: Path,
   operand: SetOperand,
   operator?: SetOperator,
   secondOperand?: SetOperand,

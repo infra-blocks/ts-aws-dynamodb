@@ -9,7 +9,7 @@ import type { IOperand } from "./type.js";
  * value in the {@link AttributeValues} registry and substitutes
  * it with the returned value.
  */
-export class ValueOperand<T extends AttributeValue = AttributeValue>
+export class Value<T extends AttributeValue = AttributeValue>
   implements IOperand
 {
   private readonly value: T;
@@ -25,14 +25,14 @@ export class ValueOperand<T extends AttributeValue = AttributeValue>
 }
 
 /**
- * Factory function to create a {@link ValueOperand}.
+ * Factory function to create a {@link Value}.
  *
  * @param value - The value this operand represents.
  *
- * @returns A new {@link ValueOperand} instance for the provided value.
+ * @returns A new {@link Value} instance for the provided value.
  */
 export function value<T extends AttributeValue = AttributeValue>(
   value: T,
-): ValueOperand<T> {
-  return new ValueOperand(value);
+): Value<T> {
+  return new Value(value);
 }
