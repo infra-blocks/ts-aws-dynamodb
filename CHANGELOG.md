@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2025-08-04
+
+### Added
+
+- Support for `RawPath` and path normalization. This feature introduce the idea of using
+unwrapped types directly with the query expression API in certain circumstances. In specific,
+this change introduce the ability to use `string`s instead of `Path`s in APIs where `Path`s
+are required. This is accomplish with the use of a union type as input: `RawPath`, and a
+normalization function behind the scene that normalizes the input to a `Path` object:
+`Path.normalize`. Let's take the `remove` update action as an example. Before, the user
+*had* to pass in a `Path` object using the `path` function, as such:
+`update: [remove(path("the.attribute.))]`. With this change, the user can pass the attribute
+path directly as a string: `update: [remove("the.attribute")]`. Affected APIs are:
+  - The `attributeExists` condition function.
+  - The `attributeNotExists` condition function.
+  - The `attributeType` condition function.
+  - All update actions (`set`, `remove`, `add`, `delete`) and the
+  `ifNotExists` update action function.
+
+
 ## [0.28.0] - 2025-07-31
 
 ### Changed
@@ -374,6 +394,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.29.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.26.0...v0.27.0
 [0.26.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.25.0...v0.26.0

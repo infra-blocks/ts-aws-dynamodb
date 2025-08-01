@@ -1,5 +1,5 @@
 import type { NativeBinary, NativeString, NativeType } from "../../../types.js";
-import type { Path } from "../operands/path.js";
+import { Path, type RawPath } from "../operands/path.js";
 import type { Value } from "../operands/value.js";
 import { ConditionExpression } from "./expression.js";
 import type { Size } from "./size.js";
@@ -7,30 +7,31 @@ import type { Size } from "./size.js";
 /**
  * Returns a condition that uses the `attribute_exists` function.
  *
- * @param attribute - The attribute path to check for existence.
+ * @param rawPath - The attribute path to check for existence.
  * @returns A {@link ConditionExpression} that evaluates to true if the provided attribute path exists.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export function attributeExists(attribute: Path): ConditionExpression {
+export function attributeExists(rawPath: RawPath): ConditionExpression {
+  const path = Path.normalize(rawPath);
   return ConditionExpression.from({
-    stringify: ({ names }) =>
-      `attribute_exists(${attribute.substitute({ names })})`,
+    stringify: ({ names }) => `attribute_exists(${path.substitute({ names })})`,
   });
 }
 
 /**
  * Returns a condition that uses the `attribute_not_exists` function.
  *
- * @param attribute - The attribute path to check for non-existence.
+ * @param rawPath - The attribute path to check for non-existence.
  * @returns A {@link ConditionExpression} that evaluates to true if the provided attribute path does not exist.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export function attributeNotExists(attribute: Path): ConditionExpression {
+export function attributeNotExists(rawPath: RawPath): ConditionExpression {
+  const path = Path.normalize(rawPath);
   return ConditionExpression.from({
     stringify: ({ names }) =>
-      `attribute_not_exists(${attribute.substitute({ names })})`,
+      `attribute_not_exists(${path.substitute({ names })})`,
   });
 }
 
@@ -45,12 +46,13 @@ export function attributeNotExists(attribute: Path): ConditionExpression {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
 export function attributeType(
-  attribute: Path,
+  attribute: RawPath,
   type: Value<NativeType>,
 ): ConditionExpression {
+  const path = Path.normalize(attribute);
   return ConditionExpression.from({
     stringify: ({ names, values }) =>
-      `attribute_type(${attribute.substitute({ names })}, ${type.substitute({ values })})`,
+      `attribute_type(${path.substitute({ names })}, ${type.substitute({ values })})`,
   });
 }
 
@@ -81,6 +83,7 @@ export function beginsWith(
   });
 }
 
+// TODO: type better on the lhs/rhs?
 /**
  * This type aggregates the types of operands that can be used as the first operand of the {@link contains} function.
  */

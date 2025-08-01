@@ -4,40 +4,47 @@ import { actionMatch } from "./action-match.js";
 
 describe("commands.expressions.update.delete", () => {
   describe(deleteFrom.name, () => {
-    it("should not compile with an attribute name and a string", () => {
-      // @ts-expect-error
+    it("should not compile with a path and a string", () => {
+      // @ts-expect-error A string is not a valid rhs operand for delete.
       deleteFrom(path("name"), value("toto"));
     });
-    it("should not compile with an attribute name and a number", () => {
-      // @ts-expect-error
+    it("should not compile with a path and a number", () => {
+      // @ts-expect-error A number is not a valid rhs operand for delete.
       deleteFrom(path("name"), value(42));
     });
-    it("should not compile with an attribute name and a boolean", () => {
-      // @ts-expect-error
+    it("should not compile with a path and a boolean", () => {
+      // @ts-expect-error A boolean is not a valid rhs operand for delete.
       deleteFrom(path("name"), value(true));
     });
-    it("should not compile with an attribute name and null", () => {
-      // @ts-expect-error
+    it("should not compile with a path and null", () => {
+      // @ts-expect-error Null is not a valid rhs operand for delete.
       deleteFrom(path("name"), value(null));
     });
-    it("should not compile with an attribute name and undefined", () => {
-      // @ts-expect-error
+    it("should not compile with a path and undefined", () => {
+      // @ts-expect-error Undefined is not a valid rhs operand for delete.
       deleteFrom(path("name"), value(undefined));
     });
-    it("should not compile with an attribute name and a record", () => {
-      // Records are maps, which aren't sets or numbers.
-      // @ts-expect-error
+    it("should not compile with a path and a record", () => {
+      // @ts-expect-error A record is not a valid rhs operand for delete.
       deleteFrom(path("name"), value({}));
     });
-    it("should not compile with an attribute name and an array", () => {
-      // Arrays are lists, which aren't sets or numbers.
-      // @ts-expect-error
+    it("should not compile with a path and an array", () => {
+      // @ts-expect-error An array is not a valid rhs operand for delete.
       deleteFrom(path("name"), value([]));
     });
-    it("should work with an attribute name and a set", () => {
+    it("should work with a path and a set", () => {
       const deleted = new Set(["toto", "tata", "tutu"]);
       const { match, names, values } = actionMatch({
         action: deleteFrom(path("attr.name"), value(deleted)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(deleted));
+    });
+    it("should work with an implicit path and a set", () => {
+      const deleted = new Set(["toto", "tata", "tutu"]);
+      const { match, names, values } = actionMatch({
+        action: deleteFrom("attr.name", value(deleted)),
         matcher: /(#\S+)\s+(:\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("attr.name"));

@@ -1,6 +1,6 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { Path } from "../operands/path.js";
+import { Path, type RawPath } from "../operands/path.js";
 import type { IOperand, Operand } from "../operands/type.js";
 
 export class IfNotExistsOperand implements IOperand {
@@ -23,8 +23,9 @@ export class IfNotExistsOperand implements IOperand {
 }
 
 export function ifNotExists(
-  path: Path,
+  rawPath: RawPath,
   defaultValue: Operand,
 ): IfNotExistsOperand {
+  const path = Path.normalize(rawPath);
   return new IfNotExistsOperand({ path, defaultValue });
 }
