@@ -24,6 +24,15 @@ describe("commands.expressions.condition.functions", () => {
       const attributeSubstitution = match[1];
       expect(attributeSubstitution).to.equal(names.substitute(attribute));
     });
+    it("should work with an implicit path", () => {
+      const attribute = "test.attribute";
+      const { match, names } = expressionMatch({
+        expression: attributeExists(attribute),
+        matcher: /attribute_exists\((#\S+)\)/,
+      });
+      const attributeSubstitution = match[1];
+      expect(attributeSubstitution).to.equal(names.substitute(attribute));
+    });
   });
   describe(attributeNotExists.name, () => {
     it("should not compile with a value", () => {
@@ -34,6 +43,15 @@ describe("commands.expressions.condition.functions", () => {
       const attribute = "test.attribute";
       const { match, names } = expressionMatch({
         expression: attributeNotExists(path(attribute)),
+        matcher: /attribute_not_exists\((#\S+)\)/,
+      });
+      const attributeSubstitution = match[1];
+      expect(attributeSubstitution).to.equal(names.substitute(attribute));
+    });
+    it("should work with an implicit path", () => {
+      const attribute = "test.attribute";
+      const { match, names } = expressionMatch({
+        expression: attributeNotExists(attribute),
         matcher: /attribute_not_exists\((#\S+)\)/,
       });
       const attributeSubstitution = match[1];
@@ -57,6 +75,17 @@ describe("commands.expressions.condition.functions", () => {
         const lhs = "test.attribute";
         const { match, names, values } = expressionMatch({
           expression: attributeType(path(lhs), value(type)),
+          matcher: /attribute_type\((#\S+),\s*(:\S+)\)/,
+        });
+        const lhsSubstitution = match[1];
+        const rhsSubstitution = match[2];
+        expect(lhsSubstitution).to.equal(names.substitute(lhs));
+        expect(rhsSubstitution).to.equal(values.substitute(type));
+      });
+      it(`should work with an implicit path and type ${type}`, () => {
+        const lhs = "test.attribute";
+        const { match, names, values } = expressionMatch({
+          expression: attributeType(lhs, value(type)),
           matcher: /attribute_type\((#\S+),\s*(:\S+)\)/,
         });
         const lhsSubstitution = match[1];

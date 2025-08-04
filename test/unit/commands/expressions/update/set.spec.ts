@@ -4,7 +4,7 @@ import { actionMatch } from "./action-match.js";
 
 describe("commands.expressions.update.set", () => {
   describe(set.name, () => {
-    it("should work with an attribute name", () => {
+    it("should work with a path as lhs and a path as rhs", () => {
       const attribute = "attr.path";
       const operand = "attr.operand";
       const { match, names } = actionMatch({
@@ -14,7 +14,17 @@ describe("commands.expressions.update.set", () => {
       expect(match[1]).to.equal(names.substitute(attribute));
       expect(match[2]).to.equal(names.substitute(operand));
     });
-    it("should work with an attribute value", () => {
+    it("should work with an implicit path as lhs and a path as rhs", () => {
+      const attribute = "attr.path";
+      const operand = "attr.operand";
+      const { match, names } = actionMatch({
+        action: set(attribute, path(operand)),
+        matcher: /(#\S+)\s+=\s+(#\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute(attribute));
+      expect(match[2]).to.equal(names.substitute(operand));
+    });
+    it("should work with a value", () => {
       const attribute = "attr.path";
       const operand = 42;
       const { match, names, values } = actionMatch({
