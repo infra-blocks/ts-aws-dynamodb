@@ -2,7 +2,7 @@ import type { NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import { Path, type RawPath } from "../operands/path.js";
-import type { Value } from "../operands/value.js";
+import { type RawValue, Value } from "../operands/value.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
@@ -45,7 +45,7 @@ export class DeleteAction implements IUpdateAction {
  * provided subset.
  *
  * @param rawPath - The attribute path to modify.
- * @param value - The value to remove from the attribute.
+ * @param rawValue - The value to remove from the attribute.
  *
  * @returns A {@link DeleteAction} that will remove the subset from the attribute.
  *
@@ -54,8 +54,9 @@ export class DeleteAction implements IUpdateAction {
 
 export function deleteFrom(
   rawPath: RawPath,
-  value: Value<NativeSet>,
+  rawValue: RawValue<NativeSet>,
 ): UpdateAction {
   const path = Path.normalize(rawPath);
+  const value = Value.normalize(rawValue);
   return DeleteAction.from({ path, value });
 }

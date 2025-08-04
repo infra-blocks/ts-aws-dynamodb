@@ -50,5 +50,14 @@ describe("commands.expressions.update.delete", () => {
       expect(match[1]).to.equal(names.substitute("attr.name"));
       expect(match[2]).to.equal(values.substitute(deleted));
     });
+    it("should work with an implicit path and an implicit set", () => {
+      const deleted = new Set(["toto", "tata", "tutu"]);
+      const { match, names, values } = actionMatch({
+        action: deleteFrom("attr.name", deleted),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(deleted));
+    });
   });
 });

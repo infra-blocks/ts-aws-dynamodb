@@ -1,6 +1,11 @@
-import type { AttributeValue } from "../../../types.js";
+import type { AttributePath, AttributeValue } from "../../../types.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import type { IOperand } from "./type.js";
+
+export type ImplicitValue = Exclude<AttributeValue, AttributePath>;
+
+export type RawValue<T extends AttributeValue = AttributeValue> =
+  T extends ImplicitValue ? T | Value<T> : Value<T>;
 
 /**
  * Represents a value operand in an expression.
@@ -14,13 +19,36 @@ export class Value<T extends AttributeValue = AttributeValue>
 {
   private readonly value: T;
 
-  constructor(value: T) {
+  private constructor(value: T) {
     this.value = value;
   }
 
   substitute(params: { values: AttributeValues }): string {
     const { values } = params;
     return values.substitute(this.value);
+  }
+
+  /**
+   * @private
+   */
+  static from<T extends AttributeValue = AttributeValue>(value: T): Value<T> {
+    return new Value(value);
+  }
+
+  // TODO: docs
+  /**
+   *
+   * @param value
+   * @returns
+   */
+  static normalize<T extends AttributeValue = AttributeValue>(
+    value: RawValue<T>,
+  ): Value<T> {
+    if (value instanceof Value) {
+      return value as Value<T>;
+    }
+
+    return Value.from(value) as Value<T>;
   }
 }
 
@@ -34,5 +62,5 @@ export class Value<T extends AttributeValue = AttributeValue>
 export function value<T extends AttributeValue = AttributeValue>(
   value: T,
 ): Value<T> {
-  return new Value(value);
+  return Value.from(value);
 }

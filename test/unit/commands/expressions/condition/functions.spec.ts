@@ -93,6 +93,10 @@ describe("commands.expressions.condition.functions", () => {
         expect(lhsSubstitution).to.equal(names.substitute(lhs));
         expect(rhsSubstitution).to.equal(values.substitute(type));
       });
+      it(`should not compile with an implicit path and an implicit type ${type}`, () => {
+        // @ts-expect-error Strings are not valid implicit values for types.
+        attributeType("whatever", type);
+      });
     }
   });
   describe(beginsWith.name, () => {
