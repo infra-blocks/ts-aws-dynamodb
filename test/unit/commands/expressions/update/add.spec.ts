@@ -44,6 +44,14 @@ describe("commands.expressions.update.add", () => {
       expect(match[1]).to.equal(names.substitute("attr.name"));
       expect(match[2]).to.equal(values.substitute(42));
     });
+    it("should work with an implicit path and an implicit number", () => {
+      const { match, names, values } = actionMatch({
+        action: add("attr.name", 42),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(42));
+    });
     it("should work with a path name and a set", () => {
       const added = new Set(["toto", "tata", "tutu"]);
       const { match, names, values } = actionMatch({
@@ -57,6 +65,15 @@ describe("commands.expressions.update.add", () => {
       const added = new Set(["toto", "tata", "tutu"]);
       const { match, names, values } = actionMatch({
         action: add("attr.name", value(added)),
+        matcher: /(#\S+)\s+(:\S+)/,
+      });
+      expect(match[1]).to.equal(names.substitute("attr.name"));
+      expect(match[2]).to.equal(values.substitute(added));
+    });
+    it("should work with an implicit path name and an implicit set", () => {
+      const added = new Set(["toto", "tata", "tutu"]);
+      const { match, names, values } = actionMatch({
+        action: add("attr.name", added),
         matcher: /(#\S+)\s+(:\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("attr.name"));

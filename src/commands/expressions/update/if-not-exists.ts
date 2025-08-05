@@ -3,6 +3,7 @@ import type { AttributeValues } from "../../attributes/values.js";
 import { Path, type RawPath } from "../operands/path.js";
 import type { IOperand, Operand } from "../operands/type.js";
 
+// TODO: generic type on this bitch.
 export class IfNotExistsOperand implements IOperand {
   private readonly path: Path;
   private readonly defaultValue: Operand;

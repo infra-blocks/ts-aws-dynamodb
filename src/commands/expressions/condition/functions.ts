@@ -1,6 +1,6 @@
 import type { NativeBinary, NativeString, NativeType } from "../../../types.js";
 import { Path, type RawPath } from "../operands/path.js";
-import type { Value } from "../operands/value.js";
+import { type RawValue, Value } from "../operands/value.js";
 import { ConditionExpression } from "./expression.js";
 import type { Size } from "./size.js";
 
@@ -39,7 +39,7 @@ export function attributeNotExists(rawPath: RawPath): ConditionExpression {
  * Returns a condition that uses the `attribute_type` function.
  *
  * @param attribute - The attribute path to check.
- * @param type - The expected type of the attribute.
+ * @param rawType - The expected type of the attribute.
  *
  * @returns A {@link ConditionExpression} that evaluates to true if the attribute is of the expected type.
  *
@@ -47,9 +47,10 @@ export function attributeNotExists(rawPath: RawPath): ConditionExpression {
  */
 export function attributeType(
   attribute: RawPath,
-  type: Value<NativeType>,
+  rawType: RawValue<NativeType>,
 ): ConditionExpression {
   const path = Path.normalize(attribute);
+  const type = Value.normalize(rawType);
   return ConditionExpression.from({
     stringify: ({ names, values }) =>
       `attribute_type(${path.substitute({ names })}, ${type.substitute({ values })})`,
