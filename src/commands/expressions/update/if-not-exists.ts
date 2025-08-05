@@ -1,14 +1,16 @@
+import type { AttributeValue } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
 import { Path, type RawPath } from "../operands/path.js";
 import type { IOperand, Operand } from "../operands/type.js";
 
-// TODO: generic type on this bitch.
-export class IfNotExistsOperand implements IOperand {
+export class IfNotExists<T extends AttributeValue = AttributeValue>
+  implements IOperand
+{
   private readonly path: Path;
-  private readonly defaultValue: Operand;
+  private readonly defaultValue: Operand<T>;
 
-  constructor(params: { path: Path; defaultValue: Operand }) {
+  constructor(params: { path: Path; defaultValue: Operand<T> }) {
     const { path, defaultValue } = params;
     this.path = path;
     this.defaultValue = defaultValue;
@@ -23,10 +25,10 @@ export class IfNotExistsOperand implements IOperand {
   }
 }
 
-export function ifNotExists(
+export function ifNotExists<T extends AttributeValue = AttributeValue>(
   rawPath: RawPath,
-  defaultValue: Operand,
-): IfNotExistsOperand {
+  defaultValue: Operand<T>,
+): IfNotExists<T> {
   const path = Path.normalize(rawPath);
-  return new IfNotExistsOperand({ path, defaultValue });
+  return new IfNotExists({ path, defaultValue });
 }

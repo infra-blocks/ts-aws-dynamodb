@@ -4,9 +4,9 @@ import { Path, type RawPath } from "../operands/path.js";
 import type { Operand } from "../operands/type.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
-import type { IfNotExistsOperand } from "./if-not-exists.js";
+import type { IfNotExists } from "./if-not-exists.js";
 
-export type SetOperand = Operand | IfNotExistsOperand;
+export type SetOperand = Operand | IfNotExists;
 
 export type SetOperator = "+" | "-";
 
