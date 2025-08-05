@@ -1,4 +1,5 @@
 import { expect } from "@infra-blocks/test";
+import type { IfNotExists } from "../../../../../src/commands/expressions/update/if-not-exists.js";
 import { ifNotExists, path, value } from "../../../../../src/index.js";
 import { operandMatch } from "./action-match.js";
 
@@ -36,6 +37,16 @@ describe("commands.expressions.update.if-not-exists", () => {
 
       expect(match[1]).to.equal(names.substitute(attribute));
       expect(match[2]).to.equal(values.substitute(defaultValue));
+    });
+    it("should carry the type of its default value", () => {
+      const attribute = "attr.path";
+      const defaultValue = new Set([1, 2, 3]);
+      // Just validating that it compiles and doesn't throw at runtime.
+      // biome-ignore lint/correctness/noUnusedVariables: see above.
+      const result: IfNotExists<Set<number>> = ifNotExists(
+        path(attribute),
+        value(defaultValue),
+      );
     });
   });
 });
