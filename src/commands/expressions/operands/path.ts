@@ -1,6 +1,6 @@
-import type { AttributePath } from "../../../types.js";
+import { type AttributePath, isNativeString } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
-import type { IOperand } from "./type.js";
+import type { IOperand } from "./operand.js";
 
 /**
  * This type represents the types that can implicitly be used
@@ -81,4 +81,23 @@ export class Path implements IOperand {
  */
 export function path(path: AttributePath): Path {
   return Path.from(path);
+}
+
+/**
+ * A type guard to assess if something is a {@link RawPath}.
+ *
+ * @param operand - The operand to test.
+ *
+ * @returns Whether the operand is a {@link RawPath}.
+ */
+export function isRawPath(operand: unknown): operand is RawPath {
+  return isImplicitPath(operand) || isPath(operand);
+}
+
+function isImplicitPath(operand: unknown): operand is ImplicitPath {
+  return isNativeString(operand);
+}
+
+function isPath(operand: unknown): operand is Path {
+  return operand instanceof Path;
 }

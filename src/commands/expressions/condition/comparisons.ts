@@ -1,15 +1,20 @@
 import { unreachable } from "@infra-blocks/types";
 import type {
+  AttributeValue,
   NativeBinary,
   NativeNumber,
   NativeString,
 } from "../../../types.js";
-import type { IOperand, Operand } from "../operands/type.js";
-import type { ConditionOperand, ConditionParams } from "./condition.js";
+import type { Operand } from "../operands/index.js";
+import {
+  type ConditionParams,
+  conditionOperand,
+  type RawConditionOperand,
+} from "./condition.js";
 import { ConditionExpression } from "./expression.js";
 
 export type ComparableValue = NativeBinary | NativeNumber | NativeString;
-export type ComparableOperand = ConditionOperand<ComparableValue>;
+export type ComparableOperand = RawConditionOperand<ComparableValue>;
 
 export type ConditionComparisonParams =
   | Between
@@ -30,13 +35,13 @@ export type Between = [
 ];
 
 // TODO: test that lhs can also be a size function IRL on all these comparisons.
-export type Equals = [ConditionOperand, "=", ConditionOperand];
+export type Equals = [RawConditionOperand, "=", RawConditionOperand];
 export type GreaterThan = [ComparableOperand, ">", ComparableOperand];
 export type GreaterThanOrEquals = [ComparableOperand, ">=", ComparableOperand];
 export type In = [ComparableOperand, "IN", ComparableOperand[]];
 export type LowerThan = [ComparableOperand, "<", ComparableOperand];
 export type LowerThanOrEquals = [ComparableOperand, "<=", ComparableOperand];
-export type NotEquals = [ConditionOperand, "<>", ConditionOperand];
+export type NotEquals = [RawConditionOperand, "<>", RawConditionOperand];
 
 // TODO: don't export publicly through index.
 export function comparison(
@@ -98,9 +103,13 @@ export function isComparison(
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function between(params: Between): ConditionExpression {
+  const lhs = conditionOperand<ComparableValue>(params[0]);
+  const lower = conditionOperand<ComparableValue>(params[2]);
+  const upper = conditionOperand<ComparableValue>(params[4]);
+
   return ConditionExpression.from({
     stringify: ({ names, values }) => {
-      return `${params[0].substitute({ names, values })} BETWEEN ${params[2].substitute({ names, values })} AND ${params[4].substitute({ names, values })}`;
+      return `${lhs.substitute({ names, values })} BETWEEN ${lower.substitute({ names, values })} AND ${upper.substitute({ names, values })}`;
     },
   });
 }
@@ -138,7 +147,7 @@ function isEquals(value: ConditionComparisonParams): value is Equals {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function greaterThan(params: GreaterThan): ConditionExpression {
-  return binaryOperation(params);
+  return binaryOperation<ComparableValue>(params);
 }
 
 function isGreaterThan(value: ConditionComparisonParams): value is GreaterThan {
@@ -156,7 +165,7 @@ function isGreaterThan(value: ConditionComparisonParams): value is GreaterThan {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function greaterThanOrEquals(params: GreaterThanOrEquals): ConditionExpression {
-  return binaryOperation(params);
+  return binaryOperation<ComparableValue>(params);
 }
 
 function isGreaterThanOrEquals(
@@ -178,23 +187,24 @@ function isGreaterThanOrEquals(
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function inComparison(params: In): ConditionExpression {
-  const containerElements = params[2];
   // TODO: unit test those limits
-  if (containerElements.length === 0) {
+  if (params[2].length === 0) {
     throw new Error("the IN operator requires at least one operand.");
   }
-  if (containerElements.length > 100) {
+  if (params[2].length > 100) {
     throw new Error(
-      `up to 100 operands are support for the IN operator, got ${containerElements.length}`,
+      `up to 100 operands are support for the IN operator, got ${params[2].length}`,
     );
   }
 
+  const element = conditionOperand<ComparableValue>(params[0]);
+  const elements = params[2].map(conditionOperand<ComparableValue>);
   return ConditionExpression.from({
     stringify: ({ names, values }) => {
-      const operands = containerElements
+      const elementsString = elements
         .map((operand) => (operand as Operand).substitute({ names, values }))
         .join(",");
-      return `${params[0].substitute({ names, values })} IN (${operands})`;
+      return `${element.substitute({ names, values })} IN (${elementsString})`;
     },
   });
 }
@@ -214,7 +224,7 @@ function isIn(value: ConditionComparisonParams): value is In {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function lowerThan(params: LowerThan): ConditionExpression {
-  return binaryOperation(params);
+  return binaryOperation<ComparableValue>(params);
 }
 
 function isLowerThan(value: ConditionComparisonParams): value is LowerThan {
@@ -232,7 +242,7 @@ function isLowerThan(value: ConditionComparisonParams): value is LowerThan {
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
  */
 function lowerThanOrEquals(params: LowerThanOrEquals): ConditionExpression {
-  return binaryOperation(params);
+  return binaryOperation<ComparableValue>(params);
 }
 
 function isLowerThanOrEquals(
@@ -259,12 +269,15 @@ function isNotEquals(value: ConditionComparisonParams): value is NotEquals {
   return value[1] === "<>";
 }
 
-function binaryOperation(
-  params: [IOperand, string, IOperand],
+function binaryOperation<T extends AttributeValue = AttributeValue>(
+  params: [RawConditionOperand<T>, string, RawConditionOperand<T>],
 ): ConditionExpression {
+  const lhs = conditionOperand(params[0]);
+  const rhs = conditionOperand(params[2]);
+
   return ConditionExpression.from({
     stringify: ({ names, values }) => {
-      return `${params[0].substitute({ names, values })} ${params[1]} ${params[2].substitute({ names, values })}`;
+      return `${lhs.substitute({ names, values })} ${params[1]} ${rhs.substitute({ names, values })}`;
     },
   });
 }

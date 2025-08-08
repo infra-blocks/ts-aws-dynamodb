@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.32.0] - 2025-08-13
+
+### Added
+
+- Support for `RawOperand` and path/value unified normalization. It's the union of the work done
+for `RawPath` and `RawValue`. Basically, APIs that support both types of operands now expose the
+`RawOperand`, or a variant of it, to allow users to pass native types directly. The types that are
+supported are described by `AttributeValue`, with one important distinction: strings are *paths*
+by default, and every other type is a value. This change covers the remaining of the condition
+APIs that weren't covered in the previous homologous patches for `Path` and `Value` operands.
+
 ## [0.31.0] - 2025-08-05
 
 ### Changed

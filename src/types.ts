@@ -1,3 +1,13 @@
+import { isSet } from "node:util/types";
+import {
+  isBigint,
+  isBoolean,
+  isNull,
+  isNumber,
+  isPlainObject,
+  isString,
+} from "@infra-blocks/types";
+
 // DynamoDB supported types and their TypeScript representations
 export type NativeType =
   | "B" // Binary
@@ -40,6 +50,41 @@ export type NativeScalar =
 export type NativeSet = NativeNumberSet | NativeStringSet | NativeBinarySet;
 export type NativeString = string;
 export type NativeStringSet = Set<NativeString>;
+
+// Native type guards.
+export function isNativeBinary(value: unknown): value is NativeBinary {
+  return Buffer.isBuffer(value);
+}
+
+export function isNativeBoolean(value: unknown): value is NativeBoolean {
+  return isBoolean(value);
+}
+
+// Note: the type of the elements is not checked.
+export function isNativeList(value: unknown): value is NativeList {
+  return Array.isArray(value);
+}
+
+// Note: the type of the elements is not checked.
+export function isNativeMap(value: unknown): value is NativeMap {
+  return isPlainObject(value);
+}
+
+export function isNativeNull(value: unknown): value is NativeNull {
+  return isNull(value);
+}
+
+export function isNativeNumber(value: unknown): value is NativeNumber {
+  return isNumber(value) || isBigint(value);
+}
+
+export function isNativeSet(value: unknown): value is NativeSet {
+  return isSet(value);
+}
+
+export function isNativeString(value: unknown): value is NativeString {
+  return isString(value);
+}
 
 // Package wide types used to interact with the APIs.
 

@@ -1,7 +1,7 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
+import type { Operand } from "../operands/operand.js";
 import { Path, type RawPath } from "../operands/path.js";
-import type { Operand } from "../operands/type.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 import type { IfNotExists } from "./if-not-exists.js";

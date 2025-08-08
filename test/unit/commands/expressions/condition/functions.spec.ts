@@ -106,6 +106,10 @@ describe("commands.expressions.condition.functions", () => {
       // @ts-expect-error Numbers are not valid operands for beginsWith.
       beginsWith(value(lhs), value(rhs));
     });
+    it("should not compile with implicit number values", () => {
+      // @ts-expect-error Numbers are not valid operands for beginsWith.
+      beginsWith(42, 69);
+    });
     it("should work with paths", () => {
       const lhs = "test.attribute.lhs";
       const rhs = "test.attribute.rhs";
@@ -118,7 +122,19 @@ describe("commands.expressions.condition.functions", () => {
       expect(lhsSubstitution).to.equal(names.substitute(lhs));
       expect(rhsSubstitution).to.equal(names.substitute(rhs));
     });
-    it("should work with string", () => {
+    it("should work with implicit paths", () => {
+      const lhs = "test.attribute.lhs";
+      const rhs = "test.attribute.rhs";
+      const { match, names } = expressionMatch({
+        expression: beginsWith(lhs, rhs),
+        matcher: /begins_with\((#\S+),\s*(#\S+)\)/,
+      });
+      const lhsSubstitution = match[1];
+      const rhsSubstitution = match[2];
+      expect(lhsSubstitution).to.equal(names.substitute(lhs));
+      expect(rhsSubstitution).to.equal(names.substitute(rhs));
+    });
+    it("should work with a string value", () => {
       const lhs = "I am a cuntish string";
       const rhs = "I am also a cuntish string";
       const { match, values } = expressionMatch({
@@ -130,7 +146,7 @@ describe("commands.expressions.condition.functions", () => {
       expect(lhsSubstitution).to.equal(values.substitute(lhs));
       expect(rhsSubstitution).to.equal(values.substitute(rhs));
     });
-    it("should work with binary", () => {
+    it("should work with a binary value", () => {
       const lhs = Buffer.from("I am a cuntish binary");
       const rhs = Buffer.from("I am also a cuntish binary");
       const { match, values } = expressionMatch({
@@ -142,11 +158,25 @@ describe("commands.expressions.condition.functions", () => {
       expect(lhsSubstitution).to.equal(values.substitute(lhs));
       expect(rhsSubstitution).to.equal(values.substitute(rhs));
     });
+    it("should work with an implicit binary value", () => {
+      const lhs = Buffer.from("I am a cuntish binary");
+      const rhs = Buffer.from("I am also a cuntish binary");
+      const { match, values } = expressionMatch({
+        expression: beginsWith(lhs, rhs),
+        matcher: /begins_with\((:\S+),\s*(:\S+)\)/,
+      });
+      const lhsSubstitution = match[1];
+      const rhsSubstitution = match[2];
+      expect(lhsSubstitution).to.equal(values.substitute(lhs));
+      expect(rhsSubstitution).to.equal(values.substitute(rhs));
+    });
   });
   describe(contains.name, () => {
     it("should not compile with size as lhs operand", () => {
-      // @ts-expect-error Size is not a valid lhs operand for contains.
-      contains(size(path("test.attribute")), value("test.value"));
+      expect(() =>
+        // @ts-expect-error Size is not a valid lhs operand for contains.
+        contains(size(path("test.attribute")), value("test.value")),
+      ).to.throw();
     });
     it("should work with paths", () => {
       const lhs = "test.attribute.lhs";
@@ -160,11 +190,35 @@ describe("commands.expressions.condition.functions", () => {
       expect(lhsSubstitution).to.equal(names.substitute(lhs));
       expect(rhsSubstitution).to.equal(names.substitute(rhs));
     });
+    it("should work with implicit paths", () => {
+      const lhs = "test.attribute.lhs";
+      const rhs = "test.attribute.rhs";
+      const { match, names } = expressionMatch({
+        expression: contains(lhs, rhs),
+        matcher: /contains\((#\S+),\s*(#\S+)\)/,
+      });
+      const lhsSubstitution = match[1];
+      const rhsSubstitution = match[2];
+      expect(lhsSubstitution).to.equal(names.substitute(lhs));
+      expect(rhsSubstitution).to.equal(names.substitute(rhs));
+    });
     it("should work with values", () => {
       const lhs = "I am a cuntish string";
       const rhs = "Maybe I am contained in the previous cuntish string";
       const { match, values } = expressionMatch({
         expression: contains(value(lhs), value(rhs)),
+        matcher: /contains\((:\S+),\s*(:\S+)\)/,
+      });
+      const lhsSubstitution = match[1];
+      const rhsSubstitution = match[2];
+      expect(lhsSubstitution).to.equal(values.substitute(lhs));
+      expect(rhsSubstitution).to.equal(values.substitute(rhs));
+    });
+    it("should work with implicit values", () => {
+      const lhs = new Set([1, 2, 3]);
+      const rhs = 4;
+      const { match, values } = expressionMatch({
+        expression: contains(lhs, rhs),
         matcher: /contains\((:\S+),\s*(:\S+)\)/,
       });
       const lhsSubstitution = match[1];
