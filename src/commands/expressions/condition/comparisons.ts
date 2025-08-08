@@ -4,7 +4,7 @@ import type {
   NativeNumber,
   NativeString,
 } from "../../../types.js";
-import type { IOperand, Operand } from "../operands/type.js";
+import type { IOperand, Operand } from "../operands/operand.js";
 import type { ConditionOperand, ConditionParams } from "./condition.js";
 import { ConditionExpression } from "./expression.js";
 

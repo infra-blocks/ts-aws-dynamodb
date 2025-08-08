@@ -9,8 +9,8 @@ import type {
   AttributeNames,
   AttributeValues,
 } from "../../attributes/index.js";
+import type { IOperand } from "../operands/operand.js";
 import type { Path } from "../operands/path.js";
-import type { IOperand } from "../operands/type.js";
 import type { Value } from "../operands/value.js";
 
 /**

@@ -1,8 +1,8 @@
 import type { AttributeValue } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
+import type { IOperand, Operand } from "../operands/operand.js";
 import { Path, type RawPath } from "../operands/path.js";
-import type { IOperand, Operand } from "../operands/type.js";
 
 export class IfNotExists<T extends AttributeValue = AttributeValue>
   implements IOperand
