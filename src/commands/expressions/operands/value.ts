@@ -1,6 +1,16 @@
-import type { AttributePath, AttributeValue } from "../../../types.js";
+import {
+  type AttributePath,
+  type AttributeValue,
+  isNativeBinary,
+  isNativeBoolean,
+  isNativeList,
+  isNativeMap,
+  isNativeNull,
+  isNativeNumber,
+  isNativeSet,
+} from "../../../types.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { IOperand } from "./type.js";
+import type { IOperand } from "./operand.js";
 
 export type ImplicitValue = Exclude<AttributeValue, AttributePath>;
 
@@ -63,4 +73,34 @@ export function value<T extends AttributeValue = AttributeValue>(
   value: T,
 ): Value<T> {
   return Value.from(value);
+}
+
+/**
+ * A type guard to assess if something is a {@link RawValue}.
+ *
+ * @param operand - The operand to test.
+ *
+ * @returns Whether the operand is a {@link RawValue}.
+ */
+export function isRawValue<T extends AttributeValue = AttributeValue>(
+  operand: unknown,
+): operand is RawValue<T> {
+  return isImplicitValue(operand) || isValue(operand);
+}
+
+function isImplicitValue(value: unknown): value is ImplicitValue {
+  // Any of the native types *but* NativeString.
+  return (
+    isNativeBinary(value) ||
+    isNativeBoolean(value) ||
+    isNativeList(value) ||
+    isNativeMap(value) ||
+    isNativeNull(value) ||
+    isNativeNumber(value) ||
+    isNativeSet(value)
+  );
+}
+
+function isValue(operand: unknown): operand is Value {
+  return operand instanceof Value;
 }

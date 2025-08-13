@@ -1,8 +1,14 @@
-import type { NativeBinary, NativeString, NativeType } from "../../../types.js";
+import type {
+  AttributeValue,
+  NativeBinary,
+  NativeString,
+  NativeType,
+} from "../../../types.js";
+import { operand, type RawOperand } from "../operands/operand.js";
 import { Path, type RawPath } from "../operands/path.js";
 import { type RawValue, Value } from "../operands/value.js";
+import { conditionOperand, type RawConditionOperand } from "./condition.js";
 import { ConditionExpression } from "./expression.js";
-import type { Size } from "./size.js";
 
 /**
  * Returns a condition that uses the `attribute_exists` function.
@@ -57,17 +63,18 @@ export function attributeType(
   });
 }
 
+// TODO: make a type for string + binary and use it in the function implementation.
 /**
  * This type aggregates the types of operands that can be used with the {@link beginsWith} function.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export type BeginsWithOperand = Path | Value<NativeString | NativeBinary>;
+export type BeginsWithOperand = RawOperand<NativeString | NativeBinary>;
 
 /**
  * Returns a condition that uses the `begins_with` function.
  *
- * @param first - The first function operand, which is the attribute or value to check.
+ * @param first - The first function operand, which is the path or value to check.
  * @param second - The second function operand, which is the prefix to validate against.
  *
  * @returns A {@link ConditionExpression} that evaluates to true if the first operand begins with the second.
@@ -78,26 +85,28 @@ export function beginsWith(
   first: BeginsWithOperand,
   second: BeginsWithOperand,
 ): ConditionExpression {
+  const firstOperand = operand<NativeString | NativeBinary>(first);
+  const secondOperand = operand<NativeString | NativeBinary>(second);
+
   return ConditionExpression.from({
     stringify: ({ names, values }) =>
-      `begins_with(${first.substitute({ names, values })}, ${second.substitute({ names, values })})`,
+      `begins_with(${firstOperand.substitute({ names, values })}, ${secondOperand.substitute({ names, values })})`,
   });
 }
 
-// TODO: type better on the lhs/rhs?
 /**
  * This type aggregates the types of operands that can be used as the first operand of the {@link contains} function.
  */
-export type ContainsFirstOperand = Path | Value;
+export type ContainsFirstOperand = RawOperand;
 /**
  * This type aggregates the types of operands that can be used as the second operand of the {@link contains} function.
  */
-export type ContainsSecondOperand = Path | Value | Size;
+export type ContainsSecondOperand = RawConditionOperand;
 
 /**
  * Returns a condition that uses the `contains` function.
  *
- * @param first - The first function operand, which is the attribute or value to check.
+ * @param first - The first function operand, which is the path or value to check.
  * @param second - The second function operand, which is the value to check for containment.
  *
  * @returns A {@link ConditionExpression} that evaluates to true if this operand contains the provided one.
@@ -108,8 +117,11 @@ export function contains(
   first: ContainsFirstOperand,
   second: ContainsSecondOperand,
 ): ConditionExpression {
+  const firstOperand = operand<AttributeValue>(first);
+  const secondOperand = conditionOperand<AttributeValue>(second);
+
   return ConditionExpression.from({
     stringify: ({ names, values }) =>
-      `contains(${first.substitute({ names, values })}, ${second.substitute({ names, values })})`,
+      `contains(${firstOperand.substitute({ names, values })}, ${secondOperand.substitute({ names, values })})`,
   });
 }
