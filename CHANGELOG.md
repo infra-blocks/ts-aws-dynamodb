@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.32.1] - 2025-08-23
+
+## Added
+
+- Small documentation update on the `Attributes` type specifying that `undefined` fields are
+ignored and undefined elements within collections will throw errors. Both of these cases
+won't compile, however. This is mostly for describing the behavior when the user *cheats* the
+types.
+
 ## [0.32.0] - 2025-08-13
 
 ### Added
@@ -422,6 +431,11 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+
+[0.32.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.32.0...v0.32.1
+[0.32.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.31.0...v0.32.0
+[0.31.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.30.0...v0.31.0
+[0.30.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.29.0...v0.30.0
 [0.29.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.26.0...v0.27.0
