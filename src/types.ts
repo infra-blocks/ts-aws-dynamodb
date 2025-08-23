@@ -121,6 +121,12 @@ export type AttributeValue =
   | NativeString
   | NativeStringSet;
 
+/**
+ * Type representing a record of attributes belonging to a DynamoDB item.
+ *
+ * Undefined fields are stripped off before being marshalled, and undefined
+ * values within collections result in errors being thrown.
+ */
 export type Attributes = Record<AttributeName, AttributeValue>;
 
 export type IndexAttributeType = Extract<NativeType, "B" | "N" | "S">;
