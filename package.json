@@ -45,7 +45,6 @@
     "@infra-blocks/iter": "^0.2.7",
     "@infra-blocks/node-console-logger": "^0.3.1",
     "@infra-blocks/test": "^0.4.0",
-    "@infra-blocks/types": "^0.13.1",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.0.10",
     "c8": "^10.1.3",
@@ -65,6 +64,7 @@
     "@aws-sdk/lib-dynamodb": "^3.840.0",
     "@infra-blocks/logger-interface": "^0.3.1",
     "@infra-blocks/null-logger": "^0.1.1",
-    "@infra-blocks/retry": "^0.1.1"
+    "@infra-blocks/retry": "^0.1.1",
+    "@infra-blocks/types": "^0.14.0"
   }
 }
