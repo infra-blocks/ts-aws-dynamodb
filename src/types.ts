@@ -37,7 +37,7 @@ export type NativeBinary = Buffer;
 export type NativeBinarySet = Set<NativeBinary>;
 export type NativeBoolean = boolean;
 export type NativeList = Array<AttributeValue>;
-export type NativeMap = { [key: AttributeName]: AttributeValue };
+export interface NativeMap extends Attributes {}
 export type NativeNull = null;
 export type NativeNumber = bigint | number;
 export type NativeNumberSet = Set<NativeNumber>;
