@@ -14,6 +14,10 @@ definition that mimicks the signature of `Attributes`. This works because interf
 lazily as opposed to eagerly like type definitions. This has the added benefit of immediately
 supporting/invalidating any changes that are made to `Attributes`.
 
+### Fixed
+
+- Bring the `@infra-blocks/types` package into prod dependencies, as type guards are now being
+composed to become DynamoDB native type guards.
 
 ## [0.32.1] - 2025-08-23
 
