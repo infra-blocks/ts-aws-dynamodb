@@ -17,6 +17,7 @@ import {
   WriteTransaction,
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
+import { DynamoDbClientError } from "./error.js";
 import type { Attributes } from "./types.js";
 
 /**
@@ -44,13 +45,6 @@ export type CreateParams = {
    */
   logger?: Logger;
 };
-
-export class DynamoDbClientError extends Error {
-  constructor(message: string, options?: { cause?: unknown }) {
-    super(message, options);
-    this.name = "DynamoDbClientError";
-  }
-}
 
 /**
  * Wrapper class around the {@link DynamoDBDocumentClient} that provides added functionality,
