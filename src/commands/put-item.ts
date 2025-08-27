@@ -1,4 +1,9 @@
-import { PutCommand, type PutCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  type DynamoDBDocumentClient,
+  PutCommand,
+  type PutCommandInput,
+  type PutCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
@@ -6,22 +11,36 @@ import { conditionExpression } from "./expressions/condition/expression.js";
 import type { ConditionParams } from "./expressions/index.js";
 import type { Command } from "./types.js";
 
-export interface PutItemParams {
+export interface PutItemInput {
   table: string;
   item: Attributes;
   condition?: ConditionParams;
 }
 
-export class PutItem implements Command<PutCommandInput, PutCommand> {
+export type PutItemOutput = PutCommandOutput;
+
+export class PutItem implements Command<PutItemOutput> {
   private readonly table: string;
   private readonly item: Attributes;
   private readonly condition?: ConditionParams;
 
-  private constructor(params: PutItemParams) {
+  private constructor(params: PutItemInput) {
     const { table, item, condition } = params;
     this.table = table;
     this.item = item;
     this.condition = condition;
+  }
+
+  execute(client: DynamoDBDocumentClient): Promise<PutItemOutput> {
+    return client.send(this.toAwsCommand());
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "PutItem";
   }
 
   toAwsCommandInput(): PutCommandInput {
@@ -52,11 +71,11 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
     };
   }
 
-  toAwsCommand(): PutCommand {
+  private toAwsCommand(): PutCommand {
     return new PutCommand(this.toAwsCommandInput());
   }
 
-  static from(params: PutItemParams): PutItem {
+  static from(params: PutItemInput): PutItem {
     return new PutItem(params);
   }
 }

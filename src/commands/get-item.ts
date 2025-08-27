@@ -1,4 +1,8 @@
-import { GetCommand, type GetCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  type DynamoDBDocumentClient,
+  GetCommand,
+  type GetCommandInput,
+} from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import type { Command } from "./types.js";
 
@@ -20,14 +24,29 @@ export interface GetItemParams {
   key: Attributes;
 }
 
-export class GetItem implements Command<GetCommandInput, GetCommand> {
+export type GetItemOutput<T> = T | undefined;
+
+export class GetItem<T> implements Command<GetItemOutput<T>> {
   private readonly params: GetItemParams;
 
   private constructor(params: GetItemParams) {
     this.params = params;
   }
 
-  toAwsCommandInput(): GetCommandInput {
+  async execute(client: DynamoDBDocumentClient): Promise<GetItemOutput<T>> {
+    const response = await client.send(this.toAwsCommand());
+    return response.Item as T | undefined;
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "GetItem";
+  }
+
+  private toAwsCommandInput(): GetCommandInput {
     const key = this.params.key;
     return {
       TableName: this.params.table,
@@ -35,11 +54,11 @@ export class GetItem implements Command<GetCommandInput, GetCommand> {
     };
   }
 
-  toAwsCommand(): GetCommand {
+  private toAwsCommand(): GetCommand {
     return new GetCommand(this.toAwsCommandInput());
   }
 
-  static from(params: GetItemParams): GetItem {
+  static from<T>(params: GetItemParams): GetItem<T> {
     return new GetItem(params);
   }
 }

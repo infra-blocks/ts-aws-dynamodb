@@ -7,14 +7,29 @@ import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
 import {
   CreateTable,
-  type CreateTableParams,
+  type CreateTableParams as CreateTableInput,
+  type CreateTableOutput,
 } from "./commands/create-table.js";
-import { GetItem, type GetItemParams } from "./commands/get-item.js";
-import { PutItem, type PutItemParams } from "./commands/put-item.js";
-import { Query, type QueryParams } from "./commands/query.js";
-import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
+import {
+  GetItem,
+  type GetItemParams as GetItemInput,
+  type GetItemOutput,
+} from "./commands/get-item.js";
+import {
+  PutItem,
+  type PutItemInput,
+  type PutItemOutput,
+} from "./commands/put-item.js";
+import { Query, type QueryParams as QueryInput } from "./commands/query.js";
+import type { Command } from "./commands/types.js";
+import {
+  UpdateItem,
+  type UpdateItemParams as UpdateItemInput,
+  type UpdateItemOutput,
+} from "./commands/update-item.js";
 import {
   WriteTransaction,
+  type WriteTransactionOutput,
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
 import { DynamoDbClientError } from "./error.js";
@@ -70,19 +85,12 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_CreateTable.html
    */
-  async createTable(params: CreateTableParams): Promise<void> {
+  createTable(params: CreateTableInput): Promise<CreateTableOutput> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("createTable(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = CreateTable.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while creating table", {
-        cause: err,
-      });
-    }
+    return this.send(CreateTable.from(params));
   }
 
   /**
@@ -95,25 +103,12 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
    */
-  async getItem<T>(params: GetItemParams): Promise<T | undefined> {
+  getItem<T>(params: GetItemInput): Promise<GetItemOutput<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("getItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      const response = await this.client.send(
-        GetItem.from(params).toAwsCommand(),
-      );
-
-      return response.Item as T | undefined;
-    } catch (err) {
-      throw new DynamoDbClientError(
-        `error while getting item from DynamoDB: ${JSON.stringify(params)}`,
-        {
-          cause: err,
-        },
-      );
-    }
+    return this.send(GetItem.from(params));
   }
 
   /**
@@ -127,19 +122,12 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
-  async putItem(params: PutItemParams): Promise<void> {
+  putItem(params: PutItemInput): Promise<PutItemOutput> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = PutItem.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while putting item", {
-        cause: err,
-      });
-    }
+    return this.send(PutItem.from(params));
   }
 
   /**
@@ -156,7 +144,7 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
   async *query<T extends Attributes = Attributes>(
-    params: QueryParams,
+    params: QueryInput,
   ): AsyncGenerator<T> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("query(%s)", JSON.stringify(params));
@@ -200,7 +188,7 @@ export class DynamoDbClient {
    * @returns The only item matching the query, or `undefined` if no item matches.
    */
   async queryOne<T extends Attributes = Attributes>(
-    params: QueryParams,
+    params: QueryInput,
   ): Promise<T | undefined> {
     try {
       let item: T | undefined;
@@ -266,19 +254,12 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html
    */
-  async updateItem(params: UpdateItemParams): Promise<void> {
+  updateItem(params: UpdateItemInput): Promise<UpdateItemOutput> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("updateItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = UpdateItem.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while updating item", {
-        cause: err,
-      });
-    }
+    return this.send(UpdateItem.from(params));
   }
 
   /**
@@ -288,27 +269,33 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html
    */
-  async writeTransaction(params: WriteTransactionParams): Promise<void> {
+  writeTransaction(
+    params: WriteTransactionParams,
+  ): Promise<WriteTransactionOutput> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("transactWriteItems(%s)", JSON.stringify(params));
     }
 
-    try {
-      await this.client.send(WriteTransaction.from(params).toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError(
-        "error while transactionally writing items in DynamoDB",
-        {
-          cause: err,
-        },
-      );
-    }
+    return this.send(WriteTransaction.from(params));
   }
 
   /**
    * Alias for the {@link putItem} method.
    */
   upsert = this.putItem;
+
+  private async send<Output>(command: Command<Output>): Promise<Output> {
+    try {
+      return await command.execute(this.client);
+    } catch (err) {
+      throw new DynamoDbClientError(
+        `error executing command ${command.getName()} details: ${JSON.stringify(command.getDetails())}`,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
 
   /**
    * Creates an instance of the {@link DynamoDbClient} wrapping the provided document

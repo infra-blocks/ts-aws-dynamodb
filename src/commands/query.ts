@@ -1,4 +1,9 @@
-import { QueryCommand, type QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  type DynamoDBDocumentClient,
+  QueryCommand,
+  type QueryCommandInput,
+  type QueryCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { AttributeValue } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
@@ -13,7 +18,7 @@ export interface QueryParams {
   exclusiveStartKey?: Record<string, AttributeValue>;
 }
 
-export class Query implements Command<QueryCommandInput, QueryCommand> {
+export class Query implements Command<QueryCommandOutput> {
   private readonly table: string;
   private readonly index?: string;
   private readonly condition: KeyConditionExpression;
@@ -27,7 +32,19 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
     this.exclusiveStartKey = exclusiveStartKey;
   }
 
-  toAwsCommandInput(): QueryCommandInput {
+  execute(client: DynamoDBDocumentClient): Promise<QueryCommandOutput> {
+    return client.send(this.toAwsCommand());
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "Query";
+  }
+
+  private toAwsCommandInput(): QueryCommandInput {
     const names = AttributeNames.create();
     const values = AttributeValues.create();
     const expression = conditionExpression(this.condition).stringify({
@@ -44,7 +61,7 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
     };
   }
 
-  toAwsCommand(): QueryCommand {
+  private toAwsCommand(): QueryCommand {
     return new QueryCommand(this.toAwsCommandInput());
   }
 
