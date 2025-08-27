@@ -1,10 +1,12 @@
 import {
   CreateTableCommand,
   type CreateTableCommandInput,
+  type CreateTableCommandOutput,
   type GlobalSecondaryIndex,
   type KeySchemaElement,
   type LocalSecondaryIndex,
 } from "@aws-sdk/client-dynamodb";
+import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { Index, IndexAttributeType } from "../types.js";
 import type { Command } from "./types.js";
 
@@ -15,9 +17,7 @@ export interface CreateTableParams {
   lsis?: Record<string, Index>;
 }
 
-export class CreateTable
-  implements Command<CreateTableCommandInput, CreateTableCommand>
-{
+export class CreateTable implements Command<CreateTableCommandOutput> {
   private readonly name: string;
   private readonly primaryKey: Index;
   private readonly gsis?: Record<string, Index>;
@@ -31,7 +31,19 @@ export class CreateTable
     this.lsis = lsis;
   }
 
-  toAwsCommandInput(): CreateTableCommandInput {
+  execute(client: DynamoDBDocumentClient): Promise<CreateTableCommandOutput> {
+    return client.send(this.toAwsCommand());
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "CreateTable";
+  }
+
+  private toAwsCommandInput(): CreateTableCommandInput {
     const attributeDefinitions: Map<string, IndexAttributeType> = new Map();
     const primaryKeySchema = keySchema({
       attributeDefinitions,
@@ -60,7 +72,7 @@ export class CreateTable
     };
   }
 
-  toAwsCommand(): CreateTableCommand {
+  private toAwsCommand(): CreateTableCommand {
     return new CreateTableCommand(this.toAwsCommandInput());
   }
 

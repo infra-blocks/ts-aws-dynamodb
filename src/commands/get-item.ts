@@ -1,4 +1,9 @@
-import { GetCommand, type GetCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  type DynamoDBDocumentClient,
+  GetCommand,
+  type GetCommandInput,
+  type GetCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import type { Command } from "./types.js";
 
@@ -20,14 +25,26 @@ export interface GetItemParams {
   key: Attributes;
 }
 
-export class GetItem implements Command<GetCommandInput, GetCommand> {
+export class GetItem implements Command<GetCommandOutput> {
   private readonly params: GetItemParams;
 
   private constructor(params: GetItemParams) {
     this.params = params;
   }
 
-  toAwsCommandInput(): GetCommandInput {
+  execute(client: DynamoDBDocumentClient): Promise<GetCommandOutput> {
+    return client.send(this.toAwsCommand());
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "GetItem";
+  }
+
+  private toAwsCommandInput(): GetCommandInput {
     const key = this.params.key;
     return {
       TableName: this.params.table,
@@ -35,7 +52,7 @@ export class GetItem implements Command<GetCommandInput, GetCommand> {
     };
   }
 
-  toAwsCommand(): GetCommand {
+  private toAwsCommand(): GetCommand {
     return new GetCommand(this.toAwsCommandInput());
   }
 

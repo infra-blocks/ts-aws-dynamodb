@@ -1,4 +1,7 @@
-export interface Command<Input, AwsCommand> {
-  toAwsCommandInput(): Input;
-  toAwsCommand(): AwsCommand;
+import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
+export interface Command<Output> {
+  execute(client: DynamoDBDocumentClient): Promise<Output>;
+  getName(): string;
+  getDetails(): object;
 }

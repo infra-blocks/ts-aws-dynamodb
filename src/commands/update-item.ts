@@ -1,4 +1,9 @@
-import { UpdateCommand, type UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import {
+  type DynamoDBDocumentClient,
+  UpdateCommand,
+  type UpdateCommandInput,
+  type UpdateCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
@@ -18,14 +23,26 @@ export interface UpdateItemParams {
   update: UpdateExpressionParams;
 }
 
-export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
+export class UpdateItem implements Command<UpdateCommandOutput> {
   private readonly params: UpdateItemParams;
 
   private constructor(params: UpdateItemParams) {
     this.params = params;
   }
 
-  toAwsCommandInput(): UpdateCommandInput {
+  execute(client: DynamoDBDocumentClient): Promise<UpdateCommandOutput> {
+    return client.send(this.toAwsCommand());
+  }
+
+  getDetails(): object {
+    return this.toAwsCommandInput();
+  }
+
+  getName(): string {
+    return "UpdateItem";
+  }
+
+  private toAwsCommandInput(): UpdateCommandInput {
     const { table, key, condition, update } = this.params;
 
     const input: UpdateCommandInput = {
@@ -61,7 +78,7 @@ export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
     return input;
   }
 
-  toAwsCommand(): UpdateCommand {
+  private toAwsCommand(): UpdateCommand {
     return new UpdateCommand(this.toAwsCommandInput());
   }
 
