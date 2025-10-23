@@ -16,7 +16,7 @@ describe("commands.attributes.reserved-words", () => {
     ];
     for (const { expected, item } of words) {
       it(`should return ${expected} for ${item}`, () => {
-        expect(isReservedWord(item)).to.be[expected ? "true" : "false"];
+        expect(isReservedWord(item)).to.equal(expected);
       });
     }
   });
