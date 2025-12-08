@@ -13,6 +13,7 @@ import {
   DeleteTable,
   type DeleteTableParams,
 } from "./commands/delete.table.js";
+import { DeleteItem, type DeleteItemParams } from "./commands/delete-item.js";
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import { PutItem, type PutItemParams } from "./commands/put-item.js";
 import { Query, type QueryParams } from "./commands/query.js";
@@ -88,6 +89,28 @@ export class DynamoDbClient {
       await this.client.send(command.toAwsCommand());
     } catch (err) {
       throw new DynamoDbClientError("error while creating table", {
+        cause: err,
+      });
+    }
+  }
+
+  /**
+   * Deletes an item using the DeleteItem API.
+   *
+   * @param params
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
+   */
+  async deleteItem(params: DeleteItemParams): Promise<void> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("deleteItem(%s)", JSON.stringify(params));
+    }
+
+    try {
+      const command = DeleteItem.from(params);
+      await this.client.send(command.toAwsCommand());
+    } catch (err) {
+      throw new DynamoDbClientError("error while deleting item", {
         cause: err,
       });
     }
