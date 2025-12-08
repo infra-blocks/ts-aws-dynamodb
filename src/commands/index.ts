@@ -1,5 +1,6 @@
 export type { CreateTableParams } from "./create-table.js";
 export type { DeleteTableParams } from "./delete.table.js";
+export type { DeleteItemParams } from "./delete-item.js";
 export * from "./expressions/index.js";
 export type { GetItemParams } from "./get-item.js";
 export type { PutItemParams } from "./put-item.js";
