@@ -470,6 +470,8 @@ intuitive.
 project to here.
 
 
+[0.36.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.35.0...v0.36.0
+[0.35.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.34.0...v0.35.0
 [0.34.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.33.0...v0.34.0
 [0.33.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.32.2...v0.33.0
 [0.32.2]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.32.1...v0.32.2
