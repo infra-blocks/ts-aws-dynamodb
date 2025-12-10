@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.38.0] - 2025-12-10
+
+### Added
+
+- `dateToTtl` utility to transform a `Date` into, you guess it, a `ttl` value, as expected
+by AWS DynamoDB. See [here](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html)
+
 ## [0.37.0] - 2025-12-10
 
 ### Added
@@ -478,7 +485,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
-
+[0.38.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.37.0...v0.38.0
 [0.37.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.36.0...v0.37.0
 [0.36.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.35.0...v0.36.0
 [0.35.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.34.0...v0.35.0
