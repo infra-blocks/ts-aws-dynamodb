@@ -15,7 +15,11 @@ import {
 } from "./commands/delete.table.js";
 import { DeleteItem, type DeleteItemParams } from "./commands/delete-item.js";
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
-import { PutItem, type PutItemParams } from "./commands/put-item.js";
+import {
+  PutItem,
+  type PutItemParams,
+  type PutItemResult,
+} from "./commands/put-item.js";
 import { Query, type QueryParams } from "./commands/query.js";
 import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
 import {
@@ -180,14 +184,15 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
-  async putItem(params: PutItemParams): Promise<void> {
+  async putItem(params: PutItemParams): Promise<PutItemResult> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
     }
 
     try {
-      const command = PutItem.from(params);
-      await this.client.send(command.toAwsCommand());
+      return await PutItem.from(params).execute({
+        client: this.client,
+      });
     } catch (err) {
       throw new DynamoDbClientError("error while putting item", {
         cause: err,

@@ -15,7 +15,7 @@ describe(DynamoDbClient.name, () => {
   afterEach("clean up", dropAllTables());
 
   describe("putItem", () => {
-    it("should work on table without sort key", async function () {
+    it("should work on hash table", async function () {
       const client = this.createClient();
       const createTableParams: CreateTableParams = {
         name: "test-table",
@@ -24,13 +24,15 @@ describe(DynamoDbClient.name, () => {
         },
       };
       await client.createTable(createTableParams);
+
       const putItemParams: PutItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
         },
       };
-      await client.putItem(putItemParams);
+      const response = await client.putItem(putItemParams);
+      expect(response.item).to.be.undefined;
 
       const item = await client.getItem({
         table: createTableParams.name,
@@ -38,7 +40,7 @@ describe(DynamoDbClient.name, () => {
       });
       expect(item).to.deep.include(putItemParams.item);
     });
-    it("should work on table with sort key", async function () {
+    it("should work on compound table", async function () {
       const client = this.createClient();
       const createTableParams: CreateTableParams = {
         name: "test-table",
@@ -48,6 +50,7 @@ describe(DynamoDbClient.name, () => {
         },
       };
       await client.createTable(createTableParams);
+
       const putItemParams: PutItemParams = {
         table: createTableParams.name,
         item: {
@@ -55,13 +58,77 @@ describe(DynamoDbClient.name, () => {
           sk: 42,
         },
       };
-      await client.putItem(putItemParams);
+      const response = await client.putItem(putItemParams);
+      expect(response.item).to.be.undefined;
 
       const item = await client.getItem({
         table: createTableParams.name,
         key: { pk: putItemParams.item.pk, sk: putItemParams.item.sk },
       });
       expect(item).to.deep.include(putItemParams.item);
+    });
+    it("should behave the same when return values NONE is specified", async function () {
+      const client = this.createClient();
+      const createTableParams: CreateTableParams = {
+        name: "test-table",
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+
+      const putItemParams: PutItemParams = {
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+        },
+        returnValues: "NONE",
+      };
+      const response = await client.putItem(putItemParams);
+      expect(response.item).to.be.undefined;
+    });
+    it("should return the old value when return values ALL_OLD is specified", async function () {
+      const client = this.createClient();
+      const createTableParams: CreateTableParams = {
+        name: "test-table",
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+
+      const firstPut: PutItemParams = {
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+          oldValue: "original",
+        },
+      };
+      const firstResponse = await client.putItem(firstPut);
+      expect(firstResponse.item).to.be.undefined;
+
+      const secondPut: PutItemParams = {
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+          newValue: "on the block",
+        },
+        returnValues: "ALL_OLD",
+      };
+      const secondResponse = await client.putItem(secondPut);
+      expect(secondResponse).to.deep.equal({
+        item: {
+          pk: "BigIron#1",
+          oldValue: "original",
+        },
+      });
+
+      // Sanity check to make sure the item was actually inserted.
+      const item = await client.getItem({
+        table: createTableParams.name,
+        key: { pk: firstPut.item.pk },
+      });
+      expect(item).to.deep.include(secondPut.item);
     });
     it("should work with expression", async function () {
       const client = this.createClient();
