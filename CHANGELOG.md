@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.39.0] - 2025-12-14
+
+### Added
+
+- The `isTransactionCanceledBy` utility function that determines if an error is caused
+by a `TransactionCanceledException` for the provided reason. This is useful when using
+unicity constraints as part of a transaction, for example, and wanting to know if the
+cause of the transactional failure was the unicity constraint. Such as:
+```typescript
+try {
+  await client.writeTransaction({writes: [valueThatMustBeUnique, ...otherStuff]});
+} catch (err) {
+  if (isTransactionCanceledBy(err, ConditionalCheckFailed.atIndex(0))) {
+    throw new ValueNotUniqueError(`you fucked up! value ${uniqueValue} already exists!`);
+  }
+  throw err;
+}
+```
+
 ## [0.38.0] - 2025-12-10
 
 ### Added

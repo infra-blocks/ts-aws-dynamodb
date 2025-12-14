@@ -42,7 +42,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
     "@infra-blocks/checks": "^0.2.7",
-    "@infra-blocks/error": "^0.1.0",
     "@infra-blocks/iter": "^0.2.7",
     "@infra-blocks/node-console-logger": "^0.3.1",
     "@infra-blocks/test": "^0.4.0",
@@ -63,6 +62,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.840.0",
     "@aws-sdk/lib-dynamodb": "^3.840.0",
+    "@infra-blocks/error": "^0.2.0",
     "@infra-blocks/logger-interface": "^0.3.1",
     "@infra-blocks/null-logger": "^0.1.1",
     "@infra-blocks/retry": "^0.1.1",
