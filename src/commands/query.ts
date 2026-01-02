@@ -1,51 +1,95 @@
-import { QueryCommand, type QueryCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { AttributeValue } from "../types.js";
+import type { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import {
+  QueryCommand,
+  type QueryCommandInput,
+  type QueryCommandOutput,
+} from "@aws-sdk/lib-dynamodb";
+import { checkNotNull } from "@infra-blocks/checks";
+import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
 import type { KeyConditionExpression } from "./expressions/key-condition.js";
 import type { Command } from "./types.js";
 
-export interface QueryParams {
+export type QueryParams = {
   table: string;
   index?: string;
   condition: KeyConditionExpression;
-  exclusiveStartKey?: Record<string, AttributeValue>;
-}
+  consistentRead?: boolean;
+  exclusiveStartKey?: Attributes;
+  limit?: number;
+  scanIndexForward?: boolean;
+};
+
+export type QueryResult<T> = {
+  count: number;
+  items: Array<T>;
+  scannedCount: number;
+  lastEvaluatedKey?: Attributes;
+};
 
 export class Query implements Command<QueryCommandInput, QueryCommand> {
-  private readonly table: string;
-  private readonly index?: string;
-  private readonly condition: KeyConditionExpression;
-  private readonly exclusiveStartKey?: Record<string, AttributeValue>;
+  private readonly params: QueryParams;
 
   private constructor(params: QueryParams) {
-    const { table, index, condition, exclusiveStartKey } = params;
-    this.table = table;
-    this.index = index;
-    this.condition = condition;
-    this.exclusiveStartKey = exclusiveStartKey;
+    this.params = params;
   }
 
   toAwsCommandInput(): QueryCommandInput {
+    const {
+      table,
+      index,
+      condition,
+      consistentRead,
+      exclusiveStartKey,
+      limit,
+      scanIndexForward,
+    } = this.params;
+
     const names = AttributeNames.create();
     const values = AttributeValues.create();
-    const expression = conditionExpression(this.condition).stringify({
+    const expression = conditionExpression(condition).stringify({
       names,
       values,
     });
     return {
-      TableName: this.table,
-      IndexName: this.index,
+      TableName: table,
+      IndexName: index,
+      ConsistentRead: consistentRead,
       KeyConditionExpression: expression,
       ExpressionAttributeNames: names.getSubstitutions(),
       ExpressionAttributeValues: values.getSubstitutions(),
-      ExclusiveStartKey: this.exclusiveStartKey,
+      ExclusiveStartKey: exclusiveStartKey,
+      Limit: limit,
+      ScanIndexForward: scanIndexForward,
     };
   }
 
   toAwsCommand(): QueryCommand {
     return new QueryCommand(this.toAwsCommandInput());
+  }
+
+  private transformResult<T extends Attributes>(
+    result: QueryCommandOutput,
+  ): QueryResult<T> {
+    const items = (result.Items ?? []) as Array<T>;
+    return {
+      items,
+      lastEvaluatedKey: result.LastEvaluatedKey,
+      count: checkNotNull(result.Count, "count"),
+      scannedCount: checkNotNull(result.ScannedCount, "scannedCount"),
+    };
+  }
+
+  async execute<T extends Attributes>(params: {
+    client: DynamoDBClient;
+  }): Promise<QueryResult<T>> {
+    const { client } = params;
+
+    const response = await client.send(this.toAwsCommand());
+
+    return this.transformResult(response);
   }
 
   static from(params: QueryParams): Query {
