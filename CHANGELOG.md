@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.0] - 2026-01-02
+
+### Added
+
+- `query`: the base behavior of the query API. It returns a result page respecting
+the provided parameters.
+- `paginateQuery`: an convenience built on top of the `query` API that returns an
+async generator over `query`'s returned pages.
+- `iterateQuery`: the previous behavior of `query` has moved here, where all *items*
+are iterated and returned in an async generator. Note that this call loses information
+about pages to focus on user convenience.
+- For all three APIs, support for additional query parameters: `consistentRead`, `limit`
+and `scanIndexForward`.
+
+### Changed
+
+- Renamed `query` to `iterateQuery`. It feels less surprising if `query` behaves like
+the native call instead of wrapping it up with all the magic, and we need the base
+behavior in certain cases, such as when paginating over the network.
+
 ## [0.39.0] - 2025-12-14
 
 ### Added
