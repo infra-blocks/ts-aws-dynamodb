@@ -34,23 +34,33 @@ import { DynamoDbClientError } from "./error.js";
 import type { Attributes } from "./types.js";
 
 /**
+ * Re-export of the native client's, renamed.
+ */
+export type DynamoDbClientConfig = DynamoDBClientConfig;
+
+/**
+ * Re-export of the document client's {@link TranslateConfig}, renamed.
+ */
+export type DocumentClientConfig = TranslateConfig;
+
+/**
  * Creation parameters for the {@link DynamoDbClient}.
  */
 export type CreateParams = {
   /**
-   * The configuration for the vanilly DynamoDB client.
+   * The configuration for the vanilla DynamoDB client.
    *
    * When none is provided, the client is instantiated with the default configuration
    * provided by the AWS SDK.
    */
-  dynamodb?: DynamoDBClientConfig;
+  dynamodb?: DynamoDbClientConfig;
   /**
    * The configuration for the document client.
    *
    * When none is provided, the document client is instantiated with the default
    * configuration provided by the AWS SDK.
    */
-  document?: TranslateConfig;
+  document?: DocumentClientConfig;
   /**
    * Optional logger to use for logging.
    *
