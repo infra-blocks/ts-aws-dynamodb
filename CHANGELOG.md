@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.41.0] - 2026-01-10
+
+### Added
+
+- Re-exporting a few more types for convenience. Those are the types used to parameterize
+the client at construction: `DynamoDbClientConfig` and `DocumentClientConfig`.
+
 ## [0.40.1] - 2026-01-02
 
 ### Fixed
@@ -531,6 +538,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.41.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.40.1...v0.41.0
 [0.40.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.40.0...v0.40.1
 [0.40.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.39.0...v0.40.0
 [0.39.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.38.0...v0.39.0
