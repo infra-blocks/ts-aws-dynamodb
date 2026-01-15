@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.0] - 2026-01-15
+
+### Added
+
+- Support for updates, deletes, and condition checks in write transactions. This required breaking the
+API compatibility, see below.
+
+### Changed
+
+- Changed the `writeTransaction` API to support more than just puts. This meant reviewing
+the parameters and the type has changed from `PutParams` to `TransactionWrite`. It behaves
+similarly to the native client, where each type is specified in an outer object's key.
+For example, `{table: "myTable", item: {pk: "Toto"}}` becomes: `{put: {table: "myTable", item: {pk: "Toto"}}}`.
+
 ## [0.41.1] - 2026-01-10
 
 ### Fixed
@@ -544,6 +558,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.42.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.40.1...v0.41.0
 [0.40.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.40.0...v0.40.1
 [0.40.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.39.0...v0.40.0
