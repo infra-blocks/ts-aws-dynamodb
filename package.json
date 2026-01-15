@@ -1,6 +1,6 @@
 {
   "name": "@infra-blocks/aws-dynamodb",
-  "version": "0.41.1",
+  "version": "0.42.0",
   "description": "A convenience wrapper over @aws-sdk/client-dynamodb and @aws-sdk/lib-dynamodb.",
   "keywords": [
     "aws",
