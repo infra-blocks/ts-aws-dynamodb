@@ -7,4 +7,7 @@ export type { PutItemParams } from "./put-item.js";
 export type { QueryParams } from "./query.js";
 export type { UpdateItemParams } from "./update-item.js";
 export type { UpdateTimeToLiveParams } from "./update-time-to-live.js";
-export type { WriteTransactionParams } from "./write-transaction.js";
+export type {
+  ConditionCheckParams,
+  WriteTransactionParams,
+} from "./write-transaction.js";
