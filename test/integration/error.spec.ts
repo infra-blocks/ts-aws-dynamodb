@@ -27,14 +27,18 @@ describe("error", () => {
           await client.writeTransaction({
             writes: [
               {
-                table: "test-table",
-                item: { pk: "key2" },
-                condition: attributeNotExists("pk"),
+                put: {
+                  table: "test-table",
+                  item: { pk: "key2" },
+                  condition: attributeNotExists("pk"),
+                },
               },
               {
-                table: "test-table",
-                item: { pk: "key1" },
-                condition: attributeNotExists("pk"),
+                put: {
+                  table: "test-table",
+                  item: { pk: "key1" },
+                  condition: attributeNotExists("pk"),
+                },
               },
             ],
           });

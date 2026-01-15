@@ -60,6 +60,7 @@ export class SetAction implements IUpdateAction {
   }
 }
 
+// TODO: support rawoperand here?
 // TODO: increment/decrement utilities built on top of the assignments.
 export function set(rawPath: RawPath, operand: SetOperand): UpdateAction;
 export function set(
