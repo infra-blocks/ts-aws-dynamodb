@@ -1,5 +1,6 @@
 import { expect } from "@infra-blocks/test";
 import {
+  attributeNotExists,
   type CreateTableParams,
   DynamoDbClient,
   set,
@@ -49,6 +50,15 @@ describe(DynamoDbClient.name, () => {
               key: {
                 pk: "DeletedItem",
               },
+            },
+          },
+          {
+            conditionCheck: {
+              table,
+              key: {
+                pk: "InexistentItem",
+              },
+              condition: attributeNotExists("pk"),
             },
           },
         ],
