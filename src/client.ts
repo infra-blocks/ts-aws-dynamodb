@@ -5,6 +5,7 @@ import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
+import { trusted } from "@infra-blocks/types";
 import {
   CreateTable,
   type CreateTableParams,
@@ -162,7 +163,9 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
    */
-  async getItem<T>(params: GetItemParams): Promise<T | undefined> {
+  async getItem<T extends Attributes = Attributes>(
+    params: GetItemParams,
+  ): Promise<T | undefined> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("getItem(%s)", JSON.stringify(params));
     }
@@ -172,7 +175,7 @@ export class DynamoDbClient {
         GetItem.from(params).toAwsCommand(),
       );
 
-      return response.Item as T | undefined;
+      return trusted(response.Item);
     } catch (err) {
       throw new DynamoDbClientError(
         `error while getting item from DynamoDB: ${JSON.stringify(params)}`,
@@ -223,15 +226,15 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async *iterateQuery<T extends Attributes = Attributes>(
-    params: QueryParams,
+  async *iterateQuery<K extends Attributes, T extends Attributes = Attributes>(
+    params: QueryParams<K>,
   ): AsyncGenerator<T> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("iterateQuery(%s)", JSON.stringify(params));
     }
 
     try {
-      for await (const page of this.paginateQuery<T>(params)) {
+      for await (const page of this.paginateQuery<K, T>(params)) {
         for (const item of page.items) {
           yield item;
         }
@@ -256,15 +259,15 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async *paginateQuery<T extends Attributes = Attributes>(
-    params: QueryParams,
-  ): AsyncGenerator<QueryResult<T>> {
+  async *paginateQuery<K extends Attributes, T extends Attributes = Attributes>(
+    params: QueryParams<K>,
+  ): AsyncGenerator<QueryResult<K, T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("paginateQuery(%s)", JSON.stringify(params));
     }
 
     try {
-      let page = await this.query<T>(params);
+      let page = await this.query<K, T>(params);
       yield page;
 
       while (page.lastEvaluatedKey != null) {
@@ -296,9 +299,9 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async query<T extends Attributes = Attributes>(
-    params: QueryParams,
-  ): Promise<QueryResult<T>> {
+  async query<K extends Attributes, T extends Attributes = Attributes>(
+    params: QueryParams<K>,
+  ): Promise<QueryResult<K, T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("query(%s)", JSON.stringify(params));
     }
@@ -323,12 +326,12 @@ export class DynamoDbClient {
    *
    * @returns The only item matching the query, or `undefined` if no item matches.
    */
-  async queryOne<T extends Attributes = Attributes>(
-    params: QueryParams,
+  async queryOne<K extends Attributes, T extends Attributes = Attributes>(
+    params: QueryParams<K>,
   ): Promise<T | undefined> {
     try {
       let item: T | undefined;
-      for await (const queryItem of this.iterateQuery<T>(params)) {
+      for await (const queryItem of this.iterateQuery<K, T>(params)) {
         if (item != null) {
           throw new DynamoDbClientError(
             "expected one item in query but found at least 2",
