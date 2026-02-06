@@ -5,6 +5,7 @@ import {
   type QueryCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
+import { trusted } from "@infra-blocks/types";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
@@ -12,27 +13,29 @@ import { conditionExpression } from "./expressions/condition/expression.js";
 import type { KeyConditionExpression } from "./expressions/key-condition.js";
 import type { Command } from "./types.js";
 
-export type QueryParams = {
+export type QueryParams<K extends Attributes> = {
   table: string;
   index?: string;
   condition: KeyConditionExpression;
   consistentRead?: boolean;
-  exclusiveStartKey?: Attributes;
+  exclusiveStartKey?: K;
   limit?: number;
   scanIndexForward?: boolean;
 };
 
-export type QueryResult<T> = {
+export type QueryResult<K extends Attributes, T extends Attributes> = {
   count: number;
   items: Array<T>;
   scannedCount: number;
-  lastEvaluatedKey?: Attributes;
+  lastEvaluatedKey?: K;
 };
 
-export class Query implements Command<QueryCommandInput, QueryCommand> {
-  private readonly params: QueryParams;
+export class Query<K extends Attributes>
+  implements Command<QueryCommandInput, QueryCommand>
+{
+  private readonly params: QueryParams<K>;
 
-  private constructor(params: QueryParams) {
+  private constructor(params: QueryParams<K>) {
     this.params = params;
   }
 
@@ -72,11 +75,11 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
 
   private transformResult<T extends Attributes>(
     result: QueryCommandOutput,
-  ): QueryResult<T> {
+  ): QueryResult<K, T> {
     const items = (result.Items ?? []) as Array<T>;
     return {
       items,
-      lastEvaluatedKey: result.LastEvaluatedKey,
+      lastEvaluatedKey: trusted(result.LastEvaluatedKey),
       count: checkNotNull(result.Count, "count"),
       scannedCount: checkNotNull(result.ScannedCount, "scannedCount"),
     };
@@ -84,7 +87,7 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
 
   async execute<T extends Attributes>(params: {
     client: DynamoDBClient;
-  }): Promise<QueryResult<T>> {
+  }): Promise<QueryResult<K, T>> {
     const { client } = params;
 
     const response = await client.send(this.toAwsCommand());
@@ -92,7 +95,7 @@ export class Query implements Command<QueryCommandInput, QueryCommand> {
     return this.transformResult(response);
   }
 
-  static from(params: QueryParams): Query {
+  static from<K extends Attributes>(params: QueryParams<K>): Query<K> {
     return new Query(params);
   }
 }

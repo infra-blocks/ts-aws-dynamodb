@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.0] - 2026-02-06
+
+### Changed
+
+- Parameterized `query` on primary key. Because the primary key can be inferred by the params payload,
+it is presented as the first type parameter. The previous type parameter for the return type is kept
+as the second type parameter, and defaults to `Attributes`.
+- The type parameter for `getItem` now requires to extend `Attributes` and defaults to `Attributes`.
+
 ## [0.42.1] - 2026-01-15
 
 ### Fixed
@@ -564,6 +573,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.43.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.42.1...v0.43.0
 [0.42.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.42.0...v0.42.1
 [0.42.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.40.1...v0.41.0
