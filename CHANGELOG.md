@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.0] - 2026-02-13
+
+### Changed
+
+- The `putItem` now also supports `returnValuesOnConditionCheckFailure`, the same way `deleteItem`
+does. Both APIs have also been standardized in terms of result typings. The conditional typing
+has been removed from the `deleteItem` API result to be friendlier to looser typing.
+
 ## [0.44.0] - 2026-02-13
 
 ### Changed
@@ -583,6 +591,8 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.45.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.44.0...v0.45.0
+[0.44.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.43.0...v0.44.0
 [0.43.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.42.1...v0.43.0
 [0.42.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.42.0...v0.42.1
 [0.42.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.41.0...v0.42.0

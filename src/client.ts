@@ -120,10 +120,9 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
    */
-  async deleteItem<
-    P extends DeleteItemParams,
-    T extends Attributes = Attributes,
-  >(params: P): Promise<DeleteItemResult<P, T>> {
+  async deleteItem<T extends Attributes = Attributes>(
+    params: DeleteItemParams,
+  ): Promise<DeleteItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("deleteItem(%s)", JSON.stringify(params));
     }
@@ -205,7 +204,9 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
-  async putItem(params: PutItemParams): Promise<PutItemResult> {
+  async putItem<T extends Attributes = Attributes>(
+    params: PutItemParams,
+  ): Promise<PutItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
     }

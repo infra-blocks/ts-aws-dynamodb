@@ -118,7 +118,7 @@ describe(DynamoDBClient.name, () => {
       );
       expect(response.Item).to.be.undefined;
     });
-    it("should return the item when requested", async function () {
+    it("should return the previous item when ALL_OLD requested", async function () {
       const client = this.createClient();
       const table = "test-table";
       const createTableParams: CreateTableParams = {
@@ -152,7 +152,7 @@ describe(DynamoDBClient.name, () => {
       );
       expect(getItem.Item).to.be.undefined;
     });
-    it("should return the item on condition check failure when requested", async function () {
+    it("should return the previous item on condition check failure when ALL_OLD requested", async function () {
       const client = this.createClient();
       const table = "test-table";
       const createTableParams: CreateTableParams = {
