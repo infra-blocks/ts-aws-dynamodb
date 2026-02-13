@@ -20,27 +20,12 @@ export interface DeleteItemParams {
   returnValuesOnConditionCheckFailure?: DeleteItemReturnValue;
 }
 
-export type DeleteItemResult<
-  P extends DeleteItemParams,
-  T extends Attributes,
-> = ResultWithAttributes<P, T, Record<string, never>>;
+export type DeleteItemResult<T extends Attributes> = { item?: T };
 
-type ResultWithAttributes<
-  P extends DeleteItemParams,
-  T extends Attributes,
-  R,
-> = P extends {
-  returnValues: "ALL_OLD";
-}
-  ? R & { item?: T }
-  : R;
+export class DeleteItem implements Command<DeleteCommandInput, DeleteCommand> {
+  private readonly params: DeleteItemParams;
 
-export class DeleteItem<P extends DeleteItemParams>
-  implements Command<DeleteCommandInput, DeleteCommand>
-{
-  private readonly params: P;
-
-  private constructor(params: P) {
+  private constructor(params: DeleteItemParams) {
     this.params = params;
   }
 
@@ -87,7 +72,7 @@ export class DeleteItem<P extends DeleteItemParams>
 
   async execute<T extends Attributes>(params: {
     client: DynamoDBClient;
-  }): Promise<DeleteItemResult<P, T>> {
+  }): Promise<DeleteItemResult<T>> {
     const { client } = params;
 
     const result: Record<string, unknown> = {};
@@ -99,7 +84,7 @@ export class DeleteItem<P extends DeleteItemParams>
     return trusted(result);
   }
 
-  static from<P extends DeleteItemParams>(params: P): DeleteItem<P> {
+  static from(params: DeleteItemParams): DeleteItem {
     return new DeleteItem(params);
   }
 }

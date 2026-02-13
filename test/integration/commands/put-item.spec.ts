@@ -1,7 +1,11 @@
-import { expect } from "@infra-blocks/test";
+import assert, { fail } from "node:assert";
+import { findCauseByType } from "@infra-blocks/error";
+import { expect, expectTypeOf } from "@infra-blocks/test";
 import {
+  type Attributes,
   attributeNotExists,
   attributeType,
+  ConditionalCheckFailedException,
   type CreateTableParams,
   DynamoDbClient,
   or,
@@ -87,7 +91,7 @@ describe(DynamoDbClient.name, () => {
       const response = await client.putItem(putItemParams);
       expect(response.item).to.be.undefined;
     });
-    it("should return the old value when return values ALL_OLD is specified", async function () {
+    it("should return the previous item when ALL_OLD requested", async function () {
       const client = this.createClient();
       const createTableParams: CreateTableParams = {
         name: "test-table",
@@ -107,15 +111,16 @@ describe(DynamoDbClient.name, () => {
       const firstResponse = await client.putItem(firstPut);
       expect(firstResponse.item).to.be.undefined;
 
-      const secondPut: PutItemParams = {
+      const secondPut = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
           newValue: "on the block",
         },
-        returnValues: "ALL_OLD",
+        returnValues: "ALL_OLD" as const,
       };
       const secondResponse = await client.putItem(secondPut);
+      expectTypeOf(secondResponse.item).toEqualTypeOf<Attributes | undefined>();
       expect(secondResponse).to.deep.equal({
         item: {
           pk: "BigIron#1",
@@ -129,6 +134,42 @@ describe(DynamoDbClient.name, () => {
         key: { pk: firstPut.item.pk },
       });
       expect(item).to.deep.include(secondPut.item);
+    });
+    it("should return the previous item on condition check failure when ALL_OLD requested", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      const createTableParams: CreateTableParams = {
+        name: table,
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+
+      await client.putItem({
+        table: createTableParams.name,
+        item: {
+          pk: "BigIron#1",
+          oldValue: "original",
+        },
+      });
+
+      try {
+        await client.putItem({
+          table,
+          item: { pk: "BigIron#1", newValue: "allNew" },
+          returnValuesOnConditionCheckFailure: "ALL_OLD",
+          condition: attributeNotExists("pk"),
+        });
+        fail("putItem should have thrown");
+      } catch (err) {
+        const cause = findCauseByType(err, ConditionalCheckFailedException);
+        assert(cause != null);
+        expect(cause.Item).to.deep.equal({
+          pk: { S: "BigIron#1" },
+          oldValue: { S: "original" },
+        });
+      }
     });
     it("should work with expression", async function () {
       const client = this.createClient();
