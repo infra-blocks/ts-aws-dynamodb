@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.0] - 2026-02-13
+
+### Changed
+
+- The `deleteItem` API now accepts the `returnValues` and `returnValuesOnConditionCheckFailure` options.
+The return type of `deleteItem` was also changed to reflect those new options. When neither is provided,
+the API returns an empty object of type `Record<string, never>`. When `returnValues` with a value of
+`ALL_OLD` is provided, then the return payload looks like this: `{ item?: T }`, where `T` is provided
+as a type generic or defaults to `Attributes`.
+
 ## [0.43.0] - 2026-02-06
 
 ### Changed

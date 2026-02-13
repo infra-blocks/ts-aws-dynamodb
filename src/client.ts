@@ -14,7 +14,11 @@ import {
   DeleteTable,
   type DeleteTableParams,
 } from "./commands/delete.table.js";
-import { DeleteItem, type DeleteItemParams } from "./commands/delete-item.js";
+import {
+  DeleteItem,
+  type DeleteItemParams,
+  type DeleteItemResult,
+} from "./commands/delete-item.js";
 import { GetItem, type GetItemParams } from "./commands/get-item.js";
 import {
   PutItem,
@@ -116,14 +120,18 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
    */
-  async deleteItem(params: DeleteItemParams): Promise<void> {
+  async deleteItem<
+    P extends DeleteItemParams,
+    T extends Attributes = Attributes,
+  >(params: P): Promise<DeleteItemResult<P, T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("deleteItem(%s)", JSON.stringify(params));
     }
 
     try {
-      const command = DeleteItem.from(params);
-      await this.client.send(command.toAwsCommand());
+      return await DeleteItem.from(params).execute({
+        client: this.client,
+      });
     } catch (err) {
       throw new DynamoDbClientError("error while deleting item", {
         cause: err,

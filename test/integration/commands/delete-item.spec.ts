@@ -1,12 +1,18 @@
+import assert, { fail } from "node:assert";
 import {
+  ConditionalCheckFailedException,
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
   ResourceNotFoundException,
 } from "@aws-sdk/client-dynamodb";
 import { findCauseByType } from "@infra-blocks/error";
-import { expect } from "@infra-blocks/test";
-import type { CreateTableParams } from "../../../src/index.js";
+import { expect, expectTypeOf } from "@infra-blocks/test";
+import {
+  type Attributes,
+  attributeNotExists,
+  type CreateTableParams,
+} from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe(DynamoDBClient.name, () => {
@@ -111,6 +117,75 @@ describe(DynamoDBClient.name, () => {
         }),
       );
       expect(response.Item).to.be.undefined;
+    });
+    it("should return the item when requested", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      const createTableParams: CreateTableParams = {
+        name: table,
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+      const testClient = this.createTestClient();
+      await testClient.send(
+        new PutItemCommand({
+          TableName: table,
+          Item: { pk: { S: "User#BigToto" } },
+        }),
+      );
+
+      const response = await client.deleteItem({
+        table,
+        key: { pk: "User#BigToto" },
+        returnValues: "ALL_OLD",
+      });
+      expectTypeOf(response.item).toEqualTypeOf<Attributes | undefined>();
+      expect(response.item).to.deep.equal({ pk: "User#BigToto" });
+
+      const getItem = await testClient.send(
+        new GetItemCommand({
+          TableName: table,
+          Key: { pk: { S: "User#BigToto" } },
+        }),
+      );
+      expect(getItem.Item).to.be.undefined;
+    });
+    it("should return the item on condition check failure when requested", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      const createTableParams: CreateTableParams = {
+        name: table,
+        primaryKey: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      };
+      await client.createTable(createTableParams);
+      const testClient = this.createTestClient();
+      await testClient.send(
+        new PutItemCommand({
+          TableName: table,
+          Item: { pk: { S: "User#BigToto" }, other: { S: "coucou" } },
+        }),
+      );
+
+      try {
+        await client.deleteItem({
+          table,
+          key: { pk: "User#BigToto" },
+          returnValuesOnConditionCheckFailure: "ALL_OLD",
+          condition: attributeNotExists("pk"),
+        });
+        fail("deleteItem should have thrown");
+      } catch (err) {
+        const cause = findCauseByType(err, ConditionalCheckFailedException);
+        assert(cause != null);
+        expect(cause.Item).to.deep.equal({
+          pk: { S: "User#BigToto" },
+          other: { S: "coucou" },
+        });
+      }
     });
   });
 });
