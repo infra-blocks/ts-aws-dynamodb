@@ -33,6 +33,23 @@ export const NATIVE_TYPES = [
   "SS",
 ] as const;
 
+/**
+ * A type map object mapping {@link NativeType} values to their corresponding
+ * Typescript equivalent.
+ */
+export type TypeMap = {
+  B: NativeBinary;
+  BS: NativeBinarySet;
+  BOOL: NativeBoolean;
+  L: NativeList;
+  M: NativeMap;
+  N: NativeNumber;
+  NS: NativeNumberSet;
+  NULL: NativeNull;
+  S: NativeString;
+  SS: NativeStringSet;
+};
+
 export type NativeBinary = Buffer;
 export type NativeBinarySet = Set<NativeBinary>;
 export type NativeBoolean = boolean;
@@ -130,14 +147,14 @@ export type AttributeValue =
  */
 export type Attributes = Record<AttributeName, AttributeValue>;
 
-export type IndexAttributeType = Extract<NativeType, "B" | "N" | "S">;
+export type KeyAttributeType = Extract<NativeType, "B" | "N" | "S">;
 
-export interface IndexAttributeDefinition {
-  name: string;
-  type: IndexAttributeType;
+export interface KeyAttributeDefinition {
+  name: AttributeName;
+  type: KeyAttributeType;
 }
 
-export interface Index {
-  partitionKey: IndexAttributeDefinition;
-  sortKey?: IndexAttributeDefinition;
+export interface KeyDefinition {
+  partitionKey: KeyAttributeDefinition;
+  sortKey?: KeyAttributeDefinition;
 }
