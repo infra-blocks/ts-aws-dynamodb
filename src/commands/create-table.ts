@@ -5,23 +5,24 @@ import {
   type KeySchemaElement,
   type LocalSecondaryIndex,
 } from "@aws-sdk/client-dynamodb";
-import type { Index, IndexAttributeType } from "../types.js";
+import type { KeyAttributeType, KeyDefinition } from "../types.js";
 import type { Command } from "./types.js";
 
 export interface CreateTableParams {
   name: string;
-  primaryKey: Index;
-  gsis?: Record<string, Index>;
-  lsis?: Record<string, Index>;
+  // TODO: rename to just key?
+  primaryKey: KeyDefinition;
+  gsis?: Record<string, KeyDefinition>;
+  lsis?: Record<string, KeyDefinition>;
 }
 
 export class CreateTable
   implements Command<CreateTableCommandInput, CreateTableCommand>
 {
   private readonly name: string;
-  private readonly primaryKey: Index;
-  private readonly gsis?: Record<string, Index>;
-  private readonly lsis?: Record<string, Index>;
+  private readonly primaryKey: KeyDefinition;
+  private readonly gsis?: Record<string, KeyDefinition>;
+  private readonly lsis?: Record<string, KeyDefinition>;
 
   private constructor(params: CreateTableParams) {
     const { name, primaryKey, gsis, lsis } = params;
@@ -32,7 +33,7 @@ export class CreateTable
   }
 
   toAwsCommandInput(): CreateTableCommandInput {
-    const attributeDefinitions: Map<string, IndexAttributeType> = new Map();
+    const attributeDefinitions: Map<string, KeyAttributeType> = new Map();
     const primaryKeySchema = keySchema({
       attributeDefinitions,
       key: this.primaryKey,
@@ -65,7 +66,7 @@ export class CreateTable
   }
 
   private gsiInput(
-    attributeDefinitions: Map<string, IndexAttributeType>,
+    attributeDefinitions: Map<string, KeyAttributeType>,
   ): Array<GlobalSecondaryIndex> {
     const gsis = this.gsis ?? {};
 
@@ -87,7 +88,7 @@ export class CreateTable
   }
 
   private lsiInput(
-    attributeDefinitions: Map<string, IndexAttributeType>,
+    attributeDefinitions: Map<string, KeyAttributeType>,
   ): Array<LocalSecondaryIndex> {
     const lsis = this.lsis ?? {};
 
@@ -117,8 +118,8 @@ export class CreateTable
 }
 
 function keySchema(params: {
-  attributeDefinitions: Map<string, IndexAttributeType>;
-  key: Index;
+  attributeDefinitions: Map<string, KeyAttributeType>;
+  key: KeyDefinition;
 }): Array<KeySchemaElement> {
   const { attributeDefinitions, key } = params;
   const keySchema: Array<KeySchemaElement> = [];
