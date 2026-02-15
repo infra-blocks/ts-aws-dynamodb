@@ -1,5 +1,5 @@
 import { GetCommand, type GetCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { Attributes } from "../types.js";
+import type { KeyAttributes } from "../types.js";
 import type { Command } from "./types.js";
 
 /**
@@ -17,7 +17,7 @@ export interface GetItemParams {
    * This should always include at least the partition key, and the sort key if one
    * is part of the table's primary key. No more than 2 fields are expected here.
    */
-  key: Attributes;
+  key: KeyAttributes;
 }
 
 export class GetItem implements Command<GetCommandInput, GetCommand> {

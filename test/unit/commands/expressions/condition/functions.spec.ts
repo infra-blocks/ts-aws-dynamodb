@@ -6,7 +6,12 @@ import {
   beginsWith,
   contains,
 } from "../../../../../src/commands/expressions/condition/functions.js";
-import { NATIVE_TYPES, path, size, value } from "../../../../../src/index.js";
+import {
+  ATTRIBUTE_TYPES,
+  path,
+  size,
+  value,
+} from "../../../../../src/index.js";
 import { expressionMatch } from "../update/action-match.js";
 
 describe("commands.expressions.condition.functions", () => {
@@ -70,7 +75,7 @@ describe("commands.expressions.condition.functions", () => {
       // @ts-expect-error Only NativeType values are valid rhs operands for attributeType.
       attributeType(path(lhs), value(rhs));
     });
-    for (const type of NATIVE_TYPES) {
+    for (const type of ATTRIBUTE_TYPES) {
       it(`should work with a path and type ${type}`, () => {
         const lhs = "test.attribute";
         const { match, names, values } = expressionMatch({

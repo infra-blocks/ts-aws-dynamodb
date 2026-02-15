@@ -6,7 +6,6 @@ import {
   type CreateTableParams,
   deleteFrom,
   ifNotExists,
-  type PutItemParams,
   path,
   remove,
   set,
@@ -27,7 +26,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(createTableParams);
-      const putItemParams: PutItemParams = {
+      const putItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
