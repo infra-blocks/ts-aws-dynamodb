@@ -29,7 +29,7 @@ describe(DynamoDbClient.name, () => {
       };
       await client.createTable(createTableParams);
 
-      const putItemParams: PutItemParams = {
+      const putItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
@@ -55,7 +55,7 @@ describe(DynamoDbClient.name, () => {
       };
       await client.createTable(createTableParams);
 
-      const putItemParams: PutItemParams = {
+      const putItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
@@ -101,7 +101,7 @@ describe(DynamoDbClient.name, () => {
       };
       await client.createTable(createTableParams);
 
-      const firstPut: PutItemParams = {
+      const firstPut = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
@@ -181,7 +181,7 @@ describe(DynamoDbClient.name, () => {
         },
       };
       await client.createTable(createTableParams);
-      const putItemParams: PutItemParams = {
+      const putItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
@@ -209,24 +209,23 @@ describe(DynamoDbClient.name, () => {
         },
       };
       await client.createTable(createTableParams);
-      const putItemParams: PutItemParams = {
+      const putItemParams = {
         table: createTableParams.name,
         item: {
           pk: "BigIron#1",
           string: "hello",
-          // We're just double checking here that, even if the typing
-          // does not allow to pass undefined, if a user works around it,
-          // the field will still be stripped.
-          // @ts-expect-error undefined is not a valid attribute field.
-          undefined: undefined,
         },
       };
-      await client.putItem(putItemParams);
+      // @ts-expect-error undefined is not a valid attribute field.
+      await client.putItem({ ...putItemParams, undefined: undefined });
 
       const item = await client.getItem({
         table: createTableParams.name,
         key: { pk: putItemParams.item.pk },
       });
+      // We're just double checking here that, even if the typing
+      // does not allow to pass undefined, if a user works around it,
+      // the field will still be stripped.
       expect(item).to.deep.equals({
         pk: "BigIron#1",
         string: "hello",

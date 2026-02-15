@@ -3,7 +3,7 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import type { WithRequired } from "@infra-blocks/types";
-import type { Attributes } from "../types.js";
+import type { KeyAttributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
@@ -30,8 +30,7 @@ type UpdateCommandInput = WithRequired<
 
 export interface UpdateItemParams {
   table: string;
-  // TODO: specific type def for primary key attributes (subset of attribute types)
-  key: Attributes;
+  key: KeyAttributes;
   condition?: ConditionParams;
   update: UpdateExpressionParams;
 }

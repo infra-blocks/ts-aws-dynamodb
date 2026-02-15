@@ -1,8 +1,8 @@
 import type {
+  AttributeType,
   AttributeValue,
   NativeBinary,
   NativeString,
-  NativeType,
 } from "../../../types.js";
 import { operand, type RawOperand } from "../operands/operand.js";
 import { Path, type RawPath } from "../operands/path.js";
@@ -53,7 +53,7 @@ export function attributeNotExists(rawPath: RawPath): ConditionExpression {
  */
 export function attributeType(
   attribute: RawPath,
-  rawType: RawValue<NativeType>,
+  rawType: RawValue<AttributeType>,
 ): ConditionExpression {
   const path = Path.normalize(attribute);
   const type = Value.normalize(rawType);

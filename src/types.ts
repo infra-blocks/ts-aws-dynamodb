@@ -9,7 +9,7 @@ import {
 } from "@infra-blocks/types";
 
 // DynamoDB supported types and their TypeScript representations
-export type NativeType =
+export type AttributeType =
   | "B" // Binary
   | "BS" // Binary Set
   | "BOOL" // Boolean
@@ -20,7 +20,7 @@ export type NativeType =
   | "NULL" // Null
   | "S" // String
   | "SS"; // String Set
-export const NATIVE_TYPES = [
+export const ATTRIBUTE_TYPES = [
   "B",
   "BS",
   "BOOL",
@@ -34,7 +34,7 @@ export const NATIVE_TYPES = [
 ] as const;
 
 /**
- * A type map object mapping {@link NativeType} values to their corresponding
+ * A type map object mapping {@link AttributeType} values to their corresponding
  * Typescript equivalent.
  */
 export type TypeMap = {
@@ -126,18 +126,10 @@ export type AttributeName = string;
  */
 export type AttributePath = AttributeName;
 
-export type AttributeValue =
-  | NativeBinary
-  | NativeBinarySet
-  | NativeBoolean
-  | NativeList
-  | NativeMap
-  | NativeNull
-  | NativeNumber
-  | NativeNumberSet
-  | NativeSet
-  | NativeString
-  | NativeStringSet;
+/**
+ * The typescript values that can be assigned to an attribute.
+ */
+export type AttributeValue = TypeMap[AttributeType];
 
 /**
  * Type representing a record of attributes belonging to a DynamoDB item.
@@ -147,13 +139,40 @@ export type AttributeValue =
  */
 export type Attributes = Record<AttributeName, AttributeValue>;
 
-export type KeyAttributeType = Extract<NativeType, "B" | "N" | "S">;
+/**
+ * Key attribute types are restricted to certain types: "B", "N" and "S".
+ *
+ * This type captures that fact.
+ */
+export type KeyAttributeType = Extract<AttributeType, "B" | "N" | "S">;
 
+/**
+ * The typescript values that can be assigned to a key attribute.
+ */
+export type KeyAttributeValue = TypeMap[KeyAttributeType];
+
+/**
+ * A record of {@link KeyAttributeValue} by {@link AttributeName}.
+ *
+ * Used in APIs that expect primary keys, such as GetItem.
+ */
+export type KeyAttributes = Record<AttributeName, KeyAttributeValue>;
+
+/**
+ * Each key attribute within a definition is named and has a stringified
+ * type.
+ */
 export interface KeyAttributeDefinition {
   name: AttributeName;
   type: KeyAttributeType;
 }
 
+/**
+ * A key definition used when creating tables and indexes.
+ *
+ * The partition key represents the HASH type key, and the optional sort key
+ * represents the RANGE type key.
+ */
 export interface KeyDefinition {
   partitionKey: KeyAttributeDefinition;
   sortKey?: KeyAttributeDefinition;

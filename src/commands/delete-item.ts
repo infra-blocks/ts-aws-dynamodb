@@ -1,7 +1,7 @@
 import type { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, type DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
 import { trusted } from "@infra-blocks/types";
-import type { Attributes } from "../types.js";
+import type { Attributes, KeyAttributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
@@ -12,7 +12,7 @@ export type DeleteItemReturnValue = "ALL_OLD" | "NONE";
 
 export interface DeleteItemParams {
   table: string;
-  key: Attributes;
+  key: KeyAttributes;
   condition?: ConditionParams;
   returnValues?: DeleteItemReturnValue;
   // The item will be stored in the thrown exception and won't be unarmashalled.

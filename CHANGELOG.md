@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.0] - 2026-02-15
+
+### Added
+
+- The `KeyAttributeValue`, which is a subset of the `AttributeValue`. See
+[here](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html#HowItWorks.CoreComponents.PrimaryKey)
+- The `KeyAttributes` homologous to the `Attributes` version.
+
+### Changed
+
+- Renamed `NativeType` for `AttributeType` and `NATIVE_TYPES` to `ATTRIBUTE_TYPES`. Just being
+annoying and pedantic here. Probably the `Native<type>` types are coming too. I never liked
+prefixing them with `Native` anyway. Doesn't say enough.
+- Used `TypeMap` in the declaration of `AttributeValue`. This is backwards compatible.
+- The `GetItemParams`, `DeleteItemParams` and `UpdateItemParams` now correctly use `KeyAttributes`
+for their `key` field instead of `Attributes`.
+
 ## [0.46.0] - 2026-02-14
 
 ### Added
@@ -602,6 +619,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.47.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.46.0...v0.47.0
 [0.46.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.45.0...v0.46.0
 [0.45.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.44.0...v0.45.0
 [0.44.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.43.0...v0.44.0
