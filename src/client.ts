@@ -36,7 +36,7 @@ import {
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
 import { DynamoDbClientError } from "./error.js";
-import type { Attributes } from "./types.js";
+import type { Attributes, KeyAttributes } from "./types.js";
 
 /**
  * Re-export of the native client's, renamed.
@@ -235,9 +235,10 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async *iterateQuery<K extends Attributes, T extends Attributes = Attributes>(
-    params: QueryParams<K>,
-  ): AsyncGenerator<T> {
+  async *iterateQuery<
+    K extends KeyAttributes,
+    T extends Attributes = Attributes,
+  >(params: QueryParams<K>): AsyncGenerator<T> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("iterateQuery(%s)", JSON.stringify(params));
     }
@@ -268,9 +269,10 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async *paginateQuery<K extends Attributes, T extends Attributes = Attributes>(
-    params: QueryParams<K>,
-  ): AsyncGenerator<QueryResult<K, T>> {
+  async *paginateQuery<
+    K extends KeyAttributes,
+    T extends Attributes = Attributes,
+  >(params: QueryParams<K>): AsyncGenerator<QueryResult<K, T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("paginateQuery(%s)", JSON.stringify(params));
     }
@@ -308,7 +310,7 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async query<K extends Attributes, T extends Attributes = Attributes>(
+  async query<K extends KeyAttributes, T extends Attributes = Attributes>(
     params: QueryParams<K>,
   ): Promise<QueryResult<K, T>> {
     if (this.logger.isDebugEnabled()) {
@@ -335,7 +337,7 @@ export class DynamoDbClient {
    *
    * @returns The only item matching the query, or `undefined` if no item matches.
    */
-  async queryOne<K extends Attributes, T extends Attributes = Attributes>(
+  async queryOne<K extends KeyAttributes, T extends Attributes = Attributes>(
     params: QueryParams<K>,
   ): Promise<T | undefined> {
     try {
