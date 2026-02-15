@@ -6,14 +6,14 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
 import { trusted } from "@infra-blocks/types";
-import type { Attributes } from "../types.js";
+import type { Attributes, KeyAttributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
 import type { KeyConditionExpression } from "./expressions/key-condition.js";
 import type { Command } from "./types.js";
 
-export type QueryParams<K extends Attributes> = {
+export type QueryParams<K extends KeyAttributes = KeyAttributes> = {
   table: string;
   index?: string;
   condition: KeyConditionExpression;
@@ -23,14 +23,14 @@ export type QueryParams<K extends Attributes> = {
   scanIndexForward?: boolean;
 };
 
-export type QueryResult<K extends Attributes, T extends Attributes> = {
+export type QueryResult<K extends KeyAttributes, T extends Attributes> = {
   count: number;
   items: Array<T>;
   scannedCount: number;
   lastEvaluatedKey?: K;
 };
 
-export class Query<K extends Attributes>
+export class Query<K extends KeyAttributes>
   implements Command<QueryCommandInput, QueryCommand>
 {
   private readonly params: QueryParams<K>;
@@ -95,7 +95,7 @@ export class Query<K extends Attributes>
     return this.transformResult(response);
   }
 
-  static from<K extends Attributes>(params: QueryParams<K>): Query<K> {
+  static from<K extends KeyAttributes>(params: QueryParams<K>): Query<K> {
     return new Query(params);
   }
 }
