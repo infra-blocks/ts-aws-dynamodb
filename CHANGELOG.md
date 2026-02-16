@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.51.0] - 2026-02-15
+## [0.52.0] - 2026-02-16
+
+### Changed
+
+- Parameterized `UpdateItemParams` on key type.
+
+## [0.51.0] - 2026-02-16
 
 ### Added
 
@@ -655,6 +661,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.52.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.51.0...v0.52.0
 [0.51.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.50.0...v0.51.0
 [0.50.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.49.0...v0.50.0
 [0.49.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.48.0...v0.49.0
