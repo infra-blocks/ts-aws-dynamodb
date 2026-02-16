@@ -2,7 +2,6 @@ import assert, { fail } from "node:assert";
 import { findCauseByType } from "@infra-blocks/error";
 import { expect, expectTypeOf } from "@infra-blocks/test";
 import {
-  type Attributes,
   attributeNotExists,
   attributeType,
   ConditionalCheckFailedException,
@@ -120,7 +119,9 @@ describe(DynamoDbClient.name, () => {
         returnValues: "ALL_OLD" as const,
       };
       const secondResponse = await client.putItem(secondPut);
-      expectTypeOf(secondResponse.item).toEqualTypeOf<Attributes | undefined>();
+      expectTypeOf(secondResponse.item).toEqualTypeOf<
+        typeof secondPut.item | undefined
+      >();
       expect(secondResponse).to.deep.equal({
         item: {
           pk: "BigIron#1",

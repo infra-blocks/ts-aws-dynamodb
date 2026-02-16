@@ -10,9 +10,9 @@ import type { Command } from "./types.js";
 
 export type PutItemReturnValue = "ALL_OLD" | "NONE";
 
-export type PutItemParams = {
+export type PutItemParams<T extends Attributes = Attributes> = {
   table: string;
-  item: Attributes;
+  item: T;
   condition?: ConditionParams;
   returnValues?: PutItemReturnValue;
   // The item will be stored in the thrown exception and won't be unarmashalled.
@@ -20,12 +20,15 @@ export type PutItemParams = {
   returnValuesOnConditionCheckFailure?: PutItemReturnValue;
 };
 
+// TODO: this type will have to be more flexible following projections.
 export type PutItemResult<T extends Attributes> = { item?: T };
 
-export class PutItem implements Command<PutCommandInput, PutCommand> {
-  private readonly params: PutItemParams;
+export class PutItem<T extends Attributes>
+  implements Command<PutCommandInput, PutCommand>
+{
+  private readonly params: PutItemParams<T>;
 
-  private constructor(params: PutItemParams) {
+  private constructor(params: PutItemParams<T>) {
     this.params = params;
   }
 
@@ -84,7 +87,7 @@ export class PutItem implements Command<PutCommandInput, PutCommand> {
     return trusted(result);
   }
 
-  static from(params: PutItemParams): PutItem {
+  static from<T extends Attributes>(params: PutItemParams<T>): PutItem<T> {
     return new PutItem(params);
   }
 }

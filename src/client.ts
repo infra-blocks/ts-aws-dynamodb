@@ -205,7 +205,7 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
   async putItem<T extends Attributes = Attributes>(
-    params: PutItemParams,
+    params: PutItemParams<T>,
   ): Promise<PutItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
