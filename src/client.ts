@@ -170,8 +170,8 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
    */
-  async getItem<T extends Attributes = Attributes>(
-    params: GetItemParams,
+  async getItem<K extends KeyAttributes, T extends Attributes = Attributes>(
+    params: GetItemParams<K>,
   ): Promise<T | undefined> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("getItem(%s)", JSON.stringify(params));
@@ -342,6 +342,7 @@ export class DynamoDbClient {
   ): Promise<T | undefined> {
     try {
       let item: T | undefined;
+      // TODO: page of only 2 items, remove limit from parameters.
       for await (const queryItem of this.iterateQuery<K, T>(params)) {
         if (item != null) {
           throw new DynamoDbClientError(
