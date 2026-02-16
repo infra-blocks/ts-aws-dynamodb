@@ -5,8 +5,7 @@ import type { Command } from "./types.js";
 /**
  * The input required to call the GetItem API.
  */
-
-export interface GetItemParams {
+export interface GetItemParams<K extends KeyAttributes = KeyAttributes> {
   /**
    * The name of the table to query.
    */
@@ -17,13 +16,15 @@ export interface GetItemParams {
    * This should always include at least the partition key, and the sort key if one
    * is part of the table's primary key. No more than 2 fields are expected here.
    */
-  key: KeyAttributes;
+  key: K;
 }
 
-export class GetItem implements Command<GetCommandInput, GetCommand> {
-  private readonly params: GetItemParams;
+export class GetItem<K extends KeyAttributes>
+  implements Command<GetCommandInput, GetCommand>
+{
+  private readonly params: GetItemParams<K>;
 
-  private constructor(params: GetItemParams) {
+  private constructor(params: GetItemParams<K>) {
     this.params = params;
   }
 
@@ -39,7 +40,7 @@ export class GetItem implements Command<GetCommandInput, GetCommand> {
     return new GetCommand(this.toAwsCommandInput());
   }
 
-  static from(params: GetItemParams): GetItem {
+  static from<K extends KeyAttributes>(params: GetItemParams<K>): GetItem<K> {
     return new GetItem(params);
   }
 }
