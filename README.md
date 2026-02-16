@@ -8,5 +8,4 @@ A convenience library wrapper around [`@aws-sdk/client-dynamodb`](https://www.np
 - A type safe expression language that automatically handles the aliasing of attribute names and values.
 - More conventional field names. Input and output fields use the more common `camelCase` JS/TS convention
 over the `PascalCase` imposed by the AWS APIs.
-- Every client error is wrapped into a error adding description about which operation triggered the error.
 - Pagination is provided for APIs that support it and exposed as `AsyncIterators`.
