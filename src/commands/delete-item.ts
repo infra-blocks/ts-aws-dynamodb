@@ -10,9 +10,9 @@ import type { Command } from "./types.js";
 
 export type DeleteItemReturnValue = "ALL_OLD" | "NONE";
 
-export interface DeleteItemParams {
+export interface DeleteItemParams<K extends KeyAttributes = KeyAttributes> {
   table: string;
-  key: KeyAttributes;
+  key: K;
   condition?: ConditionParams;
   returnValues?: DeleteItemReturnValue;
   // The item will be stored in the thrown exception and won't be unarmashalled.
@@ -22,10 +22,12 @@ export interface DeleteItemParams {
 
 export type DeleteItemResult<T extends Attributes> = { item?: T };
 
-export class DeleteItem implements Command<DeleteCommandInput, DeleteCommand> {
-  private readonly params: DeleteItemParams;
+export class DeleteItem<K extends KeyAttributes>
+  implements Command<DeleteCommandInput, DeleteCommand>
+{
+  private readonly params: DeleteItemParams<K>;
 
-  private constructor(params: DeleteItemParams) {
+  private constructor(params: DeleteItemParams<K>) {
     this.params = params;
   }
 
@@ -84,7 +86,9 @@ export class DeleteItem implements Command<DeleteCommandInput, DeleteCommand> {
     return trusted(result);
   }
 
-  static from(params: DeleteItemParams): DeleteItem {
+  static from<K extends KeyAttributes>(
+    params: DeleteItemParams<K>,
+  ): DeleteItem<K> {
     return new DeleteItem(params);
   }
 }
