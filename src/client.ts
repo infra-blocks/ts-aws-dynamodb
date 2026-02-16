@@ -342,6 +342,7 @@ export class DynamoDbClient {
   ): Promise<T | undefined> {
     try {
       let item: T | undefined;
+      // TODO: page of only 2 items, remove limit from parameters.
       for await (const queryItem of this.iterateQuery<K, T>(params)) {
         if (item != null) {
           throw new DynamoDbClientError(
