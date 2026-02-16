@@ -405,7 +405,9 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html
    */
-  async updateItem(params: UpdateItemParams): Promise<void> {
+  async updateItem<K extends KeyAttributes>(
+    params: UpdateItemParams<K>,
+  ): Promise<void> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("updateItem(%s)", JSON.stringify(params));
     }

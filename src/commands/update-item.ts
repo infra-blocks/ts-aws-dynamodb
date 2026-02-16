@@ -28,17 +28,19 @@ type UpdateCommandInput = WithRequired<
   "UpdateExpression"
 >;
 
-export interface UpdateItemParams {
+export interface UpdateItemParams<K extends KeyAttributes = KeyAttributes> {
   table: string;
-  key: KeyAttributes;
-  condition?: ConditionParams;
+  key: K;
   update: UpdateExpressionParams;
+  condition?: ConditionParams;
 }
 
-export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
-  private readonly params: UpdateItemParams;
+export class UpdateItem<K extends KeyAttributes>
+  implements Command<UpdateCommandInput, UpdateCommand>
+{
+  private readonly params: UpdateItemParams<K>;
 
-  private constructor(params: UpdateItemParams) {
+  private constructor(params: UpdateItemParams<K>) {
     this.params = params;
   }
 
@@ -79,7 +81,9 @@ export class UpdateItem implements Command<UpdateCommandInput, UpdateCommand> {
     return new UpdateCommand(this.toAwsCommandInput());
   }
 
-  static from(params: UpdateItemParams): UpdateItem {
+  static from<K extends KeyAttributes>(
+    params: UpdateItemParams<K>,
+  ): UpdateItem<K> {
     return new UpdateItem(params);
   }
 }
