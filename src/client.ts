@@ -120,8 +120,8 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
    */
-  async deleteItem<T extends Attributes = Attributes>(
-    params: DeleteItemParams,
+  async deleteItem<K extends KeyAttributes, T extends Attributes = Attributes>(
+    params: DeleteItemParams<K>,
   ): Promise<DeleteItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("deleteItem(%s)", JSON.stringify(params));
