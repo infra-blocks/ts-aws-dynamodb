@@ -35,7 +35,7 @@ import {
   WriteTransaction,
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
-import { DynamoDbClientError } from "./error.js";
+import { TooManyItemsException } from "./error.js";
 import type { Attributes, KeyAttributes } from "./types.js";
 
 /**
@@ -103,14 +103,8 @@ export class DynamoDbClient {
       this.logger.debug("createTable(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = CreateTable.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while creating table", {
-        cause: err,
-      });
-    }
+    const command = CreateTable.from(params);
+    await this.client.send(command.toAwsCommand());
   }
 
   /**
@@ -120,22 +114,16 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
    */
-  async deleteItem<K extends KeyAttributes, T extends Attributes = Attributes>(
+  deleteItem<K extends KeyAttributes, T extends Attributes = Attributes>(
     params: DeleteItemParams<K>,
   ): Promise<DeleteItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("deleteItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      return await DeleteItem.from(params).execute({
-        client: this.client,
-      });
-    } catch (err) {
-      throw new DynamoDbClientError("error while deleting item", {
-        cause: err,
-      });
-    }
+    return DeleteItem.from(params).execute({
+      client: this.client,
+    });
   }
 
   /**
@@ -150,14 +138,8 @@ export class DynamoDbClient {
       this.logger.debug("deleteTable(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = DeleteTable.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while deleting table", {
-        cause: err,
-      });
-    }
+    const command = DeleteTable.from(params);
+    await this.client.send(command.toAwsCommand());
   }
 
   /**
@@ -177,20 +159,11 @@ export class DynamoDbClient {
       this.logger.debug("getItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      const response = await this.client.send(
-        GetItem.from(params).toAwsCommand(),
-      );
+    const response = await this.client.send(
+      GetItem.from(params).toAwsCommand(),
+    );
 
-      return trusted(response.Item);
-    } catch (err) {
-      throw new DynamoDbClientError(
-        `error while getting item from DynamoDB: ${JSON.stringify(params)}`,
-        {
-          cause: err,
-        },
-      );
-    }
+    return trusted(response.Item);
   }
 
   /**
@@ -204,22 +177,16 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
-  async putItem<T extends Attributes = Attributes>(
+  putItem<T extends Attributes = Attributes>(
     params: PutItemParams<T>,
   ): Promise<PutItemResult<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      return await PutItem.from(params).execute({
-        client: this.client,
-      });
-    } catch (err) {
-      throw new DynamoDbClientError("error while putting item", {
-        cause: err,
-      });
-    }
+    return PutItem.from(params).execute({
+      client: this.client,
+    });
   }
 
   /**
@@ -243,16 +210,10 @@ export class DynamoDbClient {
       this.logger.debug("iterateQuery(%s)", JSON.stringify(params));
     }
 
-    try {
-      for await (const page of this.paginateQuery<K, T>(params)) {
-        for (const item of page.items) {
-          yield item;
-        }
+    for await (const page of this.paginateQuery<K, T>(params)) {
+      for (const item of page.items) {
+        yield item;
       }
-    } catch (err) {
-      throw new DynamoDbClientError("error while iterating table query", {
-        cause: err,
-      });
     }
   }
 
@@ -277,22 +238,16 @@ export class DynamoDbClient {
       this.logger.debug("paginateQuery(%s)", JSON.stringify(params));
     }
 
-    try {
-      let page = await this.query<K, T>(params);
-      yield page;
+    let page = await this.query<K, T>(params);
+    yield page;
 
-      while (page.lastEvaluatedKey != null) {
-        page = await this.query({
-          ...params,
-          exclusiveStartKey: page.lastEvaluatedKey,
-        });
-
-        yield page;
-      }
-    } catch (err) {
-      throw new DynamoDbClientError("error while paginating table query", {
-        cause: err,
+    while (page.lastEvaluatedKey != null) {
+      page = await this.query({
+        ...params,
+        exclusiveStartKey: page.lastEvaluatedKey,
       });
+
+      yield page;
     }
   }
 
@@ -310,28 +265,28 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  async query<K extends KeyAttributes, T extends Attributes = Attributes>(
+  query<K extends KeyAttributes, T extends Attributes = Attributes>(
     params: QueryParams<K>,
   ): Promise<QueryResult<K, T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("query(%s)", JSON.stringify(params));
     }
 
-    try {
-      return await Query.from(params).execute({ client: this.client });
-    } catch (err) {
-      throw new DynamoDbClientError("error while querying table", {
-        cause: err,
-      });
-    }
+    return Query.from(params).execute({ client: this.client });
   }
 
   /**
-   * Convenience method over the {@link iterateQuery} method enforcing that the query
+   * Convenience method over the {@link query} method enforcing that the query
    * matches at most one item.
    *
    * If the query doesn't match any item, then `undefined` is returned. If there are
-   * matches, then the function throws as soon as a second matching item is returned.
+   * matches, then the function enforces there is only one.
+   *
+   * Otherwise, it throws a custom exception of type {@link TooManyItemsException}.
+   *
+   * This query can be useful in conjunction with an index, where the key is not guaranteed
+   * to be unique, unlike `getItem` for the table. It can also be useful in the case where
+   * the sort key of an item is unknown, expected to match a {@link KeyConditionExpression} uniquely.
    *
    * @param params - The parameters to use to query the table or index.
    *
@@ -340,27 +295,15 @@ export class DynamoDbClient {
   async queryOne<K extends KeyAttributes, T extends Attributes = Attributes>(
     params: QueryParams<K>,
   ): Promise<T | undefined> {
-    try {
-      let item: T | undefined;
-      // TODO: page of only 2 items, remove limit from parameters.
-      for await (const queryItem of this.iterateQuery<K, T>(params)) {
-        if (item != null) {
-          throw new DynamoDbClientError(
-            "expected one item in query but found at least 2",
-          );
-        }
-        item = queryItem;
+    let item: T | undefined;
+    // TODO: page of only 2 items, remove limit from parameters.
+    for await (const queryItem of this.iterateQuery<K, T>(params)) {
+      if (item != null) {
+        throw TooManyItemsException.queryingOne(params);
       }
-      return item;
-    } catch (err) {
-      // TODO: careful here as email is PII.
-      throw new DynamoDbClientError(
-        `error while querying one: ${JSON.stringify(params)}`,
-        {
-          cause: err,
-        },
-      );
+      item = queryItem;
     }
+    return item;
   }
 
   /**
@@ -412,14 +355,8 @@ export class DynamoDbClient {
       this.logger.debug("updateItem(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = UpdateItem.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while updating item", {
-        cause: err,
-      });
-    }
+    const command = UpdateItem.from(params);
+    await this.client.send(command.toAwsCommand());
   }
 
   /**
@@ -434,14 +371,8 @@ export class DynamoDbClient {
       this.logger.debug("updateTimeToLive(%s)", JSON.stringify(params));
     }
 
-    try {
-      const command = UpdateTimeToLive.from(params);
-      await this.client.send(command.toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError("error while updating time to live", {
-        cause: err,
-      });
-    }
+    const command = UpdateTimeToLive.from(params);
+    await this.client.send(command.toAwsCommand());
   }
 
   /**
@@ -456,16 +387,7 @@ export class DynamoDbClient {
       this.logger.debug("transactWriteItems(%s)", JSON.stringify(params));
     }
 
-    try {
-      await this.client.send(WriteTransaction.from(params).toAwsCommand());
-    } catch (err) {
-      throw new DynamoDbClientError(
-        "error while transactionally writing items in DynamoDB",
-        {
-          cause: err,
-        },
-      );
-    }
+    await this.client.send(WriteTransaction.from(params).toAwsCommand());
   }
 
   /**

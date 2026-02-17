@@ -1,10 +1,23 @@
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { findCauseByType } from "@infra-blocks/error";
+import type { QueryParams } from "./commands/query.js";
 
-export class DynamoDbClientError extends Error {
-  constructor(message: string, options?: { cause?: unknown }) {
-    super(message, options);
-    this.name = "DynamoDbClientError";
+export class TooManyItemsException extends Error {
+  readonly operation: "queryOne";
+  readonly name: "TooManyItemsException";
+
+  private constructor(message: string) {
+    super(message);
+    this.operation = "queryOne";
+    this.name = "TooManyItemsException";
+  }
+
+  static queryingOne(params: QueryParams): TooManyItemsException {
+    const { table, index } = params;
+
+    return new TooManyItemsException(
+      `found multiple items while querying one on ${JSON.stringify({ table, index })}`,
+    );
   }
 }
 

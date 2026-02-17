@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.53.0] - 2026-02-17
+
+### Added
+
+- Since the `queryOne` API adds extra logic, and we removed the `DynamoDbClientError` type, we added a new
+specific type, `TooManyItemsException`, to reflect the case where the API fails because more than
+one item was returned.
+
+### Changed
+
+- Stopped wrapping errors into `DynamoDbClientErrors`. The AWS SDK exposes several exception types so users
+can test what caused an issue using `instanceof` checks. Although this is still possible by looking at the
+thrown error's cause (by using `err.cause` or `findCause` in [@infra-blocks/error](https://www.npmjs.com/package/@infra-blocks/error)),
+it is surprising. So, now the API does not wrap the native client's errors.
+
 ## [0.52.0] - 2026-02-16
 
 ### Changed
@@ -661,6 +676,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.53.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.52.0...v0.53.0
 [0.52.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.51.0...v0.52.0
 [0.51.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.50.0...v0.51.0
 [0.50.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.49.0...v0.50.0
