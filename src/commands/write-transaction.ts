@@ -6,7 +6,8 @@ import { type UnpackedArray, unreachable } from "@infra-blocks/types";
 import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
-import { DeleteItem, type DeleteItemParams } from "./delete-item.js";
+import { DeleteItemCodec } from "./command/codecs/delete-item.js";
+import type { DeleteItemInput } from "./command/inputs/index.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
 import type { ConditionParams } from "./expressions/index.js";
 import { PutItem, type PutItemParams } from "./put-item.js";
@@ -55,7 +56,7 @@ const WriteTransactionAction = {
     }
     if ("delete" in write) {
       return {
-        Delete: DeleteItem.from(write.delete).toAwsCommandInput(),
+        Delete: DeleteItemCodec.encode(write.delete),
       };
     }
     if ("conditionCheck" in write) {
@@ -76,7 +77,7 @@ export type ConditionCheckParams = {
 export type WriteTransactionAction =
   | { put: PutItemParams }
   | { update: UpdateItemParams }
-  | { delete: DeleteItemParams }
+  | { delete: DeleteItemInput }
   | { conditionCheck: ConditionCheckParams };
 
 export interface WriteTransactionParams {

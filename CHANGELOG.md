@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.54.0] - 2026-02-19
+
+### Added
+
+- The `client.send` API. Similare to the native client's version, it accepts instances of `Command`s. In the future,
+all calls to named methods, suchs as `client.getItem`, for example, will be converted internally to thei `send` counterpart.
+For example, `client.getItem(input)` becomes `client.send(new DeleteItem(input))`.
+- The `GetItem` command is now available.
+- The `DeleteItem` command is also available.
+- Typing utilities: `CommandOutput<C extends Command>` and `CommandInput<C extends Command>` for type magic on the
+client side.
+
+### Changed
+
+- `DeleteItemParams` renamed to `DeleteItemInput`, and `DeleteItemResult` renamed to `DeleteItemOutput`.
+- Same for `GetItem` equivalents.
+- The return type of `getItem` and `send(new GetItem(...))` is now an *object* instead of the flat `T | undefined` as before.
+The payload has the form `{ item?: T | undefined }` instead. This was always a planned change to support other metadata
+fields and is totally backwards incompatible.
+
 ## [0.53.0] - 2026-02-17
 
 ### Added
@@ -676,6 +696,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.54.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.53.0...v0.54.0
 [0.53.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.52.0...v0.53.0
 [0.52.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.51.0...v0.52.0
 [0.51.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.50.0...v0.51.0

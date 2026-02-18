@@ -1,3 +1,4 @@
+// TODO: export new style commands, input and output types.
 export * from "./client.js";
 export * from "./commands/index.js";
 export * from "./error.js";
