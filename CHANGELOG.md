@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.0] - 2026-02-19
+
+### Added
+
+- The `DeleteTable` command and related output `DeleteTableOutput`. It is now an empty, unusable
+object instead of void.
+
+### Changed
+
+- Renamed `DeleteTableParams` to `DeleteTableInput` for conformance.
+
 ## [0.55.0] - 2026-02-19
 
 ### Added
@@ -711,6 +722,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.56.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.55.0...v0.56.0
 [0.55.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.54.0...v0.55.0
 [0.54.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.53.0...v0.54.0
 [0.53.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.52.0...v0.53.0
