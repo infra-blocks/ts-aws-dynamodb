@@ -11,7 +11,7 @@ import { expect, expectTypeOf } from "@infra-blocks/test";
 import {
   type Attributes,
   attributeNotExists,
-  type CreateTableParams,
+  type CreateTableInput,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -34,13 +34,13 @@ describe(DynamoDBClient.name, () => {
     it("should succeed when the item does not exist", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      const CreateTableInput: CreateTableInput = {
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       };
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       await client.deleteItem({
         table,
         key: { pk: "User#BigToto" },
@@ -58,13 +58,13 @@ describe(DynamoDBClient.name, () => {
     it("should succeed when the item exists", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      const CreateTableInput: CreateTableInput = {
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       };
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       const testClient = this.createTestClient();
       await testClient.send(
         new PutItemCommand({
@@ -89,14 +89,14 @@ describe(DynamoDBClient.name, () => {
     it("should work on compound table", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      const CreateTableInput: CreateTableInput = {
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
       };
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       const testClient = this.createTestClient();
       await testClient.send(
         new PutItemCommand({
@@ -121,13 +121,13 @@ describe(DynamoDBClient.name, () => {
     it("should return the previous item when ALL_OLD requested", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      const CreateTableInput: CreateTableInput = {
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       };
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       const testClient = this.createTestClient();
       await testClient.send(
         new PutItemCommand({
@@ -155,13 +155,13 @@ describe(DynamoDBClient.name, () => {
     it("should return the previous item on condition check failure when ALL_OLD requested", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      const CreateTableInput: CreateTableInput = {
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       };
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       const testClient = this.createTestClient();
       await testClient.send(
         new PutItemCommand({

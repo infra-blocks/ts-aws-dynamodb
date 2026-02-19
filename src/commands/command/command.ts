@@ -5,45 +5,48 @@
  * each other trolololol. Hence, we use any where necessary as an escape hatch to this typing nightmare.
  */
 
+import type { CreateTableCommand } from "@aws-sdk/client-dynamodb";
 import type {
+  DeleteCommand,
   DynamoDBDocumentClient,
-  DynamoDBDocumentClientCommand,
-  DynamoDBDocumentClientResolvedConfig,
+  GetCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { trusted } from "@infra-blocks/types";
+import type { GetOutputType } from "@smithy/types";
 import type { Codec } from "./codecs/codec.js";
 
-type DocumentClientCommandCtor<DCI extends object, DCO extends object> = new (
-  input: DCI,
-) => DynamoDBDocumentClientCommand<
-  DCI,
-  DCO,
-  any,
-  any,
-  DynamoDBDocumentClientResolvedConfig
+// Working with a union is simpler than working with the lib-dynamodb's exposed types.
+type NativeCommand = DeleteCommand | GetCommand | CreateTableCommand;
+type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
+
+export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<
+  ReturnType<C["execute"]>
 >;
+export type CommandInput<C extends Command<unknown, unknown>> = C["input"];
 
-// TODO: export outside.
-export type CommandOutput<C> = C extends Command<any, infer O, any, any>
-  ? O
-  : never;
-export type CommandInput<C extends Command<any, any, any, any>> = C["input"];
-
-// TODO: don't export outside.
-export abstract class Command<
-  I extends object,
-  O extends object,
-  DCI extends object,
-  DCO extends object,
-> {
+// Not exported.
+export type Command<I, O> = {
   readonly input: I;
 
-  protected readonly codec: Codec<I, O, DCI, DCO>;
-  protected readonly command: DocumentClientCommandCtor<DCI, DCO>;
+  execute(params: { client: DynamoDBDocumentClient }): Promise<O>;
+};
+
+// Not exported.
+export abstract class AbstractCommand<
+  I extends object,
+  O extends object,
+  C extends NativeCommand,
+> implements Command<I, O>
+{
+  readonly input: I;
+
+  protected readonly codec: Codec<I, O, C["input"], GetOutputType<C>>;
+  protected readonly command: NativeCommandCtor<C>;
 
   protected constructor(params: {
     input: I;
-    codec: Codec<I, O, DCI, DCO>;
-    command: DocumentClientCommandCtor<DCI, DCO>;
+    codec: Codec<I, O, C["input"], GetOutputType<C>>;
+    command: NativeCommandCtor<C>;
   }) {
     const { input, codec, command } = params;
     this.input = input;
@@ -53,8 +56,9 @@ export abstract class Command<
 
   async execute(params: { client: DynamoDBDocumentClient }) {
     const { client } = params;
-    return this.codec.decode(
-      await client.send(new this.command(this.codec.encode(this.input))),
-    );
+    const commandInput: C["input"] = this.codec.encode(this.input);
+    const command = new this.command(commandInput);
+    const commandOutput = await client.send(command as any);
+    return this.codec.decode(trusted(commandOutput));
   }
 }

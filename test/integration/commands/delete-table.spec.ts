@@ -1,7 +1,7 @@
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import type {
-  CreateTableParams,
+  CreateTableInput,
   DeleteTableParams,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
@@ -19,9 +19,9 @@ describe(DynamoDBClient.name, () => {
     });
     it("should work with existing table", async function () {
       const client = this.createClient();
-      const params: CreateTableParams = {
+      const params: CreateTableInput = {
         name: "test-table",
-        primaryKey: { partitionKey: { name: "pk", type: "S" } },
+        keySchema: { partitionKey: { name: "pk", type: "S" } },
       };
       await client.createTable(params);
       await client.deleteTable({ name: params.name });
