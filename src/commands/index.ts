@@ -1,7 +1,5 @@
 export type { DeleteItem } from "./command/delete-item.js";
-export * from "./command/inputs/index.js";
-export * from "./command/outputs/index.js";
-export type { CreateTableParams } from "./create-table.js";
+export * from "./command/index.js";
 export type { DeleteTableParams } from "./delete.table.js";
 export * from "./expressions/index.js";
 export type {

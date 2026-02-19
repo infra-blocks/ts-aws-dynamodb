@@ -11,22 +11,22 @@ describe(DynamoDBClient.name, () => {
   describe("updateTimeToLive", () => {
     it("should correctly enable it", async function () {
       const client = this.createClient();
-      const createTableParams = {
+      const CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       } as const;
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       await client.updateTimeToLive({
-        table: createTableParams.name,
+        table: CreateTableInput.name,
         attribute: "ttl",
         enabled: true,
       });
       const testClient = this.createTestClient();
       const response = await testClient.send(
         new DescribeTimeToLiveCommand({
-          TableName: createTableParams.name,
+          TableName: CreateTableInput.name,
         }),
       );
       expect(response.TimeToLiveDescription?.AttributeName).to.equal("ttl");
@@ -36,27 +36,27 @@ describe(DynamoDBClient.name, () => {
     });
     it("should correctly disable it", async function () {
       const client = this.createClient();
-      const createTableParams = {
+      const CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       } as const;
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       await client.updateTimeToLive({
-        table: createTableParams.name,
+        table: CreateTableInput.name,
         attribute: "ttl",
         enabled: true,
       });
       await client.updateTimeToLive({
-        table: createTableParams.name,
+        table: CreateTableInput.name,
         attribute: "ttl",
         enabled: false,
       });
       const testClient = this.createTestClient();
       const response = await testClient.send(
         new DescribeTimeToLiveCommand({
-          TableName: createTableParams.name,
+          TableName: CreateTableInput.name,
         }),
       );
       // The attribute isn't part of the response when disabling.
@@ -67,16 +67,16 @@ describe(DynamoDBClient.name, () => {
     });
     it("should fail while disabling already disabled time to live", async function () {
       const client = this.createClient();
-      const createTableParams = {
+      const CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       } as const;
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       await expect(
         client.updateTimeToLive({
-          table: createTableParams.name,
+          table: CreateTableInput.name,
           attribute: "ttl",
           enabled: false,
         }),
@@ -84,21 +84,21 @@ describe(DynamoDBClient.name, () => {
     });
     it("should fail while attempting to update on a different attribute", async function () {
       const client = this.createClient();
-      const createTableParams = {
+      const CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       } as const;
-      await client.createTable(createTableParams);
+      await client.createTable(CreateTableInput);
       await client.updateTimeToLive({
-        table: createTableParams.name,
+        table: CreateTableInput.name,
         attribute: "ttl",
         enabled: true,
       });
       await expect(
         client.updateTimeToLive({
-          table: createTableParams.name,
+          table: CreateTableInput.name,
           attribute: "cuntdown",
           enabled: true,
         }),

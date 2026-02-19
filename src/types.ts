@@ -168,12 +168,12 @@ export interface KeyAttributeDefinition {
 }
 
 /**
- * A key definition used when creating tables and indexes.
+ * A key schema used when creating tables and indexes.
  *
  * The partition key represents the HASH type key, and the optional sort key
  * represents the RANGE type key.
  */
-export interface KeyDefinition {
+export interface KeySchema {
   partitionKey: KeyAttributeDefinition;
   sortKey?: KeyAttributeDefinition;
 }

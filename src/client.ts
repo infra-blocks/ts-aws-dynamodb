@@ -13,14 +13,16 @@ import { GetItem } from "./commands/command/get-item.js";
 import type { DeleteItemInput } from "./commands/command/inputs/delete-item.js";
 import type { DeleteItemOutput } from "./commands/command/outputs/delete-item.js";
 import {
-  CreateTable,
-  type CreateTableParams,
-} from "./commands/create-table.js";
-import {
   DeleteTable,
   type DeleteTableParams,
 } from "./commands/delete.table.js";
-import type { GetItemInput, GetItemOutput } from "./commands/index.js";
+import {
+  CreateTable,
+  type CreateTableInput,
+  type CreateTableOutput,
+  type GetItemInput,
+  type GetItemOutput,
+} from "./commands/index.js";
 import {
   PutItem,
   type PutItemParams,
@@ -37,7 +39,7 @@ import {
   type WriteTransactionParams,
 } from "./commands/write-transaction.js";
 import { TooManyItemsException } from "./error.js";
-import type { Attributes, KeyAttributes } from "./types.js";
+import type { Attributes, KeyAttributes, KeySchema } from "./types.js";
 
 /**
  * Re-export of the native client's, renamed.
@@ -95,17 +97,18 @@ export class DynamoDbClient {
   /**
    * Creates a table using the CreateTable API.
    *
-   * @param params - The parameters to use to create the table.
+   * @param input - The parameters to use to create the table.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_CreateTable.html
    */
-  async createTable(params: CreateTableParams): Promise<void> {
+  async createTable<KS extends KeySchema>(
+    input: CreateTableInput<KS>,
+  ): Promise<CreateTableOutput> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("createTable(%s)", JSON.stringify(params));
+      this.logger.debug("createTable(%s)", JSON.stringify(input));
     }
 
-    const command = CreateTable.from(params);
-    await this.client.send(command.toAwsCommand());
+    return this.send(new CreateTable<KS>(input));
   }
 
   /**

@@ -1,6 +1,6 @@
 import { DescribeTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
-import type { CreateTableParams } from "../../../src/index.js";
+import type { CreateTableInput } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe(DynamoDBClient.name, () => {
@@ -9,9 +9,9 @@ describe(DynamoDBClient.name, () => {
   describe("createTable", () => {
     it("should work without sort key nor indexes", async function () {
       const client = this.createClient();
-      const params: CreateTableParams = {
+      const params: CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       };
@@ -30,9 +30,9 @@ describe(DynamoDBClient.name, () => {
     });
     it("should work with sort key and no indexes", async function () {
       const client = this.createClient();
-      const params: CreateTableParams = {
+      const params: CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "N" },
         },
@@ -58,9 +58,9 @@ describe(DynamoDBClient.name, () => {
     });
     it("should work with a local secondary index", async function () {
       const client = this.createClient();
-      const params: CreateTableParams = {
+      const params: CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "N" },
         },
@@ -102,9 +102,9 @@ describe(DynamoDBClient.name, () => {
     });
     it("should work with a global secondary index", async function () {
       const client = this.createClient();
-      const params: CreateTableParams = {
+      const params: CreateTableInput = {
         name: "test-table",
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "N" },
         },

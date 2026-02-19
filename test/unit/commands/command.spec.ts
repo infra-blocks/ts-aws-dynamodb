@@ -2,12 +2,13 @@ import { expectTypeOf } from "@infra-blocks/test";
 import type {
   CommandInput,
   CommandOutput,
-} from "../../../src/commands/command/command.js";
-import type { GetItem } from "../../../src/commands/command/get-item.js";
-import type {
+  CreateTable,
+  CreateTableInput,
+  CreateTableOutput,
   DeleteItem,
   DeleteItemInput,
   DeleteItemOutput,
+  GetItem,
   GetItemInput,
   GetItemOutput,
 } from "../../../src/index.js";
@@ -22,6 +23,11 @@ describe("commands.command", () => {
     it("should work with GetItem", () => {
       expectTypeOf<CommandOutput<GetItem>>().toEqualTypeOf<GetItemOutput>();
     });
+    it("should work with CreateTable", () => {
+      expectTypeOf<
+        CommandOutput<CreateTable>
+      >().toEqualTypeOf<CreateTableOutput>();
+    });
   });
   describe("CommandInput", () => {
     it("should work with DeleteItem", () => {
@@ -29,6 +35,11 @@ describe("commands.command", () => {
     });
     it("should work with GetItem", () => {
       expectTypeOf<CommandInput<GetItem>>().toEqualTypeOf<GetItemInput>();
+    });
+    it("should work with GetItem", () => {
+      expectTypeOf<
+        CommandInput<CreateTable>
+      >().toEqualTypeOf<CreateTableInput>();
     });
   });
 });

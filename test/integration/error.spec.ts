@@ -2,7 +2,7 @@ import {
   ConditionalCheckFailed,
   isTransactionCanceledBy,
 } from "../../src/error.js";
-import { attributeNotExists, type CreateTableParams } from "../../src/index.js";
+import { attributeNotExists, type CreateTableInput } from "../../src/index.js";
 import { dropAllTables } from "./fixtures.js";
 
 describe("error", () => {
@@ -12,9 +12,9 @@ describe("error", () => {
     describe("known reasons", () => {
       it("should work for ConditionalCheckFailed", async function () {
         const client = this.createClient();
-        const params: CreateTableParams = {
+        const params: CreateTableInput = {
           name: "test-table",
-          primaryKey: {
+          keySchema: {
             partitionKey: { name: "pk", type: "S" },
           },
         };

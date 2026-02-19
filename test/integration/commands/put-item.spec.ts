@@ -21,7 +21,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
@@ -38,7 +38,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "N" },
         },
@@ -56,7 +56,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
@@ -74,7 +74,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
@@ -107,7 +107,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
@@ -143,7 +143,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "N" },
         },
@@ -166,7 +166,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
@@ -189,7 +189,7 @@ describe(DynamoDbClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.55.0] - 2026-02-19
+
+### Added
+
+- The `CreateTableOutput` type. Previously, the API returned `void` when creating a table. Now,
+it returns an unusable `Record<string, never>`, aliased to `CreateTableInput`, instead to support
+future fields in the return type.
+- The `CreateTable` command.
+
+### Changed
+
+- The `CreateTableParams` was renamed to `CreateTableInput`.
+- The `KeyDefinition` type has been renamed to `KeySchema` type to match more the native API.
+- The `CreateTableInput.primaryKey` field was renamed to `CreateTableInput.keySchema` for the same reason.
+
 ## [0.54.0] - 2026-02-19
 
 ### Added
@@ -696,6 +711,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.55.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.54.0...v0.55.0
 [0.54.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.53.0...v0.54.0
 [0.53.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.52.0...v0.53.0
 [0.52.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.51.0...v0.52.0

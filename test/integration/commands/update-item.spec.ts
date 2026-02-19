@@ -21,7 +21,7 @@ describe(DynamoDBClient.name, () => {
       const table = "test-table";
       await client.createTable({
         name: table,
-        primaryKey: {
+        keySchema: {
           partitionKey: { name: "pk", type: "S" },
         },
       });
