@@ -12,14 +12,14 @@ import { DeleteItem } from "./commands/command/delete-item.js";
 import { GetItem } from "./commands/command/get-item.js";
 import type { DeleteItemInput } from "./commands/command/inputs/delete-item.js";
 import type { DeleteItemOutput } from "./commands/command/outputs/delete-item.js";
-import {
-  DeleteTable,
-  type DeleteTableParams,
-} from "./commands/delete.table.js";
+// TODO: all imports from here.
 import {
   CreateTable,
   type CreateTableInput,
   type CreateTableOutput,
+  DeleteTable,
+  type DeleteTableInput,
+  type DeleteTableOutput,
   type GetItemInput,
   type GetItemOutput,
 } from "./commands/index.js";
@@ -132,17 +132,16 @@ export class DynamoDbClient {
   /**
    * Deletes a table using the DeleteTable API.
    *
-   * @param params - The parameters to use to delete the table.
+   * @param input - The parameters to use to delete the table.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteTable.html
    */
-  async deleteTable(params: DeleteTableParams): Promise<void> {
+  async deleteTable(input: DeleteTableInput): Promise<DeleteTableOutput> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("deleteTable(%s)", JSON.stringify(params));
+      this.logger.debug("deleteTable(%s)", JSON.stringify(input));
     }
 
-    const command = DeleteTable.from(params);
-    await this.client.send(command.toAwsCommand());
+    return this.send(new DeleteTable(input));
   }
 
   /**

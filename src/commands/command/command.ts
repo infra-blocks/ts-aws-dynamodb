@@ -5,7 +5,10 @@
  * each other trolololol. Hence, we use any where necessary as an escape hatch to this typing nightmare.
  */
 
-import type { CreateTableCommand } from "@aws-sdk/client-dynamodb";
+import type {
+  CreateTableCommand,
+  DeleteTableCommand,
+} from "@aws-sdk/client-dynamodb";
 import type {
   DeleteCommand,
   DynamoDBDocumentClient,
@@ -16,7 +19,11 @@ import type { GetOutputType } from "@smithy/types";
 import type { Codec } from "./codecs/codec.js";
 
 // Working with a union is simpler than working with the lib-dynamodb's exposed types.
-type NativeCommand = DeleteCommand | GetCommand | CreateTableCommand;
+type NativeCommand =
+  | DeleteCommand
+  | GetCommand
+  | CreateTableCommand
+  | DeleteTableCommand;
 type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
 
 export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<
