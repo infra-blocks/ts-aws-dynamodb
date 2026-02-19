@@ -7,10 +7,10 @@ import type { Attributes } from "../types.js";
 import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { DeleteItemCodec } from "./command/codecs/delete-item.js";
-import type { DeleteItemInput } from "./command/inputs/index.js";
+import { PutItemCodec } from "./command/codecs/put-item.js";
+import type { DeleteItemInput, PutItemInput } from "./command/inputs/index.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
 import type { ConditionParams } from "./expressions/index.js";
-import { PutItem, type PutItemParams } from "./put-item.js";
 import type { Command } from "./types.js";
 import { UpdateItem, type UpdateItemParams } from "./update-item.js";
 
@@ -46,7 +46,7 @@ const WriteTransactionAction = {
   toAwsCommandInput(write: WriteTransactionAction): AwsTransactWrite {
     if ("put" in write) {
       return {
-        Put: PutItem.from(write.put).toAwsCommandInput(),
+        Put: PutItemCodec.encode(write.put),
       };
     }
     if ("update" in write) {
@@ -75,7 +75,7 @@ export type ConditionCheckParams = {
 };
 
 export type WriteTransactionAction =
-  | { put: PutItemParams }
+  | { put: PutItemInput }
   | { update: UpdateItemParams }
   | { delete: DeleteItemInput }
   | { conditionCheck: ConditionCheckParams };

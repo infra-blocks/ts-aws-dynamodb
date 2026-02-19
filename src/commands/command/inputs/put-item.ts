@@ -1,28 +1,29 @@
-import type { DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { KeyAttributes } from "../../../types.js";
-import { AttributeNames } from "../../attributes/names.js";
-import { AttributeValues } from "../../attributes/values.js";
+import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
+import type { Attributes } from "../../../index.js";
+import { AttributeNames, AttributeValues } from "../../attributes/index.js";
 import { conditionExpression } from "../../expressions/condition/expression.js";
-import type { ConditionParams } from "../../expressions/index.js";
+import type { ConditionParams } from "../../index.js";
 
-export type DeleteItemReturnValue = "ALL_OLD" | "NONE";
+export type PutItemReturnValue = "ALL_OLD" | "NONE";
 
-export type DeleteItemInput<K extends KeyAttributes = KeyAttributes> = {
+export type PutItemInput<T extends Attributes = Attributes> = {
   table: string;
-  key: K;
+  item: T;
   condition?: ConditionParams;
-  returnValues?: DeleteItemReturnValue;
+  returnValues?: PutItemReturnValue;
   // The item will be stored in the thrown exception and won't be unarmashalled.
   // See: https://github.com/aws/aws-sdk-js-v3/issues/6723
-  returnValuesOnConditionCheckFailure?: DeleteItemReturnValue;
+  returnValuesOnConditionCheckFailure?: PutItemReturnValue;
 };
 
-export function encode<K extends KeyAttributes>(
-  input: DeleteItemInput<K>,
-): DeleteCommandInput {
-  const result: DeleteCommandInput = {
+export type PutItemResult<T extends Attributes> = { item?: T };
+
+export function encode<T extends Attributes = Attributes>(
+  input: PutItemInput<T>,
+): PutCommandInput {
+  const result: PutCommandInput = {
     TableName: input.table,
-    Key: input.key,
+    Item: input.item,
   };
 
   if (input.returnValues != null) {
@@ -40,7 +41,6 @@ export function encode<K extends KeyAttributes>(
     return result;
   }
 
-  // TODO: this in a reusable function.
   const names = AttributeNames.create();
   const values = AttributeValues.create();
   // Ask the expression to stringify itself, applying the substitutions by itself.

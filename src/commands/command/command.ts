@@ -13,6 +13,7 @@ import type {
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
+  PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { trusted } from "@infra-blocks/types";
 import type { GetOutputType } from "@smithy/types";
@@ -23,7 +24,8 @@ type NativeCommand =
   | DeleteCommand
   | GetCommand
   | CreateTableCommand
-  | DeleteTableCommand;
+  | DeleteTableCommand
+  | PutCommand;
 type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
 
 export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<
