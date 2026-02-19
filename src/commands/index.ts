@@ -1,4 +1,3 @@
-export type { DeleteItem } from "./command/delete-item.js";
 export * from "./command/index.js";
 export * from "./expressions/index.js";
 export type {

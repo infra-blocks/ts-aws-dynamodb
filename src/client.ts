@@ -8,18 +8,17 @@ import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
 import { trusted } from "@infra-blocks/types";
 import type { CommandOutput } from "./commands/command/command.js";
 import type { DynamoDbClientCommand } from "./commands/command/commands.js";
-import { DeleteItem } from "./commands/command/delete-item.js";
-import { GetItem } from "./commands/command/get-item.js";
-import type { DeleteItemInput } from "./commands/command/inputs/delete-item.js";
-import type { DeleteItemOutput } from "./commands/command/outputs/delete-item.js";
-// TODO: all imports from here.
 import {
   CreateTable,
   type CreateTableInput,
   type CreateTableOutput,
+  DeleteItem,
+  type DeleteItemInput,
+  type DeleteItemOutput,
   DeleteTable,
   type DeleteTableInput,
   type DeleteTableOutput,
+  GetItem,
   type GetItemInput,
   type GetItemOutput,
 } from "./commands/index.js";
