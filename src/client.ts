@@ -21,12 +21,10 @@ import {
   GetItem,
   type GetItemInput,
   type GetItemOutput,
-} from "./commands/index.js";
-import {
   PutItem,
-  type PutItemParams,
-  type PutItemResult,
-} from "./commands/put-item.js";
+  type PutItemInput,
+  type PutItemOutput,
+} from "./commands/index.js";
 import { Query, type QueryParams, type QueryResult } from "./commands/query.js";
 import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
 import {
@@ -176,15 +174,13 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html
    */
   putItem<T extends Attributes = Attributes>(
-    params: PutItemParams<T>,
-  ): Promise<PutItemResult<T>> {
+    params: PutItemInput<T>,
+  ): Promise<PutItemOutput<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("putItem(%s)", JSON.stringify(params));
     }
 
-    return PutItem.from(params).execute({
-      client: this.client,
-    });
+    return this.send(new PutItem<T>(params));
   }
 
   /**
