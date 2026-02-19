@@ -1,7 +1,6 @@
 import { expect } from "@infra-blocks/test";
 import {
   attributeNotExists,
-  type CreateTableParams,
   DynamoDbClient,
   set,
   value,
@@ -16,20 +15,19 @@ describe(DynamoDbClient.name, () => {
     it("should work with various actions", async function () {
       const client = this.createClient();
       const table = "test-table";
-      const createTableParams: CreateTableParams = {
+      await client.createTable({
         name: table,
         primaryKey: {
           partitionKey: { name: "pk", type: "S" },
         },
-      };
-      await client.createTable(createTableParams);
+      });
       await client.putItem({ table, item: { pk: "UpdatedItem" } });
       await client.putItem({ table, item: { pk: "DeletedItem" } });
       const writeTransactionParams: WriteTransactionParams = {
         writes: [
           {
             put: {
-              table: createTableParams.name,
+              table,
               item: {
                 pk: "NewItem",
               },
@@ -37,7 +35,7 @@ describe(DynamoDbClient.name, () => {
           },
           {
             update: {
-              table: createTableParams.name,
+              table,
               key: {
                 pk: "UpdatedItem",
               },
@@ -66,23 +64,13 @@ describe(DynamoDbClient.name, () => {
       await client.writeTransaction(writeTransactionParams);
 
       expect(
-        await client.getItem({
-          table: createTableParams.name,
-          key: { pk: "NewItem" },
-        }),
-      ).to.deep.equal({ pk: "NewItem" });
+        await client.getItem({ table, key: { pk: "NewItem" } }),
+      ).to.deep.equal({ item: { pk: "NewItem" } });
       expect(
-        await client.getItem({
-          table: createTableParams.name,
-          key: { pk: "UpdatedItem" },
-        }),
-      ).to.deep.equal({ pk: "UpdatedItem", newField: 42 });
-      expect(
-        await client.getItem({
-          table: createTableParams.name,
-          key: { pk: "DeletedItem" },
-        }),
-      ).to.be.undefined;
+        await client.getItem({ table, key: { pk: "UpdatedItem" } }),
+      ).to.deep.equal({ item: { pk: "UpdatedItem", newField: 42 } });
+      expect(await client.getItem({ table, key: { pk: "DeletedItem" } })).to.be
+        .empty;
     });
   });
 });

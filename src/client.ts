@@ -6,6 +6,12 @@ import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
 import { trusted } from "@infra-blocks/types";
+import type { CommandOutput } from "./commands/command/command.js";
+import type { DynamoDbClientCommand } from "./commands/command/commands.js";
+import { DeleteItem } from "./commands/command/delete-item.js";
+import { GetItem } from "./commands/command/get-item.js";
+import type { DeleteItemInput } from "./commands/command/inputs/delete-item.js";
+import type { DeleteItemOutput } from "./commands/command/outputs/delete-item.js";
 import {
   CreateTable,
   type CreateTableParams,
@@ -14,12 +20,7 @@ import {
   DeleteTable,
   type DeleteTableParams,
 } from "./commands/delete.table.js";
-import {
-  DeleteItem,
-  type DeleteItemParams,
-  type DeleteItemResult,
-} from "./commands/delete-item.js";
-import { GetItem, type GetItemParams } from "./commands/get-item.js";
+import type { GetItemInput, GetItemOutput } from "./commands/index.js";
 import {
   PutItem,
   type PutItemParams,
@@ -110,20 +111,19 @@ export class DynamoDbClient {
   /**
    * Deletes an item using the DeleteItem API.
    *
-   * @param params
+   * @param input
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_DeleteItem.html
    */
-  deleteItem<K extends KeyAttributes, T extends Attributes = Attributes>(
-    params: DeleteItemParams<K>,
-  ): Promise<DeleteItemResult<T>> {
+  deleteItem<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: DeleteItemInput<K>): Promise<DeleteItemOutput<T>> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("deleteItem(%s)", JSON.stringify(params));
+      this.logger.debug("deleteItem(%s)", JSON.stringify(input));
     }
 
-    return DeleteItem.from(params).execute({
-      client: this.client,
-    });
+    return this.send(new DeleteItem<T, K>(input));
   }
 
   /**
@@ -145,25 +145,22 @@ export class DynamoDbClient {
   /**
    * Gets an item using the GetItem API.
    *
-   * @param params - The parameters to use to get the item.
+   * @param input - The parameters to use to get the item.
    *
    * @returns The item casted to the generic type provided, or undefined if not such item
    * matches the primary key.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_GetItem.html
    */
-  async getItem<K extends KeyAttributes, T extends Attributes = Attributes>(
-    params: GetItemParams<K>,
-  ): Promise<T | undefined> {
+  async getItem<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: GetItemInput<K>): Promise<GetItemOutput<T>> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("getItem(%s)", JSON.stringify(params));
+      this.logger.debug("getItem(%s)", JSON.stringify(input));
     }
 
-    const response = await this.client.send(
-      GetItem.from(params).toAwsCommand(),
-    );
-
-    return trusted(response.Item);
+    return this.send(new GetItem<T, K>(input));
   }
 
   /**
@@ -331,6 +328,13 @@ export class DynamoDbClient {
         },
       },
     );
+  }
+
+  // TODO: without branding, one type equals all types...
+  async send<C extends DynamoDbClientCommand>(
+    command: C,
+  ): Promise<CommandOutput<C>> {
+    return trusted(command.execute({ client: this.client }));
   }
 
   /**
