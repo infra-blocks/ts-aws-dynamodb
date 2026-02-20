@@ -1,7 +1,7 @@
-import { encode } from "../inputs/put-item.js";
-import { decode } from "../outputs/put-item.js";
+import { PutItemInput } from "../inputs/put-item.js";
+import { PutItemOutput } from "../outputs/put-item.js";
 
 export const PutItemCodec = {
-  encode,
-  decode,
+  encode: PutItemInput.encode,
+  decode: PutItemOutput.decode,
 };

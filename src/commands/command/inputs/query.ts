@@ -13,7 +13,11 @@ export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   scanIndexForward?: boolean;
 };
 
-export function encode<K extends KeyAttributes = KeyAttributes>(
+export const QueryInput = {
+  encode,
+};
+
+function encode<K extends KeyAttributes = KeyAttributes>(
   input: QueryInput<K>,
 ): QueryCommandInput {
   const {

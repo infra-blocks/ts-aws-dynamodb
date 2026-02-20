@@ -6,9 +6,11 @@ export interface UpdateTimeToLiveInput {
   enabled: boolean;
 }
 
-export function encode(
-  input: UpdateTimeToLiveInput,
-): UpdateTimeToLiveCommandInput {
+export const UpdateTimeToLiveInput = {
+  encode,
+};
+
+function encode(input: UpdateTimeToLiveInput): UpdateTimeToLiveCommandInput {
   return {
     TableName: input.table,
     TimeToLiveSpecification: {

@@ -18,7 +18,11 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
   key: K;
 }
 
-export function encode<K extends KeyAttributes = KeyAttributes>(
+export const GetItemInput = {
+  encode,
+};
+
+function encode<K extends KeyAttributes = KeyAttributes>(
   input: GetItemInput<K>,
 ): GetCommandInput {
   const key = input.key;

@@ -4,7 +4,11 @@ export interface DeleteTableInput {
   name: string;
 }
 
-export function encode(input: DeleteTableInput): DeleteTableCommandInput {
+export const DeleteTableInput = {
+  encode,
+};
+
+function encode(input: DeleteTableInput): DeleteTableCommandInput {
   return {
     TableName: input.name,
   };

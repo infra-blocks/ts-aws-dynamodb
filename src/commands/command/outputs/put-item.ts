@@ -5,6 +5,12 @@ import { maybeSet } from "./lib.js";
 // TODO wrap in an object to support later upcoming types.
 export type PutItemOutput<T extends Attributes = Attributes> = { item?: T };
 
-export const decode = <T extends Attributes = Attributes>(
+export const PutItemOutput = {
+  decode,
+};
+
+function decode<T extends Attributes = Attributes>(
   output: PutCommandOutput,
-): PutItemOutput<T> => maybeSet({}, "item", output, "Attributes");
+): PutItemOutput<T> {
+  return maybeSet({}, "item", output, "Attributes");
+}

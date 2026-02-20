@@ -12,7 +12,11 @@ export type QueryOutput<
   lastEvaluatedKey?: K;
 };
 
-export function decode<
+export const QueryOutput = {
+  decode,
+};
+
+function decode<
   T extends Attributes = Attributes,
   K extends KeyAttributes = KeyAttributes,
 >(output: QueryCommandOutput): QueryOutput<T, K> {

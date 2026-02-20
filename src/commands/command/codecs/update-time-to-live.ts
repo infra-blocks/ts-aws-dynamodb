@@ -1,7 +1,7 @@
-import { encode } from "../inputs/update-time-to-live.js";
-import { decode } from "../outputs/update-time-to-live.js";
+import { UpdateTimeToLiveInput } from "../inputs/update-time-to-live.js";
+import { UpdateTimeToLiveOutput } from "../outputs/update-time-to-live.js";
 
 export const UpdateTimeToLiveCodec = {
-  encode,
-  decode,
+  encode: UpdateTimeToLiveInput.encode,
+  decode: UpdateTimeToLiveOutput.decode,
 };
