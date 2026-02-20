@@ -5,3 +5,4 @@ export type { DeleteTableInput } from "./delete-table.js";
 export type { GetItemInput } from "./get-item.js";
 export type { PutItemInput } from "./put-item.js";
 export type { QueryInput } from "./query.js";
+export type { UpdateItemInput } from "./update-item.js";

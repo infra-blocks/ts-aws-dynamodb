@@ -15,6 +15,7 @@ import type {
   GetCommand,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { trusted } from "@infra-blocks/types";
 import type { GetOutputType } from "@smithy/types";
@@ -27,7 +28,8 @@ type NativeCommand =
   | CreateTableCommand
   | DeleteTableCommand
   | PutCommand
-  | QueryCommand;
+  | QueryCommand
+  | UpdateCommand;
 type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
 
 export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<

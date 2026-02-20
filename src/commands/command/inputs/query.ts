@@ -1,5 +1,5 @@
 import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { KeyAttributes } from "../../../index.js";
+import type { KeyAttributes } from "../../../types.js";
 import type { KeyConditionExpression } from "../../expressions/index.js";
 import { intoExpressionComponents } from "./lib.js";
 
