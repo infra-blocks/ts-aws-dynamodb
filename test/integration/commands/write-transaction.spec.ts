@@ -4,7 +4,6 @@ import {
   DynamoDbClient,
   set,
   value,
-  type WriteTransactionParams,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
@@ -23,7 +22,7 @@ describe(DynamoDbClient.name, () => {
       });
       await client.putItem({ table, item: { pk: "UpdatedItem" } });
       await client.putItem({ table, item: { pk: "DeletedItem" } });
-      const writeTransactionParams: WriteTransactionParams = {
+      const writeTransactionParams = {
         writes: [
           {
             put: {

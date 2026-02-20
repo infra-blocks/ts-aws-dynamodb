@@ -32,11 +32,10 @@ import {
   UpdateTimeToLive,
   type UpdateTimeToLiveInput,
   type UpdateTimeToLiveOutput,
-} from "./commands/index.js";
-import {
   WriteTransaction,
-  type WriteTransactionParams,
-} from "./commands/write-transaction.js";
+  type WriteTransactionInput,
+  type WriteTransactionOutput,
+} from "./commands/index.js";
 import { TooManyItemsException } from "./error.js";
 import type { Attributes, KeyAttributes, KeySchema } from "./types.js";
 
@@ -384,16 +383,18 @@ export class DynamoDbClient {
   /**
    * Executes a write transaction using the TransactWriteItems API.
    *
-   * @param params - The parameters describing the transaction.
+   * @param input - The parameters describing the transaction.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html
    */
-  async writeTransaction(params: WriteTransactionParams): Promise<void> {
+  async writeTransaction(
+    input: WriteTransactionInput,
+  ): Promise<WriteTransactionOutput> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("transactWriteItems(%s)", JSON.stringify(params));
+      this.logger.debug("transactWriteItems(%s)", JSON.stringify(input));
     }
 
-    await this.client.send(WriteTransaction.from(params).toAwsCommand());
+    return this.send(new WriteTransaction(input));
   }
 
   /**
