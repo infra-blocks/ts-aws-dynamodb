@@ -8,11 +8,15 @@ import { AttributeNames } from "./attributes/names.js";
 import { AttributeValues } from "./attributes/values.js";
 import { DeleteItemCodec } from "./command/codecs/delete-item.js";
 import { PutItemCodec } from "./command/codecs/put-item.js";
-import type { DeleteItemInput, PutItemInput } from "./command/inputs/index.js";
+import { UpdateItemCodec } from "./command/codecs/update-item.js";
+import type {
+  DeleteItemInput,
+  PutItemInput,
+  UpdateItemInput,
+} from "./command/index.js";
 import { conditionExpression } from "./expressions/condition/expression.js";
 import type { ConditionParams } from "./expressions/index.js";
 import type { Command } from "./types.js";
-import { UpdateItem, type UpdateItemParams } from "./update-item.js";
 
 type AwsConditionCheck = AwsTransactWrite["ConditionCheck"];
 
@@ -51,7 +55,7 @@ const WriteTransactionAction = {
     }
     if ("update" in write) {
       return {
-        Update: UpdateItem.from(write.update).toAwsCommandInput(),
+        Update: UpdateItemCodec.encode(write.update),
       };
     }
     if ("delete" in write) {
@@ -76,7 +80,7 @@ export type ConditionCheckParams = {
 
 export type WriteTransactionAction =
   | { put: PutItemInput }
-  | { update: UpdateItemParams }
+  | { update: UpdateItemInput }
   | { delete: DeleteItemInput }
   | { conditionCheck: ConditionCheckParams };
 

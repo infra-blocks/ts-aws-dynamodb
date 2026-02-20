@@ -27,8 +27,9 @@ import {
   Query,
   type QueryInput,
   type QueryOutput,
+  UpdateItem,
+  type UpdateItemInput,
 } from "./commands/index.js";
-import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
 import {
   UpdateTimeToLive,
   type UpdateTimeToLiveParams,
@@ -350,19 +351,18 @@ export class DynamoDbClient {
    * In this design, the `params.update` is a list of {@link UpdateAction}s that
    * can be constructed using the provided factory methods, such as {@link assign}.
    *
-   * @param params - The parameters to use to update the item.
+   * @param input - The parameters to use to update the item.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html
    */
-  async updateItem<K extends KeyAttributes>(
-    params: UpdateItemParams<K>,
+  async updateItem<K extends KeyAttributes = KeyAttributes>(
+    input: UpdateItemInput<K>,
   ): Promise<void> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("updateItem(%s)", JSON.stringify(params));
+      this.logger.debug("updateItem(%s)", JSON.stringify(input));
     }
 
-    const command = UpdateItem.from(params);
-    await this.client.send(command.toAwsCommand());
+    await this.send(new UpdateItem<K>(input));
   }
 
   /**

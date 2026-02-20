@@ -1,6 +1,6 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
-import type { Attributes } from "../../../index.js";
-import type { ConditionParams } from "../../index.js";
+import type { Attributes } from "../../../types.js";
+import type { ConditionParams } from "../../expressions/index.js";
 import { intoExpressionComponents } from "./lib.js";
 
 export type PutItemReturnValue = "ALL_OLD" | "NONE";

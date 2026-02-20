@@ -1,4 +1,4 @@
-import type { AttributePath, AttributeValue } from "../../../index.js";
+import type { AttributePath, AttributeValue } from "../../../types.js";
 import {
   AttributeNames,
   AttributeValues,

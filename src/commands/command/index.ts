@@ -8,3 +8,4 @@ export * from "./inputs/index.js";
 export * from "./outputs/index.js";
 export { PutItem } from "./put-item.js";
 export { Query } from "./query.js";
+export { UpdateItem } from "./update-item.js";
