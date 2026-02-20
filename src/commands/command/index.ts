@@ -1,4 +1,5 @@
 export type { CommandInput, CommandOutput } from "./base.js";
+export type { DynamoDbClientCommand } from "./command.js";
 export { CreateTable } from "./create-table.js";
 export { DeleteItem } from "./delete-item.js";
 export { DeleteTable } from "./delete-table.js";
