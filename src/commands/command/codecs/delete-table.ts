@@ -1,7 +1,7 @@
-import { encode } from "../inputs/delete-table.js";
-import { decode } from "../outputs/delete-table.js";
+import { DeleteTableInput } from "../inputs/delete-table.js";
+import { DeleteTableOutput } from "../outputs/delete-table.js";
 
 export const DeleteTableCodec = {
-  encode,
-  decode,
+  encode: DeleteTableInput.encode,
+  decode: DeleteTableOutput.decode,
 };

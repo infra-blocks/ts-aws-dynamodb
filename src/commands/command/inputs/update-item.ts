@@ -30,7 +30,11 @@ export interface UpdateItemInput<K extends KeyAttributes = KeyAttributes> {
   condition?: ConditionParams;
 }
 
-export function encode<K extends KeyAttributes = KeyAttributes>(
+export const UpdateItemInput = {
+  encode,
+};
+
+function encode<K extends KeyAttributes = KeyAttributes>(
   input: UpdateItemInput<K>,
 ): UpdateCommandInput {
   const { table, key, condition, update } = input;

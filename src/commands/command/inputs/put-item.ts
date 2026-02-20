@@ -17,7 +17,11 @@ export type PutItemInput<T extends Attributes = Attributes> = {
 
 export type PutItemResult<T extends Attributes> = { item?: T };
 
-export function encode<T extends Attributes = Attributes>(
+export const PutItemInput = {
+  encode,
+};
+
+function encode<T extends Attributes = Attributes>(
   input: PutItemInput<T>,
 ): PutCommandInput {
   const result: PutCommandInput = {

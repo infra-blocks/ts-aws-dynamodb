@@ -1,7 +1,7 @@
-import { encode } from "../inputs/delete-item.js";
-import { decode } from "../outputs/delete-item.js";
+import { DeleteItemInput } from "../inputs/delete-item.js";
+import { DeleteItemOutput } from "../outputs/delete-item.js";
 
 export const DeleteItemCodec = {
-  encode,
-  decode,
+  encode: DeleteItemInput.encode,
+  decode: DeleteItemOutput.decode,
 };

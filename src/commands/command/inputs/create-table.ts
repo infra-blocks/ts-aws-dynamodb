@@ -14,7 +14,11 @@ export interface CreateTableInput<KS extends KeySchema = KeySchema> {
   lsis?: Record<string, KeySchema>;
 }
 
-export function encode<Def extends KeySchema = KeySchema>(
+export const CreateTableInput = {
+  encode,
+};
+
+function encode<Def extends KeySchema = KeySchema>(
   input: CreateTableInput<Def>,
 ): CreateTableCommandInput {
   const attributeDefinitions: Map<string, KeyAttributeType> = new Map();

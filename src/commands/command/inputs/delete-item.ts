@@ -15,7 +15,11 @@ export type DeleteItemInput<K extends KeyAttributes = KeyAttributes> = {
   returnValuesOnConditionCheckFailure?: DeleteItemReturnValue;
 };
 
-export function encode<K extends KeyAttributes>(
+export const DeleteItemInput = {
+  encode,
+};
+
+function encode<K extends KeyAttributes>(
   input: DeleteItemInput<K>,
 ): DeleteCommandInput {
   const result: DeleteCommandInput = {

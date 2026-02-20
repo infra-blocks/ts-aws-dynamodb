@@ -1,7 +1,7 @@
-import { encode } from "../inputs/get-item.js";
-import { decode } from "../outputs/get-item.js";
+import { GetItemInput } from "../inputs/get-item.js";
+import { GetItemOutput } from "../outputs/get-item.js";
 
 export const GetItemCodec = {
-  encode,
-  decode,
+  encode: GetItemInput.encode,
+  decode: GetItemOutput.decode,
 };
