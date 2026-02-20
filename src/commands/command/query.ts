@@ -1,7 +1,7 @@
 import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 import type { Attributes, KeyAttributes } from "../../types.js";
+import { AbstractCommand } from "./base.js";
 import { QueryCodec } from "./codecs/query.js";
-import { AbstractCommand } from "./command.js";
 import type { QueryInput } from "./inputs/query.js";
 import type { QueryOutput } from "./outputs/query.js";
 

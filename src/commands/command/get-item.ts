@@ -1,7 +1,7 @@
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import type { Attributes, KeyAttributes } from "../../types.js";
+import { AbstractCommand } from "./base.js";
 import { GetItemCodec } from "./codecs/get-item.js";
-import { AbstractCommand } from "./command.js";
 import type { GetItemInput } from "./inputs/get-item.js";
 import type { GetItemOutput } from "./outputs/get-item.js";
 

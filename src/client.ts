@@ -6,9 +6,9 @@ import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
 import { trusted } from "@infra-blocks/types";
-import type { CommandOutput } from "./commands/command/command.js";
 import type { DynamoDbClientCommand } from "./commands/command/commands.js";
 import {
+  type CommandOutput,
   CreateTable,
   type CreateTableInput,
   type CreateTableOutput,

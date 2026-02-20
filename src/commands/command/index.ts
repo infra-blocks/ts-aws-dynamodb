@@ -1,4 +1,4 @@
-export type { CommandInput, CommandOutput } from "./command.js";
+export type { CommandInput, CommandOutput } from "./base.js";
 export { CreateTable } from "./create-table.js";
 export { DeleteItem } from "./delete-item.js";
 export { DeleteTable } from "./delete-table.js";

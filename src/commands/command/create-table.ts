@@ -1,7 +1,7 @@
 import { CreateTableCommand } from "@aws-sdk/client-dynamodb";
 import type { KeySchema } from "../../types.js";
+import { AbstractCommand } from "./base.js";
 import { CreateTableCodec } from "./codecs/create-table.js";
-import { AbstractCommand } from "./command.js";
 import type { CreateTableInput } from "./inputs/create-table.js";
 import type { CreateTableOutput } from "./outputs/create-table.js";
 

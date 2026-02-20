@@ -1,7 +1,7 @@
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../../types.js";
+import { AbstractCommand } from "./base.js";
 import { PutItemCodec } from "./codecs/put-item.js";
-import { AbstractCommand } from "./command.js";
 import type { PutItemInput } from "./inputs/put-item.js";
 import type { PutItemOutput } from "./outputs/put-item.js";
 

@@ -1,7 +1,7 @@
 import { DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import type { Attributes, KeyAttributes } from "../../types.js";
+import { AbstractCommand } from "./base.js";
 import { DeleteItemCodec } from "./codecs/delete-item.js";
-import { AbstractCommand } from "./command.js";
 import type { DeleteItemInput } from "./inputs/delete-item.js";
 import type { DeleteItemOutput } from "./outputs/delete-item.js";
 
