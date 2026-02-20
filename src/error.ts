@@ -1,6 +1,6 @@
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { findCauseByType } from "@infra-blocks/error";
-import type { QueryParams } from "./commands/query.js";
+import type { QueryInput } from "./commands/index.js";
 
 export class TooManyItemsException extends Error {
   readonly operation: "queryOne";
@@ -12,7 +12,7 @@ export class TooManyItemsException extends Error {
     this.name = "TooManyItemsException";
   }
 
-  static queryingOne(params: QueryParams): TooManyItemsException {
+  static queryingOne(params: QueryInput): TooManyItemsException {
     const { table, index } = params;
 
     return new TooManyItemsException(

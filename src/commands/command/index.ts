@@ -7,3 +7,4 @@ export { GetItem } from "./get-item.js";
 export * from "./inputs/index.js";
 export * from "./outputs/index.js";
 export { PutItem } from "./put-item.js";
+export { Query } from "./query.js";

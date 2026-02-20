@@ -1,9 +1,7 @@
 import type { DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../../types.js";
-import { AttributeNames } from "../../attributes/names.js";
-import { AttributeValues } from "../../attributes/values.js";
-import { conditionExpression } from "../../expressions/condition/expression.js";
 import type { ConditionParams } from "../../expressions/index.js";
+import { intoExpressionComponents } from "./lib.js";
 
 export type DeleteItemReturnValue = "ALL_OLD" | "NONE";
 
@@ -40,19 +38,13 @@ export function encode<K extends KeyAttributes>(
     return result;
   }
 
-  // TODO: this in a reusable function.
-  const names = AttributeNames.create();
-  const values = AttributeValues.create();
-  // Ask the expression to stringify itself, applying the substitutions by itself.
-  const expression = conditionExpression(input.condition).stringify({
-    names,
-    values,
-  });
-
+  const { expression, names, values } = intoExpressionComponents(
+    input.condition,
+  );
   return {
     ...result,
     ConditionExpression: expression,
-    ExpressionAttributeNames: names.getSubstitutions(),
-    ExpressionAttributeValues: values.getSubstitutions(),
+    ExpressionAttributeNames: names,
+    ExpressionAttributeValues: values,
   };
 }
