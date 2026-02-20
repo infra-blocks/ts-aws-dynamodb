@@ -8,6 +8,7 @@
 import type {
   CreateTableCommand,
   DeleteTableCommand,
+  UpdateTimeToLiveCommand,
 } from "@aws-sdk/client-dynamodb";
 import type {
   DeleteCommand,
@@ -29,7 +30,8 @@ type NativeCommand =
   | DeleteTableCommand
   | PutCommand
   | QueryCommand
-  | UpdateCommand;
+  | UpdateCommand
+  | UpdateTimeToLiveCommand;
 type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
 
 export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<

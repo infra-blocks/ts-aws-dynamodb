@@ -10,3 +10,4 @@ export * from "./outputs/index.js";
 export { PutItem } from "./put-item.js";
 export { Query } from "./query.js";
 export { UpdateItem } from "./update-item.js";
+export { UpdateTimeToLive } from "./update-time-to-live.js";

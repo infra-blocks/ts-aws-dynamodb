@@ -5,6 +5,7 @@ import type { GetItem } from "./get-item.js";
 import type { PutItem } from "./put-item.js";
 import type { Query } from "./query.js";
 import type { UpdateItem } from "./update-item.js";
+import type { UpdateTimeToLive } from "./update-time-to-live.js";
 
 export type DynamoDbClientCommand =
   | DeleteItem
@@ -13,6 +14,7 @@ export type DynamoDbClientCommand =
   | DeleteTable
   | PutItem
   | Query
-  | UpdateItem;
+  | UpdateItem
+  | UpdateTimeToLive;
 
 // TODO: runtime checks with instanceof checks

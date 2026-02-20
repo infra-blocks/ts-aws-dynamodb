@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60.0] - 2026-02-20
+
+### Added
+
+- The `UpdateTimeToLive` command and related output `UpdateTimeToLiveOutput`.
+
+### Changed
+
+- Renamed `UpdateTimeToLiveParams` to `UpdateTimeToLiveInput`.
+- Updating a ttl now returns `UpdateTimeToLiveOutput`, an unusable empty object, instead of `void`.
+
 ## [0.59.0] - 2026-02-20
 
 ### Added
@@ -757,6 +768,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.60.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.59.0...v0.60.0
 [0.59.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.58.0...v0.59.0
 [0.58.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.57.0...v0.58.0
 [0.57.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.56.0...v0.57.0

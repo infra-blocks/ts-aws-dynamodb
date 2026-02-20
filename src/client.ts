@@ -29,11 +29,10 @@ import {
   type QueryOutput,
   UpdateItem,
   type UpdateItemInput,
-} from "./commands/index.js";
-import {
   UpdateTimeToLive,
-  type UpdateTimeToLiveParams,
-} from "./commands/update-time-to-live.js";
+  type UpdateTimeToLiveInput,
+  type UpdateTimeToLiveOutput,
+} from "./commands/index.js";
 import {
   WriteTransaction,
   type WriteTransactionParams,
@@ -368,17 +367,18 @@ export class DynamoDbClient {
   /**
    * Updates the time to live settings of a table using the UpdateTimeToLive API.
    *
-   * @param params - The parameters to use to update the time to live settings.
+   * @param input - The parameters to use to update the time to live settings.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateTimeToLive.html
    */
-  async updateTimeToLive(params: UpdateTimeToLiveParams): Promise<void> {
+  async updateTimeToLive(
+    input: UpdateTimeToLiveInput,
+  ): Promise<UpdateTimeToLiveOutput> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("updateTimeToLive(%s)", JSON.stringify(params));
+      this.logger.debug("updateTimeToLive(%s)", JSON.stringify(input));
     }
 
-    const command = UpdateTimeToLive.from(params);
-    await this.client.send(command.toAwsCommand());
+    return this.send(new UpdateTimeToLive(input));
   }
 
   /**
