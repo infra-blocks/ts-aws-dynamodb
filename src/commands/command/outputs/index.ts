@@ -5,3 +5,4 @@ export type { GetItemOutput } from "./get-item.js";
 export type { PutItemOutput } from "./put-item.js";
 export type { QueryOutput } from "./query.js";
 export type { UpdateItemOutput } from "./update-item.js";
+export type { UpdateTimeToLiveOutput } from "./update-time-to-live.js";
