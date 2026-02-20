@@ -1,8 +1,7 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../../../index.js";
-import { AttributeNames, AttributeValues } from "../../attributes/index.js";
-import { conditionExpression } from "../../expressions/condition/expression.js";
 import type { ConditionParams } from "../../index.js";
+import { intoExpressionComponents } from "./lib.js";
 
 export type PutItemReturnValue = "ALL_OLD" | "NONE";
 
@@ -41,18 +40,14 @@ export function encode<T extends Attributes = Attributes>(
     return result;
   }
 
-  const names = AttributeNames.create();
-  const values = AttributeValues.create();
-  // Ask the expression to stringify itself, applying the substitutions by itself.
-  const expression = conditionExpression(input.condition).stringify({
-    names,
-    values,
-  });
+  const { expression, names, values } = intoExpressionComponents(
+    input.condition,
+  );
 
   return {
     ...result,
     ConditionExpression: expression,
-    ExpressionAttributeNames: names.getSubstitutions(),
-    ExpressionAttributeValues: values.getSubstitutions(),
+    ExpressionAttributeNames: names,
+    ExpressionAttributeValues: values,
   };
 }

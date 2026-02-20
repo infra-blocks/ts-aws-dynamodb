@@ -2,7 +2,7 @@
  * For example, pick any command they offer. None of them are assignable to
  * Parameters<DynamoDBDocumentClient["send"]>[0]. This issue is transitive and makes it very hard to express
  * generic constraints based on their command types, or their client's interface, because they don't work with
- * each other trolololol. Hence, we use any where necessary as an escape hatch to this typing nightmare.
+ * each other trolololol. Hence, we use `any` where necessary as an escape hatch to this typing nightmare.
  */
 
 import type {
@@ -14,6 +14,7 @@ import type {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { trusted } from "@infra-blocks/types";
 import type { GetOutputType } from "@smithy/types";
@@ -25,7 +26,8 @@ type NativeCommand =
   | GetCommand
   | CreateTableCommand
   | DeleteTableCommand
-  | PutCommand;
+  | PutCommand
+  | QueryCommand;
 type NativeCommandCtor<C extends NativeCommand> = new (input: C["input"]) => C;
 
 export type CommandOutput<C extends Command<unknown, unknown>> = Awaited<

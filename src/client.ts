@@ -24,8 +24,10 @@ import {
   PutItem,
   type PutItemInput,
   type PutItemOutput,
+  Query,
+  type QueryInput,
+  type QueryOutput,
 } from "./commands/index.js";
-import { Query, type QueryParams, type QueryResult } from "./commands/query.js";
 import { UpdateItem, type UpdateItemParams } from "./commands/update-item.js";
 import {
   UpdateTimeToLive,
@@ -183,13 +185,14 @@ export class DynamoDbClient {
     return this.send(new PutItem<T>(params));
   }
 
+  // TODO: make an IterateQuery command/ free floating function function?
   /**
    * Iterates the items produced querying a table, or an index, using the Query API.
    *
    * It uses {@link paginateQuery} to handle pagination automatically, and yields
    * every item produced by every page.
    *
-   * @param params - The parameters to use to query the table or index.
+   * @param input - The parameters to use to query the table or index.
    *
    * @returns An async generator that yields items matching the query, one
    * at a time, and that handles pagination automatically.
@@ -197,14 +200,14 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
   async *iterateQuery<
-    K extends KeyAttributes,
     T extends Attributes = Attributes,
-  >(params: QueryParams<K>): AsyncGenerator<T> {
+    K extends KeyAttributes = KeyAttributes,
+  >(input: QueryInput<K>): AsyncGenerator<T> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("iterateQuery(%s)", JSON.stringify(params));
+      this.logger.debug("iterateQuery(%s)", JSON.stringify(input));
     }
 
-    for await (const page of this.paginateQuery<K, T>(params)) {
+    for await (const page of this.paginateQuery<T, K>(input)) {
       for (const item of page.items) {
         yield item;
       }
@@ -217,7 +220,7 @@ export class DynamoDbClient {
    * It uses {@link query} to produce pages, and yields them one after the other
    * through the generator.
    *
-   * @param params - The parameters to use to query the table or index.
+   * @param input - The parameters to use to query the table or index.
    *
    * @returns An async generator that yields items matching the query, one
    * at a time, and that handles pagination automatically.
@@ -225,19 +228,19 @@ export class DynamoDbClient {
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
   async *paginateQuery<
-    K extends KeyAttributes,
     T extends Attributes = Attributes,
-  >(params: QueryParams<K>): AsyncGenerator<QueryResult<K, T>> {
+    K extends KeyAttributes = KeyAttributes,
+  >(input: QueryInput<K>): AsyncGenerator<QueryOutput<T, K>> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("paginateQuery(%s)", JSON.stringify(params));
+      this.logger.debug("paginateQuery(%s)", JSON.stringify(input));
     }
 
-    let page = await this.query<K, T>(params);
+    let page = await this.query<T, K>(input);
     yield page;
 
     while (page.lastEvaluatedKey != null) {
       page = await this.query({
-        ...params,
+        ...input,
         exclusiveStartKey: page.lastEvaluatedKey,
       });
 
@@ -249,24 +252,25 @@ export class DynamoDbClient {
    * Queries a table, or an index, using the Query API.
    *
    * It produces a single page of results, which may or may not contain all the
-   * items of the query. If the result is incomplete, the {@link QueryResult.lastEvaluatedKey}
-   * will be set, and should be used in a follow up query as the {@link QueryParams.exclusiveStartKey}.
+   * items of the query. If the result is incomplete, the {@link QueryOutput.lastEvaluatedKey}
+   * will be set, and should be used in a follow up query as the {@link QueryOutput.exclusiveStartKey}.
    *
-   * @param params - The parameters to use to query the table or index.
+   * @param input - The parameters to use to query the table or index.
    *
    * @returns An async generator that yields items matching the query, one
    * at a time, and that handles pagination automatically.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
-  query<K extends KeyAttributes, T extends Attributes = Attributes>(
-    params: QueryParams<K>,
-  ): Promise<QueryResult<K, T>> {
+  query<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: QueryInput<K>): Promise<QueryOutput<T, K>> {
     if (this.logger.isDebugEnabled()) {
-      this.logger.debug("query(%s)", JSON.stringify(params));
+      this.logger.debug("query(%s)", JSON.stringify(input));
     }
 
-    return Query.from(params).execute({ client: this.client });
+    return this.send(new Query<T, K>(input));
   }
 
   /**
@@ -282,18 +286,19 @@ export class DynamoDbClient {
    * to be unique, unlike `getItem` for the table. It can also be useful in the case where
    * the sort key of an item is unknown, expected to match a {@link KeyConditionExpression} uniquely.
    *
-   * @param params - The parameters to use to query the table or index.
+   * @param input - The parameters to use to query the table or index.
    *
    * @returns The only item matching the query, or `undefined` if no item matches.
    */
-  async queryOne<K extends KeyAttributes, T extends Attributes = Attributes>(
-    params: QueryParams<K>,
-  ): Promise<T | undefined> {
+  async queryOne<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: QueryInput<K>): Promise<T | undefined> {
     let item: T | undefined;
     // TODO: page of only 2 items, remove limit from parameters.
-    for await (const queryItem of this.iterateQuery<K, T>(params)) {
+    for await (const queryItem of this.iterateQuery<T, K>(input)) {
       if (item != null) {
-        throw TooManyItemsException.queryingOne(params);
+        throw TooManyItemsException.queryingOne(input);
       }
       item = queryItem;
     }
