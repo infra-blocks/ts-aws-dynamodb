@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.63.0] - 2026-02-21
+
+### Added
+
+- The `literal` function, to mark a path attribute as literal. In can be used anywhere
+`path`s can be used in expressions. Using `literal` results in different translation
+logic. For example, `literal("toto.tata")` will translate to the expression `"#attr1`
+and attribute name `"#attr1": "toto.tata"`, instead of the default of tokenizing
+paths, which result in the expression `#attr1.#attr2` and the names `"#attr1": "toto", "#attr2": "tata"`.
+
+### Fixed
+
+- Added support for list indexing in attribute paths. For example, `list[0]` used to 
+transate to the expression `"#attr1"` and attribute name `"#attr1": "list[0]"`. Now,
+the result is the expression `"#attr1[0]"` and attribute name `"#attr1": "list"`.
+
 ## [0.62.0] - 2026-02-21
 
 ### Added
@@ -798,6 +814,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.63.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.62.0...v0.63.0
 [0.62.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.61.0...v0.62.0
 [0.61.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.60.0...v0.61.0
 [0.60.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.59.0...v0.60.0
