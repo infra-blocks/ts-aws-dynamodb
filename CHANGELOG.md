@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.61.0] - 2026-02-21
+
+### Added
+
+- The `WriteTransaction` command and related output `WriteTransactionOutput`.
+
+### Changed
+
+- Renamed `WriteTransactionParams` to `WriteTransactionInput`.
+- Write transactions now returns `WriteTransactionOuput`, an unusable empty object,
+instead of `void`.
+
 ## [0.60.0] - 2026-02-20
 
 ### Added
@@ -768,6 +780,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.61.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.60.0...v0.61.0
 [0.60.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.59.0...v0.60.0
 [0.59.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.58.0...v0.59.0
 [0.58.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.57.0...v0.58.0
