@@ -1,16 +1,14 @@
-import assert, { fail } from "node:assert";
-import { findCauseByType } from "@infra-blocks/error";
 import { expect, expectTypeOf } from "@infra-blocks/test";
 import {
   attributeNotExists,
   attributeType,
-  ConditionalCheckFailedException,
   DynamoDbClient,
   or,
   path,
   value,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
+import { expectConditionCheckFailure } from "./lib.js";
 
 describe(DynamoDbClient.name, () => {
   afterEach("clean up", dropAllTables());
@@ -120,23 +118,20 @@ describe(DynamoDbClient.name, () => {
         },
       });
 
-      try {
-        await client.putItem({
-          table,
-          item: { pk: "BigIron#1", newValue: "allNew" },
-          returnValuesOnConditionCheckFailure: "ALL_OLD",
-          condition: attributeNotExists("pk"),
-        });
-        fail("putItem should have thrown");
-      } catch (err) {
-        const cause = findCauseByType(err, ConditionalCheckFailedException);
-        assert(cause != null);
-        // TODO: use document client unmarshall/marshall functions for these types of translations.
-        expect(cause.Item).to.deep.equal({
-          pk: { S: "BigIron#1" },
-          oldValue: { S: "original" },
-        });
-      }
+      await expectConditionCheckFailure(
+        () =>
+          client.putItem({
+            table,
+            item: { pk: "BigIron#1", newValue: "allNew" },
+            returnValuesOnConditionCheckFailure: "ALL_OLD",
+            condition: attributeNotExists("pk"),
+          }),
+        (cause) =>
+          expect(cause.Item).to.deep.equal({
+            pk: { S: "BigIron#1" },
+            oldValue: { S: "original" },
+          }),
+      );
     });
     it("should work with expression", async function () {
       const client = this.createClient();

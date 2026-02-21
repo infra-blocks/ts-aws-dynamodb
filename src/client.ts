@@ -29,6 +29,7 @@ import {
   type QueryOutput,
   UpdateItem,
   type UpdateItemInput,
+  type UpdateItemOutput,
   UpdateTimeToLive,
   type UpdateTimeToLiveInput,
   type UpdateTimeToLiveOutput,
@@ -353,14 +354,15 @@ export class DynamoDbClient {
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html
    */
-  async updateItem<K extends KeyAttributes = KeyAttributes>(
-    input: UpdateItemInput<K>,
-  ): Promise<void> {
+  async updateItem<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: UpdateItemInput<K>): Promise<UpdateItemOutput<T>> {
     if (this.logger.isDebugEnabled()) {
       this.logger.debug("updateItem(%s)", JSON.stringify(input));
     }
 
-    await this.send(new UpdateItem<K>(input));
+    return this.send(new UpdateItem<T, K>(input));
   }
 
   /**

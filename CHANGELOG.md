@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.62.0] - 2026-02-21
+
+### Added
+
+- The option to specify `returnValues` and `returnValuesOnConditionCheckFailure` on
+`UpdateItemInput`.
+- Added the optional item attributes in `UpdateItemOutput`. Unlike `DeleteItemOutput` and
+`PutItemOutput`, `UpdateItemOutput`'s field is called `attributes` and not `item`. This is
+because the former two API calls return full items when `ALL_OLD` is specified. The `UpdateItem`
+command is not guaranteed to do so, as specifying `UPDATED_NEW`, for example, will only
+return a subset of the full item's attributes.
+
+### Changed
+
+- Now that `UpdateItem` has a typed output, it comes with a type parameter. The `updateItem` API
+and `UpdateItem` command both have a new type parameter that comes first and reflects the
+type of the returned attributes, if any. It has the form `T extends Attributes = Attributes`.
+
 ## [0.61.0] - 2026-02-21
 
 ### Added
@@ -780,6 +798,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.62.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.61.0...v0.62.0
 [0.61.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.60.0...v0.61.0
 [0.60.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.59.0...v0.60.0
 [0.59.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.58.0...v0.59.0

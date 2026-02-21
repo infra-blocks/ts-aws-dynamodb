@@ -1,6 +1,4 @@
-import assert, { fail } from "node:assert";
 import {
-  ConditionalCheckFailedException,
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
@@ -14,6 +12,7 @@ import {
   type CreateTableInput,
 } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
+import { expectConditionCheckFailure } from "./lib.js";
 
 describe(DynamoDBClient.name, () => {
   afterEach("clean up", dropAllTables());
@@ -170,22 +169,20 @@ describe(DynamoDBClient.name, () => {
         }),
       );
 
-      try {
-        await client.deleteItem({
-          table,
-          key: { pk: "User#BigToto" },
-          returnValuesOnConditionCheckFailure: "ALL_OLD",
-          condition: attributeNotExists("pk"),
-        });
-        fail("deleteItem should have thrown");
-      } catch (err) {
-        const cause = findCauseByType(err, ConditionalCheckFailedException);
-        assert(cause != null);
-        expect(cause.Item).to.deep.equal({
-          pk: { S: "User#BigToto" },
-          other: { S: "coucou" },
-        });
-      }
+      await expectConditionCheckFailure(
+        () =>
+          client.deleteItem({
+            table,
+            key: { pk: "User#BigToto" },
+            returnValuesOnConditionCheckFailure: "ALL_OLD",
+            condition: attributeNotExists("pk"),
+          }),
+        (err) =>
+          expect(err.Item).to.deep.equal({
+            pk: { S: "User#BigToto" },
+            other: { S: "coucou" },
+          }),
+      );
     });
   });
 });

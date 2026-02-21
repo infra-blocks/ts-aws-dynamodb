@@ -8,6 +8,8 @@ import {
 import { conditionExpression } from "../expressions/condition/expression.js";
 import type { ConditionParams } from "../expressions/index.js";
 
+export type ConditionCheckFailureReturnValue = "NONE" | "ALL_OLD";
+
 export function intoExpressionComponents(condition: ConditionParams): {
   expression: string;
   names?: Record<PathSubstitution, AttributePath>;
