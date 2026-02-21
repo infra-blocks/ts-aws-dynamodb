@@ -4,6 +4,22 @@ import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 describe("commands.attributes.names", () => {
   describe(AttributeNames.name, () => {
     describe("substitute", () => {
+      it("should throw for empty string", () => {
+        const names = AttributeNames.create();
+        expect(() => names.substitute("")).to.throw();
+      });
+      it("should throw for a empty path", () => {
+        const names = AttributeNames.create();
+        expect(() => names.substitute("hello..not.valid")).to.throw();
+      });
+      it("should throw for empty index", () => {
+        const names = AttributeNames.create();
+        expect(() => names.substitute("[]")).to.throw();
+      });
+      it("should throw for missing attribute before index", () => {
+        const names = AttributeNames.create();
+        expect(() => names.substitute("[4]")).to.throw();
+      });
       it("should return the expected substitution for a field", () => {
         const names = AttributeNames.create();
         const substitute = names.substitute("field");
@@ -13,6 +29,11 @@ describe("commands.attributes.names", () => {
         const names = AttributeNames.create();
         const substitute = names.substitute("field.nested");
         expect(substitute).to.equal("#attr1.#attr2");
+      });
+      it("should return the expected substitution for an indexed field", () => {
+        const names = AttributeNames.create();
+        const substitute = names.substitute("list[0]");
+        expect(substitute).to.equal("#attr1[0]");
       });
       it("should return the same substitution for the same field", () => {
         const names = AttributeNames.create();
@@ -40,11 +61,20 @@ describe("commands.attributes.names", () => {
         // Do the same substitution again.
         names.substitute("field1");
         names.substitute("field3");
+        // Add some nested fields.
+        names.substitute("inner.field1");
+        names.substitute("field2.outer");
+        // Then some list indexing.
+        names.substitute("list[0]");
+
         const substitutions = names.getSubstitutions();
         expect(substitutions).to.deep.equal({
           "#attr1": "field1",
           "#attr2": "field2",
           "#attr3": "field3",
+          "#attr4": "inner",
+          "#attr5": "outer",
+          "#attr6": "list",
         });
       });
     });

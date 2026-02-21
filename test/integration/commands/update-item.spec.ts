@@ -2,7 +2,6 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import {
   add,
-  attributeExists,
   attributeNotExists,
   deleteFrom,
   ifNotExists,
@@ -33,6 +32,7 @@ describe(DynamoDBClient.name, () => {
         stuff: {
           "kebab-field": 42,
           removeMe: "please",
+          list: ["a", "b", "c"],
           addMe: new Set([1, 2, 3]),
           deleteFromMe: new Set(["one", "two", "three"]),
         },
@@ -48,10 +48,11 @@ describe(DynamoDBClient.name, () => {
             ifNotExists(path("default.add"), value(0)),
           ),
           remove(path("stuff.removeMe")),
+          set("stuff.list[3]", value("d")),
           add(path("stuff.addMe"), value(new Set([4]))),
           deleteFrom(path("stuff.deleteFromMe"), value(new Set(["one"]))),
         ],
-        condition: attributeExists(path("stuff.kebab-field")),
+        condition: ["stuff.list[1]", "=", value("b")],
       });
       expect(output).to.be.empty;
       // Check the result.
@@ -61,6 +62,7 @@ describe(DynamoDBClient.name, () => {
           pk: item.pk,
           stuff: {
             "kebab-field": 0,
+            list: ["a", "b", "c", "d"],
             addMe: new Set([1, 2, 3, 4]),
             deleteFromMe: new Set(["two", "three"]),
           },

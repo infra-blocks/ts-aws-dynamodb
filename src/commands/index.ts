@@ -1,4 +1,3 @@
-export * from "./attributes/index.js";
 export type { CommandInput, CommandOutput } from "./base.js";
 export type { DynamoDbClientCommand } from "./command.js";
 export { CreateTable } from "./create-table.js";

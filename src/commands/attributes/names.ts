@@ -40,6 +40,11 @@ export class AttributeNames {
    *
    * If the attribute path was previously seen, then the associated substitution is returned.
    *
+   * If the attribute path is a nested item expression, such as "object.inner.stuff", then the
+   * function will treat it as 3 different paths by default. So 3 attribute names will
+   * be generated: "object", "inner", "stuff", and the substitution returned will be of the
+   * form "#attr1.#attr2.#attr3".
+   *
    * @param attribute - The path of the attribute to substitute.
    *
    * @returns The substitution associated with the attribute path.
@@ -59,8 +64,24 @@ export class AttributeNames {
           `error substituting attribute ${attribute}: empty path token not allowed`,
         );
       }
-      const substitute =
-        this.names.get(token) ?? this.getAndSetNextSubstituteFor(token);
+
+      // If it's indexed.
+      const match = INDEX_REGEX.exec(token);
+      if (match != null) {
+        const indexedToken = token.slice(0, match.index);
+        if (indexedToken.length === 0) {
+          throw new Error(
+            `error substituting attribute ${attribute}: empty path token not allowed`,
+          );
+        }
+
+        // The substitute will be of the form #attrN[<originalIndex>]
+        const pathSubstitute = this.getOrSetNextSubstituteFor(indexedToken);
+        result.push(`${pathSubstitute}${match[1]}`);
+        continue;
+      }
+
+      const substitute = this.getOrSetNextSubstituteFor(token);
       result.push(substitute);
     }
     return result.join(".") as PathSubstitution;
@@ -84,13 +105,19 @@ export class AttributeNames {
     return result;
   }
 
-  private getAndSetNextSubstituteFor(path: AttributePath): PathSubstitution {
-    const nextSubstitute = `#attr${this.names.size + 1}` as PathSubstitution;
-    this.names.set(path, nextSubstitute);
-    return nextSubstitute;
+  private getOrSetNextSubstituteFor(path: AttributePath): PathSubstitution {
+    const current = this.names.get(path);
+    if (current != null) {
+      return current;
+    }
+    const next = `#attr${this.names.size + 1}` as PathSubstitution;
+    this.names.set(path, next);
+    return next;
   }
 
   static create(): AttributeNames {
     return new AttributeNames();
   }
 }
+
+const INDEX_REGEX = /(\[.*\].*)$/;
