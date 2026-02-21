@@ -12,7 +12,7 @@ import {
   size,
   value,
 } from "../../../../../src/index.js";
-import { expressionMatch } from "../update/action-match.js";
+import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.condition.functions", () => {
   describe(attributeExists.name, () => {

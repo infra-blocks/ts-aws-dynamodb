@@ -1,7 +1,7 @@
 import { expect } from "@infra-blocks/test";
 import type { IfNotExists } from "../../../../../src/commands/expressions/update/if-not-exists.js";
 import { ifNotExists, path, value } from "../../../../../src/index.js";
-import { operandMatch } from "./action-match.js";
+import { operandMatch } from "../lib.js";
 
 describe("commands.expressions.update.if-not-exists", () => {
   describe(ifNotExists.name, () => {

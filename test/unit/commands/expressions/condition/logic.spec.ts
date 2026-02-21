@@ -9,7 +9,7 @@ import {
   or,
 } from "../../../../../src/commands/expressions/condition/logic.js";
 import { path, value } from "../../../../../src/index.js";
-import { expressionMatch } from "../update/action-match.js";
+import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.condition.logic", () => {
   describe(and.name, () => {

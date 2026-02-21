@@ -1,7 +1,7 @@
 import { expect } from "@infra-blocks/test";
 import { size } from "../../../../../src/commands/expressions/condition/size.js";
 import { path, value } from "../../../../../src/index.js";
-import { operandMatch } from "../update/action-match.js";
+import { operandMatch } from "../lib.js";
 
 describe("commands.expressions.condition.size", () => {
   describe(size.name, () => {
