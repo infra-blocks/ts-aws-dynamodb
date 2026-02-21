@@ -9,3 +9,11 @@ A convenience library wrapper around [`@aws-sdk/client-dynamodb`](https://www.np
 - More conventional field names. Input and output fields use the more common `camelCase` JS/TS convention
 over the `PascalCase` imposed by the AWS APIs.
 - Pagination is provided for APIs that support it and exposed as `AsyncIterators`.
+
+## Noteworthy divergences in naming
+
+- `TransactWriteItems` (dis engrish?) is renamed to `WriteTransaction`.
+- `DeleteIem` and `PutItem`'s return payload contains an `item` field, and not and `Attributes` field. This is because
+the user can only specify `ALL_OLD` as optional return value, which will always return a full item.
+- The above is unlike the `UpdateItem` command, which *can* return attributes subsets when `UPDATED_[NEW|OLD]` is specified.
+So, the `UpdateItemOutput` contains an `attributes` field instead of `item` field.

@@ -1,9 +1,12 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../../types.js";
 import type { ConditionParams } from "../expressions/index.js";
-import { intoExpressionComponents } from "./lib.js";
+import {
+  type ConditionCheckFailureReturnValue,
+  intoExpressionComponents,
+} from "./lib.js";
 
-export type PutItemReturnValue = "ALL_OLD" | "NONE";
+export type PutItemReturnValue = ConditionCheckFailureReturnValue;
 
 export type PutItemInput<T extends Attributes = Attributes> = {
   table: string;
@@ -12,7 +15,7 @@ export type PutItemInput<T extends Attributes = Attributes> = {
   returnValues?: PutItemReturnValue;
   // The item will be stored in the thrown exception and won't be unarmashalled.
   // See: https://github.com/aws/aws-sdk-js-v3/issues/6723
-  returnValuesOnConditionCheckFailure?: PutItemReturnValue;
+  returnValuesOnConditionCheckFailure?: ConditionCheckFailureReturnValue;
 };
 
 export type PutItemResult<T extends Attributes> = { item?: T };
