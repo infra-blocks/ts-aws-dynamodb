@@ -48,6 +48,22 @@ describe("commands.attributes.names", () => {
         expect(first).to.equal("#attr1.#attr2");
         expect(second).to.equal("#attr2.#attr1");
       });
+      it("should honor the literal option with a regular path", () => {
+        const names = AttributeNames.create();
+        expect(names.substitute("toto", { literal: true })).to.equal("#attr1");
+      });
+      it("should honor the literal option with a path containing dots", () => {
+        const names = AttributeNames.create();
+        expect(names.substitute("outer.inner", { literal: true })).to.equal(
+          "#attr1",
+        );
+      });
+      it("should honor the literal option with an indexed path", () => {
+        const names = AttributeNames.create();
+        expect(names.substitute("list[0]", { literal: true })).to.equal(
+          "#attr1",
+        );
+      });
     });
     describe("getSubstitutions", () => {
       it("should return undefined if no substitutions were generated", () => {
@@ -66,6 +82,10 @@ describe("commands.attributes.names", () => {
         names.substitute("field2.outer");
         // Then some list indexing.
         names.substitute("list[0]");
+        // Don't forget literal options.
+        names.substitute("field1", { literal: true });
+        names.substitute("inner.field1", { literal: true });
+        names.substitute("list[0]", { literal: true });
 
         const substitutions = names.getSubstitutions();
         expect(substitutions).to.deep.equal({
@@ -75,6 +95,8 @@ describe("commands.attributes.names", () => {
           "#attr4": "inner",
           "#attr5": "outer",
           "#attr6": "list",
+          "#attr7": "inner.field1",
+          "#attr8": "list[0]",
         });
       });
     });

@@ -1,16 +1,25 @@
 import { expect } from "@infra-blocks/test";
 import { AttributeNames } from "../../../../../src/commands/attributes/names.js";
 import { isRawPath } from "../../../../../src/commands/expressions/operands/path.js";
-import { path } from "../../../../../src/index.js";
+import { literal, path } from "../../../../../src/index.js";
 
 describe("commands.expressions.operands.path", () => {
   describe(path.name, () => {
-    it("should be correctly substitute the value", () => {
+    it("should correctly substitute the value", () => {
       const operand = path("big.toto");
       const names = AttributeNames.create();
-      expect(operand.substitute({ names })).to.equal(
-        names.substitute("big.toto"),
-      );
+      const result = operand.substitute({ names });
+      expect(result).to.equal(names.substitute("big.toto"));
+      expect(result).to.equal("#attr1.#attr2");
+    });
+  });
+  describe(literal.name, () => {
+    it("should correctly substitute the value", () => {
+      const operand = literal("big.toto");
+      const names = AttributeNames.create();
+      const result = operand.substitute({ names });
+      expect(result).to.equal(names.substitute("big.toto", { literal: true }));
+      expect(result).to.equal("#attr1");
     });
   });
   describe(isRawPath.name, () => {

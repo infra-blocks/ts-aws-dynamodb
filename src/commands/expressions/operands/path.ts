@@ -1,4 +1,8 @@
-import { type AttributePath, isNativeString } from "../../../types.js";
+import {
+  type AttributeName,
+  type AttributePath,
+  isNativeString,
+} from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { IOperand } from "./operand.js";
 
@@ -34,21 +38,25 @@ export type RawPath = AttributePath | Path;
  */
 export class Path implements IOperand {
   private readonly path: AttributePath;
+  private readonly literal: boolean;
 
-  private constructor(path: AttributePath) {
+  private constructor(params: { path: AttributePath; literal: boolean }) {
+    const { path, literal } = params;
     this.path = path;
+    this.literal = literal;
   }
 
   substitute(params: { names: AttributeNames }): string {
     const { names } = params;
-    return names.substitute(this.path);
+    return names.substitute(this.path, { literal: this.literal });
   }
 
   /**
    * @private
    */
-  static from(path: AttributePath): Path {
-    return new Path(path);
+  static from(path: AttributePath, options?: { literal?: true }): Path {
+    const { literal = false } = options ?? {};
+    return new Path({ path, literal });
   }
 
   /**
@@ -58,22 +66,27 @@ export class Path implements IOperand {
    * Otherwise, a new {@link Path} instance will be created from the provided
    * argument.
    *
-   * @param loosePath - The path to return as is or convert to a {@link Path} instance.
+   * @param raw - The path to return as is or convert to a {@link Path} instance.
    *
    * @returns The normalized {@link Path} instance.
    *
    * @private
    */
-  static normalize(loosePath: RawPath): Path {
-    if (loosePath instanceof Path) {
-      return loosePath;
+  static normalize(raw: RawPath): Path {
+    if (raw instanceof Path) {
+      return raw;
     }
-    return Path.from(loosePath);
+    return Path.from(raw);
   }
 }
 
 /**
  * Factory function to create a {@link Path}.
+ *
+ * Client code can use this function to disambiguate the expression.
+ * Normally, strings are treated as paths by default in expression constructs,
+ * but it can be clearer to write something like `set(path("toto"), path("tata"))`
+ * instead of `set("toto", "tata")`, for example.
  *
  * @param path - The path of the attribute this operand represents.
  *
@@ -81,6 +94,31 @@ export class Path implements IOperand {
  */
 export function path(path: AttributePath): Path {
   return Path.from(path);
+}
+
+/**
+ * Factory function to create a literal {@link Path}.
+ *
+ * A literal path does not get parsed before being stringified into an expression
+ * attribute name. It is simply used as is. For example, if the name of
+ * an attribute contains a dot, such as "not.a.good.idea", then the client code
+ * *must* use a {@link literal} to translate it as the following attribute names:
+ * {
+ *  "#attr1": "not.a.good.idea"
+ * }
+ * Instead of the default of:
+ * {
+ *  "#attr1": "not",
+ *  "#attr2": "a",
+ *  "#attr3": "good",
+ *  "#attr4": "idea"
+ * }
+ *
+ * @param name - The attribute name, taken literally.
+ * @returns A new literal {@link Path} instance for the provided name.
+ */
+export function literal(name: AttributeName): Path {
+  return Path.from(name, { literal: true });
 }
 
 /**
