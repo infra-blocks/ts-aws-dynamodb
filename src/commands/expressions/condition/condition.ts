@@ -1,24 +1,41 @@
-import type { AttributeValue } from "../../../types.js";
-import { type Operand, operand, type RawOperand } from "../operands/index.js";
-import type { ConditionComparisonParams } from "./comparisons.js";
-import type { ConditionExpression } from "./expression.js";
-import { isSize, type Size } from "./size.js";
+import type {
+  AttributeExists,
+  AttributeNotExists,
+  BeginsWith,
+  Contains,
+  IsAttributeOfType,
+} from "../functions/index.js";
+import {
+  ConditionComparison,
+  type ConditionComparisonParams,
+  isConditionComparisonParams,
+} from "./condition-comparison.js";
+import type { And, Not, Or } from "./logic.js";
 
-export type ConditionParams = ConditionExpression | ConditionComparisonParams;
+export type ConditionParams =
+  | ConditionComparisonParams
+  | ConditionFunction
+  | ConditionLogic;
 
-export type ConditionOperand<T extends AttributeValue = AttributeValue> =
-  | Operand<T>
-  | Size;
+export type ConditionFunction =
+  | AttributeExists
+  | AttributeNotExists
+  | BeginsWith
+  | IsAttributeOfType
+  | Contains;
 
-export type RawConditionOperand<T extends AttributeValue = AttributeValue> =
-  | RawOperand<T>
-  | Size;
+export type ConditionLogic = And | Not | Or;
 
-export function conditionOperand<T extends AttributeValue = AttributeValue>(
-  raw: RawConditionOperand<T>,
-): ConditionOperand<T> {
-  if (isSize(raw)) {
-    return raw;
-  }
-  return operand<T>(raw);
-}
+export type Condition =
+  | ConditionComparison
+  | ConditionFunction
+  | ConditionLogic;
+
+export const Condition = {
+  from(params: ConditionParams): Condition {
+    if (isConditionComparisonParams(params)) {
+      return ConditionComparison.from(params);
+    }
+    return params;
+  },
+};

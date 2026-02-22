@@ -2,11 +2,9 @@ import { expect } from "@infra-blocks/test";
 import {
   operand,
   Path,
-  path,
-  type RawOperand,
   Value,
-  value,
-} from "../../../../../src/index.js";
+} from "../../../../../src/commands/expressions/index.js";
+import { path, type RawOperand, value } from "../../../../../src/index.js";
 
 describe("commands.expressions.operands.operand", () => {
   describe(operand.name, () => {

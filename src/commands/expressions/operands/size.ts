@@ -5,16 +5,14 @@ import type {
   NativeSet,
   NativeString,
 } from "../../../types.js";
-import type {
-  AttributeNames,
-  AttributeValues,
-} from "../../attributes/index.js";
+import type { AttributeNames } from "../../attributes/names.js";
+import type { AttributeValues } from "../../attributes/values.js";
 import {
   type IOperand,
   type Operand,
   operand,
   type RawOperand,
-} from "../operands/operand.js";
+} from "./operand.js";
 
 export type SizeOperandValue =
   | NativeBinary
@@ -58,7 +56,6 @@ export class Size implements IOperand {
     return new Size(operand);
   }
 }
-
 /**
  * Creates a new {@link Size} operand to be nested in expressions.
  *
@@ -67,6 +64,7 @@ export class Size implements IOperand {
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
+
 export function size(raw: RawSizeOperand): Size {
   const effective = operand<SizeOperandValue>(raw);
   return Size.from(effective);

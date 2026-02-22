@@ -6,4 +6,4 @@ A key attribute *must be* a top level attribute of type String, Number, or Binar
 
 // TODO: narrow this type.
 // This is a straight up subset of {@link Condition}
-export type KeyConditionExpression = ConditionParams;
+export type KeyConditionParams = ConditionParams;

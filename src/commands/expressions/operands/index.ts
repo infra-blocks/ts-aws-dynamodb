@@ -12,6 +12,12 @@ export {
   type RawPath,
 } from "./path.js";
 export {
+  type RawSizeOperand,
+  type SizeOperand,
+  type SizeOperandValue,
+  size,
+} from "./size.js";
+export {
   type ImplicitValue,
   type RawValue,
   Value,

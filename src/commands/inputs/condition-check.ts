@@ -1,8 +1,8 @@
 import type { TransactWriteCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { UnpackedArray } from "@infra-blocks/types";
 import type { KeyAttributes } from "../../types.js";
-import type { ConditionParams } from "../expressions/index.js";
-import { intoExpressionComponents } from "./lib.js";
+import { Condition, type ConditionParams } from "../expressions/index.js";
+import { ExpressionsFormatter } from "./lib.js";
 
 export type ConditionCheckInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
@@ -21,15 +21,12 @@ type TransactWriteCommandConditionCheck = UnpackedArray<
 function encode<K extends KeyAttributes = KeyAttributes>(
   input: ConditionCheckInput<K>,
 ): TransactWriteCommandConditionCheck {
-  const { table, key, condition } = input;
-
-  const { expression, names, values } = intoExpressionComponents(condition);
-
+  const formatter = ExpressionsFormatter.create();
   return {
-    TableName: table,
-    Key: key,
-    ConditionExpression: expression,
-    ExpressionAttributeNames: names,
-    ExpressionAttributeValues: values,
+    TableName: input.table,
+    Key: input.key,
+    ConditionExpression: formatter.format(Condition.from(input.condition)),
+    ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
+    ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
   };
 }

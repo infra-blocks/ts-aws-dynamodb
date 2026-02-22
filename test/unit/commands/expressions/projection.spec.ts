@@ -1,40 +1,41 @@
 import { expect } from "@infra-blocks/test";
-import { literal, ProjectionExpression, path } from "../../../../src/index.js";
+import { Projection } from "../../../../src/commands/expressions/index.js";
+import { literal, path } from "../../../../src/index.js";
 import { expressionMatch } from "./lib.js";
 
 describe("commands.expressions.projection", () => {
   describe("ProjectionExpression", () => {
     it("should not compile with a type other than a raw path", () => {
       // @ts-expect-error A string is not a valid rhs operand for add.
-      ProjectionExpression.from([42]);
+      Projection.from([42]);
     });
     it("should throw for empty input", () => {
-      expect(() => ProjectionExpression.from([])).to.throw();
+      expect(() => Projection.from([])).to.throw();
     });
     it("should work with an implicit path", () => {
       const { match, names } = expressionMatch({
-        expression: ProjectionExpression.from(["toto"]),
+        expression: Projection.from(["toto"]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
     it("should work with an explicit path", () => {
       const { match, names } = expressionMatch({
-        expression: ProjectionExpression.from([path("toto")]),
+        expression: Projection.from([path("toto")]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
     it("should work with a path literal", () => {
       const { match, names } = expressionMatch({
-        expression: ProjectionExpression.from([literal("toto")]),
+        expression: Projection.from([literal("toto")]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
     it("should allow for mixed bag of raw paths", () => {
       const { match, names } = expressionMatch({
-        expression: ProjectionExpression.from([
+        expression: Projection.from([
           "joe.cunt",
           path("myList[5]"),
           literal("joe.cunt"),

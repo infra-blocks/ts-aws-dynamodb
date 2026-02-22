@@ -1,11 +1,18 @@
-import type { AttributeNames } from "../attributes/names.js";
-import type { AttributeValues } from "../attributes/values.js";
+import type { AttributeNames, AttributeValues } from "../attributes/index.js";
 
-export type Stringifier = (params: {
+export type Formatter = (params: {
   names: AttributeNames;
   values: AttributeValues;
 }) => string;
 
-export interface IExpression {
-  stringify(params: { names: AttributeNames; values: AttributeValues }): string;
-}
+export type ExpressionFormatter = {
+  format(params: { names: AttributeNames; values: AttributeValues }): string;
+};
+
+export const ExpressionFormatter = {
+  from(formatter: Formatter): ExpressionFormatter {
+    return {
+      format: formatter,
+    };
+  },
+};
