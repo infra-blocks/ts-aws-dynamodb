@@ -1,10 +1,8 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../../types.js";
-import type { ConditionParams } from "../expressions/index.js";
-import {
-  type ConditionCheckFailureReturnValue,
-  intoExpressionComponents,
-} from "./lib.js";
+import { Condition, type ConditionParams } from "../expressions/index.js";
+import type { ConditionCheckFailureReturnValue } from "./lib.js";
+import { ExpressionsFormatter } from "./lib.js";
 
 export type PutItemReturnValue = ConditionCheckFailureReturnValue;
 
@@ -47,14 +45,11 @@ function encode<T extends Attributes = Attributes>(
     return result;
   }
 
-  const { expression, names, values } = intoExpressionComponents(
-    input.condition,
-  );
-
+  const formatter = ExpressionsFormatter.create();
   return {
     ...result,
-    ConditionExpression: expression,
-    ExpressionAttributeNames: names,
-    ExpressionAttributeValues: values,
+    ConditionExpression: formatter.format(Condition.from(input.condition)),
+    ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
+    ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
   };
 }

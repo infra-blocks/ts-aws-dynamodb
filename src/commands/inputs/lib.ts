@@ -1,29 +1,31 @@
-import type { AttributePath, AttributeValue } from "../../types.js";
-import {
-  AttributeNames,
-  AttributeValues,
-  type PathSubstitution,
-  type ValueSubstitution,
-} from "../attributes/index.js";
-import { conditionExpression } from "../expressions/condition/expression.js";
-import type { ConditionParams } from "../expressions/index.js";
+import { AttributeNames } from "../attributes/names.js";
+import { AttributeValues } from "../attributes/values.js";
+import type { ExpressionFormatter } from "../expressions/expression.js";
 
 export type ConditionCheckFailureReturnValue = "NONE" | "ALL_OLD";
 
-export function intoExpressionComponents(condition: ConditionParams): {
-  expression: string;
-  names?: Record<PathSubstitution, AttributePath>;
-  values?: Record<ValueSubstitution, AttributeValue>;
-} {
-  const names = AttributeNames.create();
-  const values = AttributeValues.create();
-  const expression = conditionExpression(condition).stringify({
-    names,
-    values,
-  });
-  return {
-    expression,
-    names: names.getSubstitutions(),
-    values: values.getSubstitutions(),
-  };
-}
+export type ExpressionsFormatter = {
+  format(formatter: ExpressionFormatter): string;
+  getExpressionAttributeNames(): ReturnType<AttributeNames["getSubstitutions"]>;
+  getExpressionAttributeValues(): ReturnType<
+    AttributeValues["getSubstitutions"]
+  >;
+};
+
+export const ExpressionsFormatter = {
+  create(params?: {
+    names?: AttributeNames;
+    values?: AttributeValues;
+  }): ExpressionsFormatter {
+    const {
+      names = AttributeNames.create(),
+      values = AttributeValues.create(),
+    } = params ?? {};
+
+    return {
+      format: (formatter) => formatter.format({ names, values }),
+      getExpressionAttributeNames: () => names.getSubstitutions(),
+      getExpressionAttributeValues: () => values.getSubstitutions(),
+    };
+  },
+};

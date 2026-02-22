@@ -12,6 +12,7 @@ import {
 
 export type ImplicitOperand = ImplicitPath | ImplicitValue;
 
+// TODO: should be named OperandParams/Input to follow the conventions.
 export type RawOperand<T extends AttributeValue = AttributeValue> =
   | RawPath
   | RawValue<T>;
@@ -20,6 +21,7 @@ export type Operand<T extends AttributeValue = AttributeValue> =
   | Path
   | Value<T>;
 
+// TODO: replace with formatter.
 export interface IOperand {
   substitute(params: {
     names: AttributeNames;
@@ -27,6 +29,7 @@ export interface IOperand {
   }): string;
 }
 
+// TODO: namespace.
 export function operand<T extends AttributeValue = AttributeValue>(
   raw: RawOperand<T>,
 ): Operand<T> {

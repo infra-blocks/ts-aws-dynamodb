@@ -1,11 +1,9 @@
 import { expect } from "@infra-blocks/test";
-import {
-  attributeExists,
-  attributeNotExists,
-  attributeType,
-  beginsWith,
-  contains,
-} from "../../../../../src/commands/expressions/condition/functions.js";
+import { attributeExists } from "../../../../../src/commands/expressions/functions/attribute-exists.js";
+import { attributeNotExists } from "../../../../../src/commands/expressions/functions/attribute-not-exists.js";
+import { attributeType } from "../../../../../src/commands/expressions/functions/attribute-type.js";
+import { beginsWith } from "../../../../../src/commands/expressions/functions/begins-with.js";
+import { contains } from "../../../../../src/commands/expressions/functions/contains.js";
 import {
   ATTRIBUTE_TYPES,
   path,

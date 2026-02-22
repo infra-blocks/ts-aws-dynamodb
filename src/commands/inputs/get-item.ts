@@ -1,10 +1,10 @@
 import type { GetCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
-import { AttributeNames } from "../attributes/names.js";
 import {
-  ProjectionExpression,
-  type ProjectionExpressionParams,
+  Projection,
+  type ProjectionParams,
 } from "../expressions/projection.js";
+import { ExpressionsFormatter } from "./lib.js";
 
 /**
  * The input required to call the GetItem API.
@@ -24,7 +24,7 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
   /**
    * The projection applied to the return item, if any.
    */
-  projection?: ProjectionExpressionParams;
+  projection?: ProjectionParams;
 }
 
 export const GetItemInput = {
@@ -39,15 +39,14 @@ function encode<K extends KeyAttributes = KeyAttributes>(
     Key: input.key,
   };
 
-  if (input.projection != null) {
-    // There should be no values.
-    const names = AttributeNames.create();
-    const expression = ProjectionExpression.from(input.projection).stringify({
-      names,
-    });
-    result.ProjectionExpression = expression;
-    result.ExpressionAttributeNames = names.getSubstitutions();
+  if (input.projection == null) {
+    return result;
   }
 
-  return result;
+  const formatter = ExpressionsFormatter.create();
+  return {
+    ...result,
+    ProjectionExpression: formatter.format(Projection.from(input.projection)),
+    ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
+  };
 }

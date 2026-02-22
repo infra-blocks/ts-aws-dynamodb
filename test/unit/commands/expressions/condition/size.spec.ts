@@ -1,5 +1,5 @@
 import { expect } from "@infra-blocks/test";
-import { size } from "../../../../../src/commands/expressions/condition/size.js";
+import { size } from "../../../../../src/commands/expressions/operands/size.js";
 import { path, value } from "../../../../../src/index.js";
 import { operandMatch } from "../lib.js";
 

@@ -1,14 +1,14 @@
 import type { UpdateCommandInput as NativeUpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { WithRequired } from "@infra-blocks/types";
 import type { KeyAttributes } from "../../types.js";
-import { AttributeNames, AttributeValues } from "../attributes/index.js";
-import { conditionExpression } from "../expressions/condition/expression.js";
 import {
+  Condition,
   type ConditionParams,
-  UpdateExpression,
-  type UpdateExpressionParams,
+  Update,
+  type UpdateParams,
 } from "../expressions/index.js";
 import type { ConditionCheckFailureReturnValue } from "./lib.js";
+import { ExpressionsFormatter } from "./lib.js";
 
 export type UpdateItemReturnValue =
   | "NONE"
@@ -20,7 +20,7 @@ export type UpdateItemReturnValue =
 export interface UpdateItemInput<K extends KeyAttributes = KeyAttributes> {
   table: string;
   key: K;
-  update: UpdateExpressionParams;
+  update: UpdateParams;
   condition?: ConditionParams;
   returnValues?: UpdateItemReturnValue;
   // Item stored unmarshalled in the thrown exception.
@@ -34,15 +34,11 @@ export const UpdateItemInput = {
 function encode<K extends KeyAttributes = KeyAttributes>(
   input: UpdateItemInput<K>,
 ): UpdateCommandInput {
-  const names = AttributeNames.create();
-  const values = AttributeValues.create();
+  const formatter = ExpressionsFormatter.create();
   const result: UpdateCommandInput = {
     TableName: input.table,
     Key: input.key,
-    UpdateExpression: UpdateExpression.from(input.update).stringify({
-      names,
-      values,
-    }),
+    UpdateExpression: formatter.format(Update.from(input.update)),
   };
 
   if (input.returnValues != null) {
@@ -57,19 +53,18 @@ function encode<K extends KeyAttributes = KeyAttributes>(
   // If there is no condition, we know that the names and values are finalized and
   // we are ready to return the payload.
   if (input.condition == null) {
-    result.ExpressionAttributeNames = names.getSubstitutions();
-    result.ExpressionAttributeValues = values.getSubstitutions();
+    result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
+    result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
     return result;
   }
 
   // Otherwise, we need to stringify the condition, reusing the same names and values
   // as before.
-  result.ConditionExpression = conditionExpression(input.condition).stringify({
-    names,
-    values,
-  });
-  result.ExpressionAttributeNames = names.getSubstitutions();
-  result.ExpressionAttributeValues = values.getSubstitutions();
+  result.ConditionExpression = formatter.format(
+    Condition.from(input.condition),
+  );
+  result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
+  result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
   return result;
 }
 

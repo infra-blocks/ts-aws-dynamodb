@@ -1,13 +1,11 @@
 import { expect } from "@infra-blocks/test";
 import {
-  attributeExists,
-  attributeNotExists,
-} from "../../../../../src/commands/expressions/condition/functions.js";
-import {
   and,
   not,
   or,
 } from "../../../../../src/commands/expressions/condition/logic.js";
+import { attributeExists } from "../../../../../src/commands/expressions/functions/attribute-exists.js";
+import { attributeNotExists } from "../../../../../src/commands/expressions/functions/attribute-not-exists.js";
 import { path, value } from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 

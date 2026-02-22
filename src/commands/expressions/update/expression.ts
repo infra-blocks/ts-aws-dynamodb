@@ -1,6 +1,6 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { IExpression } from "../expression.js";
+import type { ExpressionFormatter } from "../expression.js";
 import type { UpdateAction } from "./action.js";
 import { UpdateExpressionClauses } from "./clauses.js";
 
@@ -27,24 +27,21 @@ Values here can be attributes, values or the if_not_exists function. It should t
 sense.
 */
 
-export type UpdateExpressionParams = ReadonlyArray<UpdateAction>;
+export type UpdateParams = ReadonlyArray<UpdateAction>;
 
 /**
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html
  */
 
-export class UpdateExpression implements IExpression {
+export class Update implements ExpressionFormatter {
   private readonly clauses: UpdateExpressionClauses;
 
   private constructor(clauses: UpdateExpressionClauses) {
     this.clauses = clauses;
   }
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
+  format(params: { names: AttributeNames; values: AttributeValues }): string {
     const { names, values } = params;
     const parts: string[] = [];
     this.pushAddActions({ parts, names, values });
@@ -121,9 +118,9 @@ export class UpdateExpression implements IExpression {
     );
   }
 
-  static from(params: UpdateExpressionParams): UpdateExpression {
+  static from(params: UpdateParams): Update {
     const clauses: UpdateExpressionClauses =
       UpdateExpressionClauses.from(params);
-    return new UpdateExpression(clauses);
+    return new Update(clauses);
   }
 }

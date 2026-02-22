@@ -1,10 +1,10 @@
 import { expect } from "@infra-blocks/test";
-import { comparison } from "../../../../../src/commands/expressions/condition/comparisons.js";
+import { ConditionComparison } from "../../../../../src/commands/expressions/condition/condition-comparison.js";
 import { path, value } from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.condition.comparisons", () => {
-  describe(comparison.name, () => {
+  describe("ConditionComparison", () => {
     describe("equality operators", () => {
       // Those support all data types.
       const operators = ["=", "<>"] as const;
@@ -15,7 +15,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = "toto.tata";
             const rhs = "toto.titi";
             const { match, names } = expressionMatch({
-              expression: comparison([path(lhs), operator, path(rhs)]),
+              expression: ConditionComparison.from([
+                path(lhs),
+                operator,
+                path(rhs),
+              ]),
               matcher: new RegExp(`(#\\S+)\\s+${operator}\\s+(#\\S+)`),
             });
             expect(match[1]).to.equal(names.substitute(lhs));
@@ -25,7 +29,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = "toto.tata";
             const rhs = "toto.titi";
             const { match, names } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(#\\S+)\\s+${operator}\\s+(#\\S+)`),
             });
             expect(match[1]).to.equal(names.substitute(lhs));
@@ -35,7 +39,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = Buffer.from("hello");
             const rhs = Buffer.from("bye");
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -45,7 +53,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = Buffer.from("hello");
             const rhs = Buffer.from("bye");
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -55,7 +63,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = 42;
             const rhs = 43;
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -65,7 +77,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = 42;
             const rhs = 43;
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -75,7 +87,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = "hello";
             const rhs = "bye";
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -85,7 +101,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = ["hello", "bye"];
             const rhs = ["fuck", "off"];
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -95,7 +115,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = ["hello", "bye"];
             const rhs = ["fuck", "off"];
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -105,7 +125,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = { hello: "world" };
             const rhs = { fuck: "off" };
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -115,7 +139,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = { hello: "world" };
             const rhs = { fuck: "off" };
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -125,7 +149,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = new Set(["hello", "bye"]);
             const rhs = new Set(["fuck", "off"]);
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -135,7 +163,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = new Set(["hello", "bye"]);
             const rhs = new Set(["fuck", "off"]);
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -154,43 +182,47 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = ["hello", "bye"];
             const rhs = ["fuck", "off"];
             // @ts-expect-error Arrays are not comparable.
-            comparison([value(lhs), operator, value(rhs)]);
+            ConditionComparison.from([value(lhs), operator, value(rhs)]);
           });
           it("should not compile with array implicit values", () => {
             const lhs = ["hello", "bye"];
             const rhs = ["fuck", "off"];
             // @ts-expect-error Arrays are not comparable.
-            comparison([lhs, operator, rhs]);
+            ConditionComparison.from([lhs, operator, rhs]);
           });
           it("should not compile with object values", () => {
             const lhs = { hello: "world" };
             const rhs = { fuck: "off" };
             // @ts-expect-error Objects are not comparable.
-            comparison([value(lhs), operator, value(rhs)]);
+            ConditionComparison.from([value(lhs), operator, value(rhs)]);
           });
           it("should not compile with implicit object values", () => {
             const lhs = { hello: "world" };
             const rhs = { fuck: "off" };
             // @ts-expect-error Objects are not comparable.
-            comparison([lhs, operator, rhs]);
+            ConditionComparison.from([lhs, operator, rhs]);
           });
           it("should not compile with set values", () => {
             const lhs = new Set(["hello", "bye"]);
             const rhs = new Set(["fuck", "off"]);
             // @ts-expect-error Sets are not comparable.
-            comparison([value(lhs), operator, value(rhs)]);
+            ConditionComparison.from([value(lhs), operator, value(rhs)]);
           });
           it("should not compile with implicit set values", () => {
             const lhs = new Set(["hello", "bye"]);
             const rhs = new Set(["fuck", "off"]);
             // @ts-expect-error Sets are not comparable.
-            comparison([lhs, operator, rhs]);
+            ConditionComparison.from([lhs, operator, rhs]);
           });
           it("should work with paths", () => {
             const lhs = "toto.tata";
             const rhs = "toto.titi";
             const { match, names } = expressionMatch({
-              expression: comparison([path(lhs), operator, path(rhs)]),
+              expression: ConditionComparison.from([
+                path(lhs),
+                operator,
+                path(rhs),
+              ]),
               matcher: new RegExp(`(#\\S+)\\s+${operator}\\s+(#\\S+)`),
             });
             expect(match[1]).to.equal(names.substitute(lhs));
@@ -200,7 +232,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = "toto.tata";
             const rhs = "toto.titi";
             const { match, names } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(#\\S+)\\s+${operator}\\s+(#\\S+)`),
             });
             expect(match[1]).to.equal(names.substitute(lhs));
@@ -210,7 +242,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = Buffer.from("hello");
             const rhs = Buffer.from("bye");
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -220,7 +256,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = Buffer.from("hello");
             const rhs = Buffer.from("bye");
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -230,7 +266,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = 42;
             const rhs = 43;
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -240,7 +280,7 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = 42;
             const rhs = 43;
             const { match, values } = expressionMatch({
-              expression: comparison([lhs, operator, rhs]),
+              expression: ConditionComparison.from([lhs, operator, rhs]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -250,7 +290,11 @@ describe("commands.expressions.condition.comparisons", () => {
             const lhs = "hello";
             const rhs = "bye";
             const { match, values } = expressionMatch({
-              expression: comparison([value(lhs), operator, value(rhs)]),
+              expression: ConditionComparison.from([
+                value(lhs),
+                operator,
+                value(rhs),
+              ]),
               matcher: new RegExp(`(:\\S+)\\s+${operator}\\s+(:\\S+)`),
             });
             expect(match[1]).to.equal(values.substitute(lhs));
@@ -265,7 +309,7 @@ describe("commands.expressions.condition.comparisons", () => {
         const lower = "toto.titi";
         const upper = "toto.tutu";
         const { match, names } = expressionMatch({
-          expression: comparison([
+          expression: ConditionComparison.from([
             path(lhs),
             "BETWEEN",
             path(lower),
@@ -283,7 +327,13 @@ describe("commands.expressions.condition.comparisons", () => {
         const lower = "toto.titi";
         const upper = "toto.tutu";
         const { match, names } = expressionMatch({
-          expression: comparison([lhs, "BETWEEN", lower, "AND", upper]),
+          expression: ConditionComparison.from([
+            lhs,
+            "BETWEEN",
+            lower,
+            "AND",
+            upper,
+          ]),
           matcher: /(#\S+)\s+BETWEEN\s+(#\S+)\s+AND\s+(#\S+)/,
         });
         expect(match[1]).to.equal(names.substitute(lhs));
@@ -295,7 +345,7 @@ describe("commands.expressions.condition.comparisons", () => {
         const lower = 0;
         const upper = 100;
         const { match, values } = expressionMatch({
-          expression: comparison([
+          expression: ConditionComparison.from([
             value(lhs),
             "BETWEEN",
             value(lower),
@@ -313,7 +363,13 @@ describe("commands.expressions.condition.comparisons", () => {
         const lower = 0;
         const upper = 100;
         const { match, values } = expressionMatch({
-          expression: comparison([lhs, "BETWEEN", lower, "AND", upper]),
+          expression: ConditionComparison.from([
+            lhs,
+            "BETWEEN",
+            lower,
+            "AND",
+            upper,
+          ]),
           matcher: /(:\S+)\s+BETWEEN\s+(:\S+)\s+AND\s+(:\S+)/,
         });
         expect(match[1]).to.equal(values.substitute(lhs));
@@ -324,12 +380,12 @@ describe("commands.expressions.condition.comparisons", () => {
     describe("in", () => {
       it("should throw if containement values are empty", () => {
         expect(() => {
-          comparison([path("does.not.matter"), "IN", []]);
+          ConditionComparison.from([path("does.not.matter"), "IN", []]);
         }).to.throw();
       });
       it("should throw if containement values exceed 100", () => {
         expect(() => {
-          comparison([
+          ConditionComparison.from([
             path("does.not.matter"),
             "IN",
             Array.from({ length: 101 }, (_, i) => path(`value${i}`)),
@@ -340,7 +396,11 @@ describe("commands.expressions.condition.comparisons", () => {
         const lhs = "toto.tata";
         const values = ["toto.titi", "toto.tutu"];
         const { match, names } = expressionMatch({
-          expression: comparison([path(lhs), "IN", values.map((v) => path(v))]),
+          expression: ConditionComparison.from([
+            path(lhs),
+            "IN",
+            values.map((v) => path(v)),
+          ]),
           matcher: /(#\S+)\s+IN\s+\((#\S+),(#\S+)\)/,
         });
         expect(match[1]).to.equal(names.substitute(lhs));
@@ -351,7 +411,7 @@ describe("commands.expressions.condition.comparisons", () => {
         const lhs = "toto.tata";
         const values = ["toto.titi", "toto.tutu"];
         const { match, names } = expressionMatch({
-          expression: comparison([lhs, "IN", values]),
+          expression: ConditionComparison.from([lhs, "IN", values]),
           matcher: /(#\S+)\s+IN\s+\((#\S+),(#\S+)\)/,
         });
         expect(match[1]).to.equal(names.substitute(lhs));
@@ -362,7 +422,7 @@ describe("commands.expressions.condition.comparisons", () => {
         const lhs = 42;
         const values = [0, 100];
         const { match, values: vals } = expressionMatch({
-          expression: comparison([
+          expression: ConditionComparison.from([
             value(lhs),
             "IN",
             values.map((v) => value(v)),
@@ -377,7 +437,7 @@ describe("commands.expressions.condition.comparisons", () => {
         const lhs = 42;
         const values = [0, 100];
         const { match, values: vals } = expressionMatch({
-          expression: comparison([lhs, "IN", values]),
+          expression: ConditionComparison.from([lhs, "IN", values]),
           matcher: /(:\S+)\s+IN\s+\((:\S+),(:\S+)\)/,
         });
         expect(match[1]).to.equal(vals.substitute(lhs));
