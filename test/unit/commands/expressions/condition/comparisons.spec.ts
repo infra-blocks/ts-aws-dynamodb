@@ -1,7 +1,7 @@
 import { expect } from "@infra-blocks/test";
 import { comparison } from "../../../../../src/commands/expressions/condition/comparisons.js";
 import { path, value } from "../../../../../src/index.js";
-import { expressionMatch } from "../update/action-match.js";
+import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.condition.comparisons", () => {
   describe(comparison.name, () => {

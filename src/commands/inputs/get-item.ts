@@ -1,5 +1,10 @@
 import type { GetCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
+import { AttributeNames } from "../attributes/names.js";
+import {
+  ProjectionExpression,
+  type ProjectionExpressionParams,
+} from "../expressions/projection.js";
 
 /**
  * The input required to call the GetItem API.
@@ -16,6 +21,10 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
    * is part of the table's primary key. No more than 2 fields are expected here.
    */
   key: K;
+  /**
+   * The projection applied to the return item, if any.
+   */
+  projection?: ProjectionExpressionParams;
 }
 
 export const GetItemInput = {
@@ -25,9 +34,20 @@ export const GetItemInput = {
 function encode<K extends KeyAttributes = KeyAttributes>(
   input: GetItemInput<K>,
 ): GetCommandInput {
-  const key = input.key;
-  return {
+  const result: GetCommandInput = {
     TableName: input.table,
-    Key: key,
+    Key: input.key,
   };
+
+  if (input.projection != null) {
+    // There should be no values.
+    const names = AttributeNames.create();
+    const expression = ProjectionExpression.from(input.projection).stringify({
+      names,
+    });
+    result.ProjectionExpression = expression;
+    result.ExpressionAttributeNames = names.getSubstitutions();
+  }
+
+  return result;
 }
