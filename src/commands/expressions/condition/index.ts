@@ -1,15 +1,15 @@
 export type {
-  BetweenParams,
+  BetweenInput,
   ComparableOperand,
   ComparableValue,
-  EqualsParams,
-  GreaterThanOrEqualsParams,
-  GreaterThanParams,
-  InParams,
-  LowerThanOrEqualsParams,
-  LowerThanParams,
-  NotEqualsParams,
+  EqualsInput,
+  GreaterThanInput,
+  GreaterThanOrEqualsInput,
+  InInput,
+  LowerThanInput,
+  LowerThanOrEqualsInput,
+  NotEqualsInput,
 } from "./comparisons/index.js";
 export * from "./condition.js";
-export type { ConditionComparisonParams } from "./condition-comparison.js";
+export type { ConditionComparisonInput } from "./condition-comparison.js";
 export * from "./logic.js";

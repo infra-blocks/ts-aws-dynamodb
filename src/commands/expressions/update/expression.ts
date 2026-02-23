@@ -27,7 +27,7 @@ Values here can be attributes, values or the if_not_exists function. It should t
 sense.
 */
 
-export type UpdateParams = ReadonlyArray<UpdateAction>;
+export type UpdateInput = ReadonlyArray<UpdateAction>;
 
 /**
  *
@@ -118,7 +118,7 @@ export class Update implements ExpressionFormatter {
     );
   }
 
-  static from(params: UpdateParams): Update {
+  static from(params: UpdateInput): Update {
     const clauses: UpdateExpressionClauses =
       UpdateExpressionClauses.from(params);
     return new Update(clauses);

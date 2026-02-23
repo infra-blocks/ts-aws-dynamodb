@@ -1,10 +1,10 @@
 import { type Brand, trusted } from "@infra-blocks/types";
 import { ExpressionFormatter } from "../../expression.js";
-import type { ConditionComparisonParams } from "../condition-comparison.js";
+import type { ConditionComparisonInput } from "../condition-comparison.js";
 import { ConditionOperand } from "../operand.js";
 import type { ComparableOperand, ComparableValue } from "./operand.js";
 
-export type BetweenParams = [
+export type BetweenInput = [
   ComparableOperand,
   "BETWEEN",
   ComparableOperand,
@@ -12,9 +12,9 @@ export type BetweenParams = [
   ComparableOperand,
 ];
 
-export function isBetweenParams(
-  value: ConditionComparisonParams,
-): value is BetweenParams {
+export function isBetweenInput(
+  value: ConditionComparisonInput,
+): value is BetweenInput {
   return value[1] === "BETWEEN" && value[3] === "AND";
 }
 
@@ -26,17 +26,17 @@ export const Between = {
    *
    * Both bounds are inclusive, meaning that the returned condition corresponds to `lower <= lhs <= upper`.
    *
-   * @param params - The parameters of the `BETWEEN` comparison. The first element contains the left-hand side operand,
+   * @param input - The parameters of the `BETWEEN` comparison. The first element contains the left-hand side operand,
    * the third element contains the lower inclusive bound, and the fifth element contains the upper inclusive bound.
    *
    * @returns A {@link Between} that evaluates to true if this operand is within the provided bounds.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Comparators
    */
-  from(params: BetweenParams): Between {
-    const lhs = ConditionOperand.normalize<ComparableValue>(params[0]);
-    const lower = ConditionOperand.normalize<ComparableValue>(params[2]);
-    const upper = ConditionOperand.normalize<ComparableValue>(params[4]);
+  from(input: BetweenInput): Between {
+    const lhs = ConditionOperand.normalize<ComparableValue>(input[0]);
+    const lower = ConditionOperand.normalize<ComparableValue>(input[2]);
+    const upper = ConditionOperand.normalize<ComparableValue>(input[4]);
 
     return trusted(
       ExpressionFormatter.from(

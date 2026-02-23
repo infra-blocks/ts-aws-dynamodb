@@ -1,6 +1,6 @@
 import { type Brand, trusted } from "@infra-blocks/types";
 import { ExpressionFormatter } from "../expression.js";
-import { Condition, type ConditionParams } from "./condition.js";
+import { Condition, type ConditionInput } from "./condition.js";
 
 export type Not = ExpressionFormatter & Brand<"Not">;
 
@@ -13,7 +13,7 @@ export type Not = ExpressionFormatter & Brand<"Not">;
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
  */
-export function not(condition: ConditionParams): Not {
+export function not(condition: ConditionInput): Not {
   const expression = Condition.from(condition);
   return trusted(
     ExpressionFormatter.from(
@@ -34,7 +34,7 @@ export type And = ExpressionFormatter & Brand<"And">;
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
  */
-export function and(lhs: ConditionParams, rhs: ConditionParams): And {
+export function and(lhs: ConditionInput, rhs: ConditionInput): And {
   const left = Condition.from(lhs);
   const right = Condition.from(rhs);
   return trusted(
@@ -60,7 +60,7 @@ export type Or = ExpressionFormatter & Brand<"Or">;
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.LogicalEvaluations
  */
-export function or(lhs: ConditionParams, rhs: ConditionParams): Or {
+export function or(lhs: ConditionInput, rhs: ConditionInput): Or {
   const left = Condition.from(lhs);
   const right = Condition.from(rhs);
   return trusted(

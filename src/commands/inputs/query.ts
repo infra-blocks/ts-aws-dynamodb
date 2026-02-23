@@ -2,20 +2,20 @@ import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
 import {
   Condition,
-  type KeyConditionParams,
+  type KeyConditionInput,
   Projection,
-  type ProjectionParams,
+  type ProjectionInput,
 } from "../expressions/index.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
-  condition: KeyConditionParams;
+  condition: KeyConditionInput;
   consistentRead?: boolean;
   exclusiveStartKey?: K;
   index?: string;
   limit?: number;
-  projection?: ProjectionParams;
+  projection?: ProjectionInput;
   scanIndexForward?: boolean;
 };
 

@@ -22,7 +22,7 @@ describe(DynamoDbClient.name, () => {
       });
       await client.putItem({ table, item: { pk: "UpdatedItem" } });
       await client.putItem({ table, item: { pk: "DeletedItem" } });
-      const writeTransactionParams = {
+      await client.writeTransaction({
         writes: [
           {
             put: {
@@ -59,8 +59,7 @@ describe(DynamoDbClient.name, () => {
             },
           },
         ],
-      };
-      await client.writeTransaction(writeTransactionParams);
+      });
 
       expect(
         await client.getItem({ table, key: { pk: "NewItem" } }),
