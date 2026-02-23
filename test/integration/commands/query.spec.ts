@@ -1,63 +1,46 @@
 import { asyncArrayCollect } from "@infra-blocks/iter";
 import { expect } from "@infra-blocks/test";
-import {
-  type CreateTableInput,
-  DynamoDbClient,
-  path,
-  value,
-} from "../../../src/index.js";
+import { DynamoDbClient, path, value } from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe("Query", () => {
   afterEach("clean up", dropAllTables());
 
   describe(DynamoDbClient.prototype.query.name, () => {
-    it("should work on table without sort key", async function () {
+    it("should work on empty table", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
-        name: "test-table",
-        keySchema: {
-          partitionKey: { name: "pk", type: "S" },
-        },
-      };
-      await client.createTable(CreateTableInput);
-      await client.putItem({
-        table: CreateTableInput.name,
-        item: { pk: "User#BigToto" },
-      });
-
-      const result = await client.query({
-        table: CreateTableInput.name,
-        condition: [path("pk"), "=", value("User#BigToto")],
-      });
-      expect(result).to.deep.equal({
-        count: 1,
-        scannedCount: 1,
-        items: [
-          {
-            pk: "User#BigToto",
-          },
-        ],
-        lastEvaluatedKey: undefined,
-      });
-    });
-    // This is a regression test to enforce that "." in values are handled as expected.
-    it("should work on table with email partition key", async function () {
-      const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
-        name: "test-table",
+      const table = "test-table";
+      await client.createTable({
+        name: table,
         keySchema: {
           partitionKey: { name: "email", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
-      await client.putItem({
-        table: CreateTableInput.name,
-        item: { email: "joe.cunt@gmail.com" },
       });
 
       const result = await client.query({
-        table: CreateTableInput.name,
+        table,
+        condition: [path("email"), "=", value("joe.cunt@gmail.com")],
+      });
+      expect(result).to.deep.equal({
+        count: 0,
+        scannedCount: 0,
+        items: [],
+        lastEvaluatedKey: undefined,
+      });
+    });
+    it("should work on table with one item", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "email", type: "S" },
+        },
+      });
+      await client.putItem({ table, item: { email: "joe.cunt@gmail.com" } });
+
+      const result = await client.query({
+        table,
         condition: [path("email"), "=", value("joe.cunt@gmail.com")],
       });
       expect(result).to.deep.equal({
@@ -73,25 +56,25 @@ describe("Query", () => {
     });
     it("should correctly forward limit parameter", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
-        name: "test-table",
+      const table = "test-table";
+      await client.createTable({
+        name: table,
         keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
+      });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
       });
 
       const result = await client.query({
-        table: CreateTableInput.name,
+        table,
         condition: ["pk", "=", value("Global")],
         limit: 1,
       });
@@ -106,27 +89,60 @@ describe("Query", () => {
         },
       });
     });
+    it("should correctly forward projection parameter", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+      await client.putItem({
+        table,
+        item: {
+          pk: "Global",
+          list: [1, 2, 3, 4],
+          map: { inner: { included: true, excluded: true } },
+          ignoreMe: "please",
+        },
+      });
+
+      const result = await client.query({
+        table,
+        condition: ["pk", "=", value("Global")],
+        projection: ["pk", "list[0]", "map.inner.included"],
+      });
+      expect(result).to.deep.equal({
+        items: [
+          { pk: "Global", list: [1], map: { inner: { included: true } } },
+        ],
+        count: 1,
+        scannedCount: 1,
+        lastEvaluatedKey: undefined,
+      });
+    });
     it("should correctly forward scanIndexForward parameter", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
-        name: "test-table",
+      const table = "test-table";
+      await client.createTable({
+        name: table,
         keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
+      });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
       });
 
       const result = await client.query({
-        table: CreateTableInput.name,
+        table,
         condition: ["pk", "=", value("Global")],
         scanIndexForward: false,
       });
@@ -145,26 +161,26 @@ describe("Query", () => {
   describe(DynamoDbClient.prototype.paginateQuery.name, () => {
     it("should work when results fit within one page", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
+      const table = "test-table";
+      await client.createTable({
         name: "test-table",
         keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
+      });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
       });
 
       const pages = await asyncArrayCollect(
         client.paginateQuery({
-          table: CreateTableInput.name,
+          table,
           condition: ["pk", "=", value("Global")],
           limit: 20,
         }),
@@ -183,30 +199,30 @@ describe("Query", () => {
     });
     it("should work when results span multiple pages", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
+      const table = "test-table";
+      await client.createTable({
         name: "test-table",
         keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
+      });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.chocolate@gmail.com" },
       });
 
       const pages = await asyncArrayCollect(
         client.paginateQuery({
-          table: CreateTableInput.name,
+          table,
           condition: ["pk", "=", value("Global")],
           limit: 1,
         }),
@@ -248,30 +264,30 @@ describe("Query", () => {
   describe(DynamoDbClient.prototype.iterateQuery.name, () => {
     it("should work with results spanning multiple pages", async function () {
       const client = this.createClient();
-      const CreateTableInput: CreateTableInput = {
-        name: "test-table",
+      const table = "test-table";
+      await client.createTable({
+        name: table,
         keySchema: {
           partitionKey: { name: "pk", type: "S" },
           sortKey: { name: "sk", type: "S" },
         },
-      };
-      await client.createTable(CreateTableInput);
+      });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
       });
       await client.putItem({
-        table: CreateTableInput.name,
+        table,
         item: { pk: "Global", sk: "joe.cunt+sexy.chocolate@gmail.com" },
       });
 
       const pages = await asyncArrayCollect(
         client.iterateQuery({
-          table: CreateTableInput.name,
+          table,
           condition: ["pk", "=", value("Global")],
           limit: 1,
         }),
