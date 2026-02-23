@@ -1,9 +1,6 @@
 import type { GetCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
-import {
-  Projection,
-  type ProjectionParams,
-} from "../expressions/projection.js";
+import { Projection, type ProjectionInput } from "../expressions/projection.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 /**
@@ -24,7 +21,7 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
   /**
    * The projection applied to the return item, if any.
    */
-  projection?: ProjectionParams;
+  projection?: ProjectionInput;
 }
 
 export const GetItemInput = {

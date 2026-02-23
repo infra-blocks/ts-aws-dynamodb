@@ -3,9 +3,9 @@ import type { WithRequired } from "@infra-blocks/types";
 import type { KeyAttributes } from "../../types.js";
 import {
   Condition,
-  type ConditionParams,
+  type ConditionInput,
   Update,
-  type UpdateParams,
+  type UpdateInput,
 } from "../expressions/index.js";
 import type { ConditionCheckFailureReturnValue } from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
@@ -20,8 +20,8 @@ export type UpdateItemReturnValue =
 export interface UpdateItemInput<K extends KeyAttributes = KeyAttributes> {
   table: string;
   key: K;
-  update: UpdateParams;
-  condition?: ConditionParams;
+  update: UpdateInput;
+  condition?: ConditionInput;
   returnValues?: UpdateItemReturnValue;
   // Item stored unmarshalled in the thrown exception.
   returnValuesOnConditionCheckFailure?: ConditionCheckFailureReturnValue;

@@ -188,15 +188,16 @@ describe(DynamoDbClient.name, () => {
           partitionKey: { name: "pk", type: "S" },
         },
       });
-      const putItemParams = {
-        table,
-        item: {
-          pk: "BigIron#1",
-          invalid: [undefined],
-        },
-      } as const;
-      // @ts-expect-error undefined is not a valid list element.
-      await expect(client.putItem(putItemParams)).to.eventually.be.rejected;
+      await expect(
+        client.putItem({
+          table,
+          item: {
+            pk: "BigIron#1",
+            // @ts-expect-error undefined is not a valid list element.
+            invalid: [undefined],
+          },
+        }),
+      ).to.eventually.be.rejected;
     });
   });
 });

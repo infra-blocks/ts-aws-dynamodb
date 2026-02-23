@@ -1,4 +1,4 @@
-import type { ConditionParams } from "./condition/index.js";
+import type { ConditionInput } from "./condition/index.js";
 
 /*
 A key attribute *must be* a top level attribute of type String, Number, or Binary.
@@ -6,4 +6,4 @@ A key attribute *must be* a top level attribute of type String, Number, or Binar
 
 // TODO: narrow this type.
 // This is a straight up subset of {@link Condition}
-export type KeyConditionParams = ConditionParams;
+export type KeyConditionInput = ConditionInput;

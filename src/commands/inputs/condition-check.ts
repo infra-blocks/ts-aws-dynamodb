@@ -1,13 +1,13 @@
 import type { TransactWriteCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { UnpackedArray } from "@infra-blocks/types";
 import type { KeyAttributes } from "../../types.js";
-import { Condition, type ConditionParams } from "../expressions/index.js";
+import { Condition, type ConditionInput } from "../expressions/index.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 export type ConditionCheckInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
   key: K;
-  condition: ConditionParams;
+  condition: ConditionInput;
 };
 
 export const ConditionCheckInput = {

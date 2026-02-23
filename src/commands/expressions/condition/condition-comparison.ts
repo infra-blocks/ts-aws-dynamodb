@@ -1,53 +1,53 @@
 import { unreachable } from "@infra-blocks/types";
 import {
   Between,
-  type BetweenParams,
-  isBetweenParams,
+  type BetweenInput,
+  isBetweenInput,
 } from "./comparisons/between.js";
 import {
   Equals,
-  type EqualsParams,
-  isEqualsParams,
+  type EqualsInput,
+  isEqualsInput,
 } from "./comparisons/equals.js";
 import {
   type GreaterThan,
-  type GreaterThanParams,
+  type GreaterThanInput,
   GreatThan,
-  isGreaterThanParams,
+  isGreaterThanInput,
 } from "./comparisons/greater-than.js";
 import {
   GreaterThanOrEquals,
-  type GreaterThanOrEqualsParams,
-  isGreaterThanOrEqualsParams,
+  type GreaterThanOrEqualsInput,
+  isGreaterThanOrEqualsInput,
 } from "./comparisons/greater-than-or-equals.js";
-import { In, type InParams, isInParams } from "./comparisons/in.js";
+import { In, type InInput, isInInput } from "./comparisons/in.js";
 import {
-  isLowerThanParams,
+  isLowerThanInput,
   LowerThan,
-  type LowerThanParams,
+  type LowerThanInput,
 } from "./comparisons/lower-than.js";
 import {
-  isLowerThanOrEqualsParams,
+  isLowerThanOrEqualsInput,
   LowerThanOrEquals,
-  type LowerThanOrEqualsParams,
+  type LowerThanOrEqualsInput,
 } from "./comparisons/lower-than-or-equals.js";
 import {
-  isNotEqualsParams,
+  isNotEqualsInput,
   NotEquals,
-  type NotEqualsParams,
+  type NotEqualsInput,
 } from "./comparisons/not-equals.js";
-import type { ConditionParams } from "./condition.js";
+import type { ConditionInput } from "./condition.js";
 
-export type ConditionComparisonParams =
-  | BetweenParams
+export type ConditionComparisonInput =
+  | BetweenInput
   // TODO: test that lhs can also be a size function IRL on all these comparisons.
-  | EqualsParams
-  | GreaterThanParams
-  | GreaterThanOrEqualsParams
-  | InParams
-  | LowerThanParams
-  | LowerThanOrEqualsParams
-  | NotEqualsParams;
+  | EqualsInput
+  | GreaterThanInput
+  | GreaterThanOrEqualsInput
+  | InInput
+  | LowerThanInput
+  | LowerThanOrEqualsInput
+  | NotEqualsInput;
 
 export type ConditionComparison =
   | Between
@@ -60,47 +60,47 @@ export type ConditionComparison =
   | NotEquals;
 
 export const ConditionComparison = {
-  from(params: ConditionComparisonParams): ConditionComparison {
-    if (isBetweenParams(params)) {
-      return Between.from(params);
+  from(input: ConditionComparisonInput): ConditionComparison {
+    if (isBetweenInput(input)) {
+      return Between.from(input);
     }
-    if (isEqualsParams(params)) {
-      return Equals.from(params);
+    if (isEqualsInput(input)) {
+      return Equals.from(input);
     }
-    if (isGreaterThanParams(params)) {
-      return GreatThan.from(params);
+    if (isGreaterThanInput(input)) {
+      return GreatThan.from(input);
     }
-    if (isGreaterThanOrEqualsParams(params)) {
-      return GreaterThanOrEquals.from(params);
+    if (isGreaterThanOrEqualsInput(input)) {
+      return GreaterThanOrEquals.from(input);
     }
-    if (isInParams(params)) {
-      return In.from(params);
+    if (isInInput(input)) {
+      return In.from(input);
     }
-    if (isLowerThanParams(params)) {
-      return LowerThan.from(params);
+    if (isLowerThanInput(input)) {
+      return LowerThan.from(input);
     }
-    if (isLowerThanOrEqualsParams(params)) {
-      return LowerThanOrEquals.from(params);
+    if (isLowerThanOrEqualsInput(input)) {
+      return LowerThanOrEquals.from(input);
     }
-    if (isNotEqualsParams(params)) {
-      return NotEquals.from(params);
+    if (isNotEqualsInput(input)) {
+      return NotEquals.from(input);
     }
-    unreachable(params);
+    unreachable(input);
   },
 };
 
-export function isConditionComparisonParams(
-  params: ConditionParams,
-): params is ConditionComparisonParams {
-  const casted = params as ConditionComparisonParams;
+export function isConditionComparisonInput(
+  input: ConditionInput,
+): input is ConditionComparisonInput {
+  const casted = input as ConditionComparisonInput;
   return (
-    isBetweenParams(casted) ||
-    isEqualsParams(casted) ||
-    isGreaterThanParams(casted) ||
-    isGreaterThanOrEqualsParams(casted) ||
-    isInParams(casted) ||
-    isLowerThanParams(casted) ||
-    isLowerThanOrEqualsParams(casted) ||
-    isNotEqualsParams(casted)
+    isBetweenInput(casted) ||
+    isEqualsInput(casted) ||
+    isGreaterThanInput(casted) ||
+    isGreaterThanOrEqualsInput(casted) ||
+    isInInput(casted) ||
+    isLowerThanInput(casted) ||
+    isLowerThanOrEqualsInput(casted) ||
+    isNotEqualsInput(casted)
   );
 }

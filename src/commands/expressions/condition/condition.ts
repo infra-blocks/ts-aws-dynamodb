@@ -7,13 +7,13 @@ import type {
 } from "../functions/index.js";
 import {
   ConditionComparison,
-  type ConditionComparisonParams,
-  isConditionComparisonParams,
+  type ConditionComparisonInput,
+  isConditionComparisonInput,
 } from "./condition-comparison.js";
 import type { And, Not, Or } from "./logic.js";
 
-export type ConditionParams =
-  | ConditionComparisonParams
+export type ConditionInput =
+  | ConditionComparisonInput
   | ConditionFunction
   | ConditionLogic;
 
@@ -32,10 +32,10 @@ export type Condition =
   | ConditionLogic;
 
 export const Condition = {
-  from(params: ConditionParams): Condition {
-    if (isConditionComparisonParams(params)) {
-      return ConditionComparison.from(params);
+  from(input: ConditionInput): Condition {
+    if (isConditionComparisonInput(input)) {
+      return ConditionComparison.from(input);
     }
-    return params;
+    return input;
   },
 };
