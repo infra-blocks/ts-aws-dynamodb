@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.0] - 2026-02-23
+
+### Changed
+
+- Operand types changed from classes and objects to POJOs and composition. Their interface
+also changed from the previous `IOperand` interface (now removed) to the new `ExpressionFormatter`.
+Those types are meant to be opaque for the client code and only available through factory functions,
+such as `path`, but technically their interface is visible as it is required in many places
+as inputs for expressions. That interface has changed in a backwards imcompatible way that should
+not affect client code, however.
+- Renamed the `Operand` types to `PathOrValue` as it is more telling and accurate. Indeed, `size`
+can also be used as an operand.
+
 ## [0.66.0] - 2026-02-23
 
 ### Changed
@@ -835,6 +848,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.67.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.66.0...v0.67.0
 [0.66.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.65.0...v0.66.0
 [0.65.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.64.0...v0.65.0
 [0.64.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.63.0...v0.64.0

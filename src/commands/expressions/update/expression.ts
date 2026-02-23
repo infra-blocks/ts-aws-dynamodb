@@ -1,6 +1,6 @@
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import type { ExpressionFormatter } from "../expression.js";
+import type { ExpressionFormatter } from "../formatter.js";
 import type { UpdateAction } from "./action.js";
 import { UpdateExpressionClauses } from "./clauses.js";
 

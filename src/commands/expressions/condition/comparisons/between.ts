@@ -1,5 +1,5 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import { ExpressionFormatter } from "../../expression.js";
+import { ExpressionFormatter } from "../../formatter.js";
 import type { ConditionComparisonInput } from "../condition-comparison.js";
 import { ConditionOperand } from "../operand.js";
 import type { ComparableOperand, ComparableValue } from "./operand.js";
@@ -41,7 +41,7 @@ export const Between = {
     return trusted(
       ExpressionFormatter.from(
         ({ names, values }) =>
-          `${lhs.substitute({ names, values })} BETWEEN ${lower.substitute({ names, values })} AND ${upper.substitute({ names, values })}`,
+          `${lhs.format({ names, values })} BETWEEN ${lower.format({ names, values })} AND ${upper.format({ names, values })}`,
       ),
     );
   },

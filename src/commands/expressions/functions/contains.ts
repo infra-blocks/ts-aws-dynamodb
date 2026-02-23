@@ -1,6 +1,9 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import { ExpressionFormatter } from "../expression.js";
-import { operand, type RawOperand } from "../operands/operand.js";
+import { ExpressionFormatter } from "../formatter.js";
+import {
+  PathOrValue,
+  type PathOrValueInput,
+} from "../operands/path-or-value.js";
 import { isSize, type Size } from "../operands/size.js";
 
 export type Contains = ExpressionFormatter & Brand<"Contains">;
@@ -16,16 +19,16 @@ export type Contains = ExpressionFormatter & Brand<"Contains">;
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
 export function contains(
-  first: RawOperand,
-  second: RawOperand | Size,
+  first: PathOrValueInput,
+  second: PathOrValueInput | Size,
 ): Contains {
-  const firstOperand = operand(first);
-  const secondOperand = isSize(second) ? second : operand(second);
+  const firstOperand = PathOrValue.normalize(first);
+  const secondOperand = isSize(second) ? second : PathOrValue.normalize(second);
 
   return trusted(
     ExpressionFormatter.from(
       ({ names, values }) =>
-        `contains(${firstOperand.substitute({ names, values })}, ${secondOperand.substitute({ names, values })})`,
+        `contains(${firstOperand.format({ names, values })}, ${secondOperand.format({ names, values })})`,
     ),
   );
 }

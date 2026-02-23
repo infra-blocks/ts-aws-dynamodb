@@ -1,5 +1,5 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import type { ExpressionFormatter } from "../../expression.js";
+import type { ExpressionFormatter } from "../../formatter.js";
 import type { ConditionComparisonInput } from "../condition-comparison.js";
 import { binaryOperation } from "./binary.js";
 import type { ComparableOperand, ComparableValue } from "./operand.js";

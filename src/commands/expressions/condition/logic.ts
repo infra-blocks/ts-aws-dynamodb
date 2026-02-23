@@ -1,5 +1,5 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import { ExpressionFormatter } from "../expression.js";
+import { ExpressionFormatter } from "../formatter.js";
 import { Condition, type ConditionInput } from "./condition.js";
 
 export type Not = ExpressionFormatter & Brand<"Not">;

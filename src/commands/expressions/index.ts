@@ -1,3 +1,4 @@
+// TODO: don't export the typeguards beyond here.
 export * from "./condition/index.js";
 export * from "./functions/index.js";
 export * from "./key-condition.js";

@@ -1,15 +1,15 @@
 import { expect } from "@infra-blocks/test";
 import type { IfNotExists } from "../../../../../src/commands/expressions/update/if-not-exists.js";
 import { ifNotExists, path, value } from "../../../../../src/index.js";
-import { operandMatch } from "../lib.js";
+import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.update.if-not-exists", () => {
   describe(ifNotExists.name, () => {
     it("should work with a path as lhs and a path as default", () => {
       const attribute = "attr.path";
       const defaultAttribute = "attr.defaultPath";
-      const { match, names } = operandMatch({
-        operand: ifNotExists(path(attribute), path(defaultAttribute)),
+      const { match, names } = expressionMatch({
+        expression: ifNotExists(path(attribute), path(defaultAttribute)),
         matcher: /if_not_exists\((#\S+),\s+(#\S+)\)/,
       });
 
@@ -19,8 +19,8 @@ describe("commands.expressions.update.if-not-exists", () => {
     it("should work with an implicit path as lhs and a path as default", () => {
       const attribute = "attr.path";
       const defaultAttribute = "attr.defaultPath";
-      const { match, names } = operandMatch({
-        operand: ifNotExists(attribute, path(defaultAttribute)),
+      const { match, names } = expressionMatch({
+        expression: ifNotExists(attribute, path(defaultAttribute)),
         matcher: /if_not_exists\((#\S+),\s+(#\S+)\)/,
       });
 
@@ -30,8 +30,8 @@ describe("commands.expressions.update.if-not-exists", () => {
     it("should work with a path as lhs and value as default", () => {
       const attribute = "attr.path";
       const defaultValue = [1, 2, 3];
-      const { match, names, values } = operandMatch({
-        operand: ifNotExists(path(attribute), value(defaultValue)),
+      const { match, names, values } = expressionMatch({
+        expression: ifNotExists(path(attribute), value(defaultValue)),
         matcher: /if_not_exists\((#\S+),\s+(:\S+)\)/,
       });
 

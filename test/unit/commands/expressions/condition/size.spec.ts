@@ -1,7 +1,7 @@
 import { expect } from "@infra-blocks/test";
 import { size } from "../../../../../src/commands/expressions/operands/size.js";
 import { path, value } from "../../../../../src/index.js";
-import { operandMatch } from "../lib.js";
+import { expressionMatch } from "../lib.js";
 
 describe("commands.expressions.condition.size", () => {
   describe(size.name, () => {
@@ -31,8 +31,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with a path", () => {
       const attribute = "test.attribute";
-      const { match, names } = operandMatch({
-        operand: size(path(attribute)),
+      const { match, names } = expressionMatch({
+        expression: size(path(attribute)),
         matcher: /size\((#\S+)\)/,
       });
       const substitution = match[1];
@@ -40,8 +40,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with an implicit path", () => {
       const attribute = "test.attribute";
-      const { match, names } = operandMatch({
-        operand: size(attribute),
+      const { match, names } = expressionMatch({
+        expression: size(attribute),
         matcher: /size\((#\S+)\)/,
       });
       const substitution = match[1];
@@ -49,8 +49,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with a binary value", () => {
       const operand = Buffer.from("bitchass value");
-      const { match, values } = operandMatch({
-        operand: size(value(operand)),
+      const { match, values } = expressionMatch({
+        expression: size(value(operand)),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -58,8 +58,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with an implicit binary value", () => {
       const operand = Buffer.from("bitchass value");
-      const { match, values } = operandMatch({
-        operand: size(operand),
+      const { match, values } = expressionMatch({
+        expression: size(operand),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -67,8 +67,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with a list value", () => {
       const operand = ["a", "b", "c"];
-      const { match, values } = operandMatch({
-        operand: size(value(operand)),
+      const { match, values } = expressionMatch({
+        expression: size(value(operand)),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -76,8 +76,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with an implicit list value", () => {
       const operand = ["a", "b", "c"];
-      const { match, values } = operandMatch({
-        operand: size(operand),
+      const { match, values } = expressionMatch({
+        expression: size(operand),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -85,8 +85,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work a map value", () => {
       const operand = { a: 1, b: 2 };
-      const { match, values } = operandMatch({
-        operand: size(value(operand)),
+      const { match, values } = expressionMatch({
+        expression: size(value(operand)),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -94,8 +94,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with an implicit map value", () => {
       const operand = { a: 1, b: 2 };
-      const { match, values } = operandMatch({
-        operand: size(operand),
+      const { match, values } = expressionMatch({
+        expression: size(operand),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -103,8 +103,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with a set value", () => {
       const operand = new Set(["a", "b", "c"]);
-      const { match, values } = operandMatch({
-        operand: size(value(operand)),
+      const { match, values } = expressionMatch({
+        expression: size(value(operand)),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -112,8 +112,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with an implicit set value", () => {
       const operand = new Set(["a", "b", "c"]);
-      const { match, values } = operandMatch({
-        operand: size(operand),
+      const { match, values } = expressionMatch({
+        expression: size(operand),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];
@@ -121,8 +121,8 @@ describe("commands.expressions.condition.size", () => {
     });
     it("should work with a string value", () => {
       const operand = "AI is not I but just A";
-      const { match, values } = operandMatch({
-        operand: size(value(operand)),
+      const { match, values } = expressionMatch({
+        expression: size(value(operand)),
         matcher: /size\((:\S+)\)/,
       });
       const substitution = match[1];

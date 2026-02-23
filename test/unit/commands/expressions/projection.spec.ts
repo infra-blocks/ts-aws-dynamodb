@@ -5,7 +5,7 @@ import { expressionMatch } from "./lib.js";
 
 describe("commands.expressions.projection", () => {
   describe("ProjectionExpression", () => {
-    it("should not compile with a type other than a raw path", () => {
+    it("should not compile with a type other than a path input", () => {
       // @ts-expect-error A string is not a valid rhs operand for add.
       Projection.from([42]);
     });
@@ -33,7 +33,7 @@ describe("commands.expressions.projection", () => {
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
-    it("should allow for mixed bag of raw paths", () => {
+    it("should allow for mixed bag of path inputs", () => {
       const { match, names } = expressionMatch({
         expression: Projection.from([
           "joe.cunt",
