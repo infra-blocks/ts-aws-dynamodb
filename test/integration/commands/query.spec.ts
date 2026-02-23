@@ -19,7 +19,7 @@ describe("Query", () => {
 
       const result = await client.query({
         table,
-        condition: [path("email"), "=", value("joe.cunt@gmail.com")],
+        keyCondition: [path("email"), "=", value("joe.cunt@gmail.com")],
       });
       expect(result).to.deep.equal({
         count: 0,
@@ -41,7 +41,7 @@ describe("Query", () => {
 
       const result = await client.query({
         table,
-        condition: [path("email"), "=", value("joe.cunt@gmail.com")],
+        keyCondition: [path("email"), "=", value("joe.cunt@gmail.com")],
       });
       expect(result).to.deep.equal({
         count: 1,
@@ -75,7 +75,7 @@ describe("Query", () => {
 
       const result = await client.query({
         table,
-        condition: ["pk", "=", value("Global")],
+        keyCondition: ["pk", "=", value("Global")],
         limit: 1,
       });
       // Only the first lexicographical result is returned.
@@ -110,7 +110,7 @@ describe("Query", () => {
 
       const result = await client.query({
         table,
-        condition: ["pk", "=", value("Global")],
+        keyCondition: ["pk", "=", value("Global")],
         projection: ["pk", "list[0]", "map.inner.included"],
       });
       expect(result).to.deep.equal({
@@ -143,7 +143,7 @@ describe("Query", () => {
 
       const result = await client.query({
         table,
-        condition: ["pk", "=", value("Global")],
+        keyCondition: ["pk", "=", value("Global")],
         scanIndexForward: false,
       });
       expect(result).to.deep.equal({
@@ -181,7 +181,7 @@ describe("Query", () => {
       const pages = await asyncArrayCollect(
         client.paginateQuery({
           table,
-          condition: ["pk", "=", value("Global")],
+          keyCondition: ["pk", "=", value("Global")],
           limit: 20,
         }),
       );
@@ -223,7 +223,7 @@ describe("Query", () => {
       const pages = await asyncArrayCollect(
         client.paginateQuery({
           table,
-          condition: ["pk", "=", value("Global")],
+          keyCondition: ["pk", "=", value("Global")],
           limit: 1,
         }),
       );
@@ -288,7 +288,7 @@ describe("Query", () => {
       const pages = await asyncArrayCollect(
         client.iterateQuery({
           table,
-          condition: ["pk", "=", value("Global")],
+          keyCondition: ["pk", "=", value("Global")],
           limit: 1,
         }),
       );

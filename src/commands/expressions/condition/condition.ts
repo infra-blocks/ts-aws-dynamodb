@@ -1,30 +1,19 @@
-import type {
-  AttributeExists,
-  AttributeNotExists,
-  BeginsWith,
-  Contains,
-  IsAttributeOfType,
-} from "../functions/index.js";
+import type { FunctionExpression } from "../functions/index.js";
+import type { Logic } from "../logic/index.js";
 import {
   ConditionComparison,
   type ConditionComparisonInput,
   isConditionComparisonInput,
-} from "./condition-comparison.js";
-import type { And, Not, Or } from "./logic.js";
+} from "./comparison.js";
 
 export type ConditionInput =
   | ConditionComparisonInput
   | ConditionFunction
   | ConditionLogic;
 
-export type ConditionFunction =
-  | AttributeExists
-  | AttributeNotExists
-  | BeginsWith
-  | IsAttributeOfType
-  | Contains;
+export type ConditionFunction = FunctionExpression;
 
-export type ConditionLogic = And | Not | Or;
+export type ConditionLogic = Logic;
 
 export type Condition =
   | ConditionComparison

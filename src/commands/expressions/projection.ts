@@ -1,9 +1,9 @@
 import assert from "node:assert";
 import { type Brand, trusted } from "@infra-blocks/types";
 import { ExpressionFormatter, type PathFormatter } from "./formatter.js";
-import { Path, type RawPath } from "./operands/index.js";
+import { Path, type PathInput } from "./operands/index.js";
 
-export type ProjectionInput = ReadonlyArray<RawPath>;
+export type ProjectionInput = ReadonlyArray<PathInput>;
 
 export type Projection = PathFormatter & Brand<"Projection">;
 

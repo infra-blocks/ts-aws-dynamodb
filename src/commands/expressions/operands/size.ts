@@ -54,7 +54,6 @@ export function size(input: SizeOperandInput): Size {
   return Size.from(effective);
 }
 
-// TODO: module visibility
 export function isSize(value: unknown): value is Size {
   return (
     isExpressionFormatter(value) && "type" in value && value.type === "Size"

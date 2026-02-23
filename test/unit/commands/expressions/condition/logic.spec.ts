@@ -1,14 +1,16 @@
 import { expect } from "@infra-blocks/test";
 import {
   and,
+  attributeExists,
+  attributeNotExists,
   not,
   or,
-} from "../../../../../src/commands/expressions/condition/logic.js";
-import { attributeExists } from "../../../../../src/commands/expressions/functions/attribute-exists.js";
-import { attributeNotExists } from "../../../../../src/commands/expressions/functions/attribute-not-exists.js";
-import { path, value } from "../../../../../src/index.js";
+  path,
+  value,
+} from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 
+// TODO: into its own unit test file, and here should just be to see what is accepted in Conditions.
 describe("commands.expressions.condition.logic", () => {
   describe(and.name, () => {
     it("should work with two comparisons", () => {

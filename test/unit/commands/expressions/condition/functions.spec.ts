@@ -12,6 +12,8 @@ import {
 } from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 
+// TODO: move to their own tests, this module here should only assert that they can
+// be used in Conditions.
 describe("commands.expressions.condition.functions", () => {
   describe(attributeExists.name, () => {
     it("should not compile with a value", () => {

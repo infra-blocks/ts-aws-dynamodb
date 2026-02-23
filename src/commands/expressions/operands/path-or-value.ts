@@ -1,21 +1,8 @@
 import assert from "node:assert";
 import type { AttributeValue } from "../../../types.js";
-import {
-  type ImplicitPath,
-  isPathInput,
-  Path,
-  type PathInput,
-} from "./path.js";
-import {
-  type ImplicitValue,
-  isValueInput,
-  Value,
-  type ValueInput,
-} from "./value.js";
+import { isPathInput, Path, type PathInput } from "./path.js";
+import { isValueInput, Value, type ValueInput } from "./value.js";
 
-export type ImplicitPathOrValue = ImplicitPath | ImplicitValue;
-
-// TODO: should be named OperandParams/Input to follow the conventions.
 export type PathOrValueInput<T extends AttributeValue = AttributeValue> =
   | PathInput
   | ValueInput<T>;
@@ -37,3 +24,9 @@ export const PathOrValue = {
     assert(false, `unexpected operand: ${input}`);
   },
 };
+
+export function isPathOrValueInput<T extends AttributeValue = AttributeValue>(
+  value: unknown,
+): value is PathOrValueInput<T> {
+  return isPathInput(value) || isValueInput(value);
+}
