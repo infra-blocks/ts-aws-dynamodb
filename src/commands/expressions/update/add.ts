@@ -1,8 +1,8 @@
 import type { NativeNumber, NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import { Path, type RawPath } from "../operands/path.js";
-import { type RawValue, Value } from "../operands/value.js";
+import { Path, type PathInput } from "../operands/path.js";
+import { Value, type ValueInput } from "../operands/value.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
@@ -30,7 +30,7 @@ export class AddAction implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names })} ${this.value.substitute({ values })}`;
+    return `${this.path.format({ names })} ${this.value.format({ values })}`;
   }
 
   static from(params: { path: Path; value: Value<NumberOrSet> }): AddAction {
@@ -47,19 +47,19 @@ export class AddAction implements IUpdateAction {
  *
  * This action only supports numbers and sets as values.
  *
- * @param rawPath - The attribute path to modify.
- * @param rawVAlue - The value to add to the attribute.
+ * @param path - The attribute path to modify.
+ * @param value - The value to add to the attribute.
  *
  * @returns An {@link AddAction} that will add the value to the attribute at the specified path.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.ADD
  */
-
 export function add(
-  rawPath: RawPath,
-  rawVAlue: RawValue<NumberOrSet>,
+  path: PathInput,
+  value: ValueInput<NumberOrSet>,
 ): UpdateAction {
-  const path = Path.normalize(rawPath);
-  const value = Value.normalize(rawVAlue);
-  return AddAction.from({ path, value });
+  return AddAction.from({
+    path: Path.normalize(path),
+    value: Value.normalize(value),
+  });
 }

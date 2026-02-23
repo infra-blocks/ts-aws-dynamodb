@@ -1,6 +1,6 @@
 import { AttributeNames } from "../attributes/names.js";
 import { AttributeValues } from "../attributes/values.js";
-import type { ExpressionFormatter } from "../expressions/expression.js";
+import type { ExpressionFormatter } from "../expressions/formatter.js";
 
 export type ConditionCheckFailureReturnValue = "NONE" | "ALL_OLD";
 

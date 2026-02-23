@@ -1,10 +1,14 @@
+import { type Brand, trusted } from "@infra-blocks/types";
 import {
   type AttributeName,
   type AttributePath,
-  isNativeString,
+  isAttributePath,
 } from "../../../types.js";
-import type { AttributeNames } from "../../attributes/names.js";
-import type { IOperand } from "./operand.js";
+import {
+  ExpressionFormatter,
+  isExpressionFormatter,
+  type PathFormatter,
+} from "../formatter.js";
 
 /**
  * This type represents the types that can implicitly be used
@@ -15,7 +19,7 @@ export type ImplicitPath = AttributePath;
 /**
  * This type aggregates the types that can be used as path operands.
  *
- * An {@link ImplicitPath} can be used in APIs that expect a {@link RawPath}
+ * An {@link ImplicitPath} can be used in APIs that expect a {@link PathInput}
  * just as well as an explicit {@link Path} instance.
  *
  * Using the {@link attributeExists} function as example, the following two
@@ -27,58 +31,28 @@ export type ImplicitPath = AttributePath;
  * attributeExists("foo.bar.baz");
  * ```
  */
-export type RawPath = AttributePath | Path;
+export type PathInput = AttributePath | Path;
 
-/**
- * Represents an attribute path operand in an expression.
- *
- * When this operand is stringified, it first registers the
- * attribute path in the {@link AttributeNames} registry and substitutes
- * it with the returned value.
- */
-export class Path implements IOperand {
-  private readonly path: AttributePath;
-  private readonly literal: boolean;
+export type Path = PathFormatter & Brand<"Path"> & { type: "Path" };
 
-  private constructor(params: { path: AttributePath; literal: boolean }) {
-    const { path, literal } = params;
-    this.path = path;
-    this.literal = literal;
-  }
-
-  substitute(params: { names: AttributeNames }): string {
-    const { names } = params;
-    return names.substitute(this.path, { literal: this.literal });
-  }
-
-  /**
-   * @private
-   */
-  static from(path: AttributePath, options?: { literal?: true }): Path {
+// TODO: don't export passed commands/index.ts
+export const Path = {
+  from(path: AttributePath, options?: { literal?: true }): Path {
     const { literal = false } = options ?? {};
-    return new Path({ path, literal });
-  }
-
-  /**
-   * Turns {@link RawPath} path into a {@link Path} instance.
-   *
-   * If the provided path is already a {@link Path}, it will be returned as-is.
-   * Otherwise, a new {@link Path} instance will be created from the provided
-   * argument.
-   *
-   * @param raw - The path to return as is or convert to a {@link Path} instance.
-   *
-   * @returns The normalized {@link Path} instance.
-   *
-   * @private
-   */
-  static normalize(raw: RawPath): Path {
-    if (raw instanceof Path) {
-      return raw;
+    return trusted({
+      type: "Path",
+      ...ExpressionFormatter.from(({ names }) =>
+        names.substitute(path, { literal }),
+      ),
+    });
+  },
+  normalize(input: PathInput): Path {
+    if (isPath(input)) {
+      return input;
     }
-    return Path.from(raw);
-  }
-}
+    return Path.from(input);
+  },
+};
 
 /**
  * Factory function to create a {@link Path}.
@@ -122,20 +96,24 @@ export function literal(name: AttributeName): Path {
 }
 
 /**
- * A type guard to assess if something is a {@link RawPath}.
+ * A type guard to assess if something is a {@link PathInput}.
  *
- * @param operand - The operand to test.
+ * @param value - The operand to test.
  *
- * @returns Whether the operand is a {@link RawPath}.
+ * @returns Whether the operand is a {@link PathInput}.
  */
-export function isRawPath(operand: unknown): operand is RawPath {
-  return isImplicitPath(operand) || isPath(operand);
+export function isPathInput(value: unknown): value is PathInput {
+  return isImplicitPath(value) || isPath(value);
 }
 
 function isImplicitPath(operand: unknown): operand is ImplicitPath {
-  return isNativeString(operand);
+  return isAttributePath(operand);
 }
 
-function isPath(operand: unknown): operand is Path {
-  return operand instanceof Path;
+export function isPath(operand: unknown): operand is Path {
+  return (
+    isExpressionFormatter(operand) &&
+    "type" in operand &&
+    operand.type === "Path"
+  );
 }

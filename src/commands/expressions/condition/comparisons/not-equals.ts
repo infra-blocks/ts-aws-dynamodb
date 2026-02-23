@@ -1,10 +1,14 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import type { ExpressionFormatter } from "../../expression.js";
+import type { ExpressionFormatter } from "../../formatter.js";
 import type { ConditionComparisonInput } from "../condition-comparison.js";
-import type { RawConditionOperand } from "../operand.js";
+import type { ConditionOperandInput } from "../operand.js";
 import { binaryOperation } from "./binary.js";
 
-export type NotEqualsInput = [RawConditionOperand, "<>", RawConditionOperand];
+export type NotEqualsInput = [
+  ConditionOperandInput,
+  "<>",
+  ConditionOperandInput,
+];
 
 export type NotEquals = ExpressionFormatter & Brand<"NotEquals">;
 

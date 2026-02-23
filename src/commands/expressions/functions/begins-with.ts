@@ -1,14 +1,17 @@
 import { type Brand, trusted } from "@infra-blocks/types";
 import type { NativeBinary, NativeString } from "../../../types.js";
-import { ExpressionFormatter } from "../expression.js";
-import { operand, type RawOperand } from "../operands/operand.js";
+import { ExpressionFormatter } from "../formatter.js";
+import {
+  PathOrValue,
+  type PathOrValueInput,
+} from "../operands/path-or-value.js";
 
 /**
  * This type aggregates the types of operands that can be used with the {@link beginsWith} function.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-export type BeginsWithOperand = RawOperand<StringOrBinary>;
+export type BeginsWithOperand = PathOrValueInput<StringOrBinary>;
 
 export type BeginsWith = ExpressionFormatter & Brand<"BeginsWith">;
 
@@ -26,13 +29,13 @@ export function beginsWith(
   first: BeginsWithOperand,
   second: BeginsWithOperand,
 ): BeginsWith {
-  const firstOperand = operand<StringOrBinary>(first);
-  const secondOperand = operand<StringOrBinary>(second);
+  const firstOperand = PathOrValue.normalize<StringOrBinary>(first);
+  const secondOperand = PathOrValue.normalize<StringOrBinary>(second);
 
   return trusted(
     ExpressionFormatter.from(
       ({ names, values }) =>
-        `begins_with(${firstOperand.substitute({ names, values })}, ${secondOperand.substitute({ names, values })})`,
+        `begins_with(${firstOperand.format({ names, values })}, ${secondOperand.format({ names, values })})`,
     ),
   );
 }

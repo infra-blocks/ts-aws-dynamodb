@@ -1,14 +1,11 @@
 import assert from "node:assert";
 import { type Brand, trusted } from "@infra-blocks/types";
-import type { AttributeNames } from "../attributes/names.js";
-import { ExpressionFormatter } from "./expression.js";
+import { ExpressionFormatter, type PathFormatter } from "./formatter.js";
 import { Path, type RawPath } from "./operands/index.js";
 
 export type ProjectionInput = ReadonlyArray<RawPath>;
 
-export type Projection = {
-  format(params: { names: AttributeNames }): string;
-} & Brand<"Projection">;
+export type Projection = PathFormatter & Brand<"Projection">;
 
 export const Projection = {
   /**
@@ -28,7 +25,7 @@ export const Projection = {
       ExpressionFormatter.from(({ names }) => {
         const substitutions = [];
         for (const path of input) {
-          substitutions.push(Path.normalize(path).substitute({ names }));
+          substitutions.push(Path.normalize(path).format({ names }));
         }
         return substitutions.join(",");
       }),

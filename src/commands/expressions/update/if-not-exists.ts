@@ -1,34 +1,30 @@
+import { type Brand, trusted } from "@infra-blocks/types";
 import type { AttributeValue } from "../../../types.js";
-import type { AttributeNames } from "../../attributes/names.js";
-import type { AttributeValues } from "../../attributes/values.js";
-import type { IOperand, Operand } from "../operands/operand.js";
-import { Path, type RawPath } from "../operands/path.js";
+import { ExpressionFormatter } from "../formatter.js";
+import { Path, type PathInput } from "../operands/path.js";
+import type { PathOrValue } from "../operands/path-or-value.js";
 
-export class IfNotExists<T extends AttributeValue = AttributeValue>
-  implements IOperand
-{
-  private readonly path: Path;
-  private readonly defaultValue: Operand<T>;
+export type IfNotExists<T extends AttributeValue = AttributeValue> =
+  ExpressionFormatter & Brand<"IfNotExists"> & { _phantom?: T };
 
-  constructor(params: { path: Path; defaultValue: Operand<T> }) {
-    const { path, defaultValue } = params;
-    this.path = path;
-    this.defaultValue = defaultValue;
-  }
+export const IfNotExists = {
+  from<T extends AttributeValue = AttributeValue>(
+    path: Path,
+    defaultValue: PathOrValue<T>,
+  ): IfNotExists<T> {
+    return trusted({
+      ...ExpressionFormatter.from(
+        ({ names, values }) =>
+          `if_not_exists(${path.format({ names })}, ${defaultValue.format({ names, values })})`,
+      ),
+    });
+  },
+};
 
-  substitute(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    const { names, values } = params;
-    return `if_not_exists(${this.path.substitute({ names })}, ${this.defaultValue.substitute({ names, values })})`;
-  }
-}
-
+// TODO: support PathOrValueInput here?
 export function ifNotExists<T extends AttributeValue = AttributeValue>(
-  rawPath: RawPath,
-  defaultValue: Operand<T>,
+  path: PathInput,
+  defaultValue: PathOrValue<T>,
 ): IfNotExists<T> {
-  const path = Path.normalize(rawPath);
-  return new IfNotExists({ path, defaultValue });
+  return IfNotExists.from(Path.normalize(path), defaultValue);
 }

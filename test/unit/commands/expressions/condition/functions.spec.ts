@@ -176,10 +176,12 @@ describe("commands.expressions.condition.functions", () => {
   });
   describe(contains.name, () => {
     it("should not compile with size as lhs operand", () => {
-      expect(() =>
-        // @ts-expect-error Size is not a valid lhs operand for contains.
-        contains(size(path("test.attribute")), value("test.value")),
-      ).to.throw();
+      // TODO: used to result in a runtime error, but now that expressions (including size)
+      // are plain objects, it doesn't (it passes the isNativeMap test). To circumvent this,
+      // and for the future, those should be schematized properly.
+      // See https://github.com/infra-blocks/ts-aws-dynamodb/issues/108
+      // @ts-expect-error size is not a valid lhs operand for contains.
+      contains(size(path("test.attribute")), value("test.value"));
     });
     it("should work with paths", () => {
       const lhs = "test.attribute.lhs";

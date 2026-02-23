@@ -1,3 +1,4 @@
+import { type Brand, trusted } from "@infra-blocks/types";
 import type {
   NativeBinary,
   NativeList,
@@ -5,14 +6,8 @@ import type {
   NativeSet,
   NativeString,
 } from "../../../types.js";
-import type { AttributeNames } from "../../attributes/names.js";
-import type { AttributeValues } from "../../attributes/values.js";
-import {
-  type IOperand,
-  type Operand,
-  operand,
-  type RawOperand,
-} from "./operand.js";
+import { ExpressionFormatter, isExpressionFormatter } from "../formatter.js";
+import { PathOrValue, type PathOrValueInput } from "./path-or-value.js";
 
 export type SizeOperandValue =
   | NativeBinary
@@ -28,49 +23,40 @@ export type SizeOperandValue =
  * @see Path
  * @see Value
  */
-export type SizeOperand = Operand<SizeOperandValue>;
+export type SizeOperand = PathOrValue<SizeOperandValue>;
 
-export type RawSizeOperand = RawOperand<SizeOperandValue>;
+export type SizeOperandInput = PathOrValueInput<SizeOperandValue>;
 
-/**
- * A type representing the result of the {@link size} function as an operand to be used in expressions.
- */
-export class Size implements IOperand {
-  private readonly inner: SizeOperand;
+export type Size = ExpressionFormatter &
+  Brand<"Size"> & { readonly type: "Size" };
 
-  constructor(operand: SizeOperand) {
-    this.inner = operand;
-  }
+export const Size = {
+  from(operand: SizeOperand): Size {
+    return trusted({
+      type: "Size",
+      ...ExpressionFormatter.from(
+        (params) => `size(${operand.format(params)})`,
+      ),
+    });
+  },
+};
 
-  substitute(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
-    return `size(${this.inner.substitute(params)})`;
-  }
-
-  /**
-   * @private
-   */
-  static from(operand: SizeOperand): Size {
-    return new Size(operand);
-  }
-}
 /**
  * Creates a new {@link Size} operand to be nested in expressions.
  *
- * @param raw - The operand to calculate the size of.
+ * @param input - The operand to calculate the size of.
  * @returns A new {@link Size} operand.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Functions
  */
-
-export function size(raw: RawSizeOperand): Size {
-  const effective = operand<SizeOperandValue>(raw);
+export function size(input: SizeOperandInput): Size {
+  const effective = PathOrValue.normalize<SizeOperandValue>(input);
   return Size.from(effective);
 }
 
 // TODO: module visibility
 export function isSize(value: unknown): value is Size {
-  return value instanceof Size;
+  return (
+    isExpressionFormatter(value) && "type" in value && value.type === "Size"
+  );
 }

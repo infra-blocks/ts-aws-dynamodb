@@ -1,6 +1,6 @@
 import { expect } from "@infra-blocks/test";
 import { AttributeValues } from "../../../../../src/commands/attributes/values.js";
-import { isRawValue } from "../../../../../src/commands/expressions/operands/value.js";
+import { isValueInput } from "../../../../../src/commands/expressions/operands/value.js";
 import { value } from "../../../../../src/index.js";
 
 describe("commands.expressions.operands.value", () => {
@@ -8,12 +8,12 @@ describe("commands.expressions.operands.value", () => {
     it("should be correctly substitute the value", () => {
       const operand = value(42);
       const values = AttributeValues.create();
-      expect(operand.substitute({ values })).to.equal(values.substitute(42));
+      expect(operand.format({ values })).to.equal(values.substitute(42));
     });
   });
-  describe(isRawValue.name, () => {
+  describe(isValueInput.name, () => {
     it("should return false for string", () => {
-      expect(isRawValue("foo")).to.be.false;
+      expect(isValueInput("foo")).to.be.false;
     });
 
     const valid = [
@@ -29,13 +29,13 @@ describe("commands.expressions.operands.value", () => {
 
     for (const { name, value } of valid) {
       it(`should return true for ${name}`, () => {
-        expect(isRawValue(value)).to.be.true;
+        expect(isValueInput(value)).to.be.true;
       });
     }
 
     it("should return true for value", () => {
       // Notice how string values are possible, they just need to be wrapped.
-      expect(isRawValue(value("toto"))).to.be.true;
+      expect(isValueInput(value("toto"))).to.be.true;
     });
   });
 });

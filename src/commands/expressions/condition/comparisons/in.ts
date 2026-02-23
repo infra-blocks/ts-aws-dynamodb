@@ -1,6 +1,6 @@
 import { type Brand, trusted } from "@infra-blocks/types";
-import { ExpressionFormatter } from "../../expression.js";
-import type { Operand } from "../../operands/operand.js";
+import { ExpressionFormatter } from "../../formatter.js";
+import type { PathOrValue } from "../../operands/path-or-value.js";
 import type { ConditionComparisonInput } from "../condition-comparison.js";
 import { ConditionOperand } from "../operand.js";
 import type { ComparableOperand, ComparableValue } from "./operand.js";
@@ -38,9 +38,9 @@ export const In = {
     return trusted(
       ExpressionFormatter.from(({ names, values }) => {
         const elementsString = elements
-          .map((operand) => (operand as Operand).substitute({ names, values }))
+          .map((operand) => (operand as PathOrValue).format({ names, values }))
           .join(",");
-        return `${element.substitute({ names, values })} IN (${elementsString})`;
+        return `${element.format({ names, values })} IN (${elementsString})`;
       }),
     );
   },

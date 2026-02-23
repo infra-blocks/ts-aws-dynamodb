@@ -1,3 +1,4 @@
+import { type Brand, trusted } from "@infra-blocks/types";
 import {
   type AttributePath,
   type AttributeValue,
@@ -9,58 +10,46 @@ import {
   isNativeNumber,
   isNativeSet,
 } from "../../../types.js";
-import type { AttributeValues } from "../../attributes/values.js";
-import type { IOperand } from "./operand.js";
-
-export type ImplicitValue = Exclude<AttributeValue, AttributePath>;
-
-export type RawValue<T extends AttributeValue = AttributeValue> =
-  T extends ImplicitValue ? T | Value<T> : Value<T>;
+import {
+  ExpressionFormatter,
+  isExpressionFormatter,
+  type ValueFormatter,
+} from "../formatter.js";
 
 /**
- * Represents a value operand in an expression.
- *
- * When this operand is stringified, it first registers the
- * value in the {@link AttributeValues} registry and substitutes
- * it with the returned value.
+ * Any type that isn't an implicit path is an implicit value.
  */
-export class Value<T extends AttributeValue = AttributeValue>
-  implements IOperand
-{
-  private readonly value: T;
+export type ImplicitValue = Exclude<AttributeValue, AttributePath>;
 
-  private constructor(value: T) {
-    this.value = value;
-  }
+/**
+ * A type representing the accepted inputs in place of a {@link Value}.
+ *
+ * It's a conditional type where a value can be expressed as a primitive
+ * unless it is a string, then it *must* be of type {@link Value}.
+ */
+export type ValueInput<T extends AttributeValue = AttributeValue> =
+  T extends ImplicitValue ? T | Value<T> : Value<T>;
 
-  substitute(params: { values: AttributeValues }): string {
-    const { values } = params;
-    return values.substitute(this.value);
-  }
+// TODO: include branding in base formatter?
+export type Value<T extends AttributeValue = AttributeValue> = ValueFormatter &
+  Brand<"Value"> & { readonly type: "Value"; readonly _phantom?: T };
 
-  /**
-   * @private
-   */
-  static from<T extends AttributeValue = AttributeValue>(value: T): Value<T> {
-    return new Value(value);
-  }
-
-  // TODO: docs
-  /**
-   *
-   * @param value
-   * @returns
-   */
-  static normalize<T extends AttributeValue = AttributeValue>(
-    value: RawValue<T>,
+export const Value = {
+  from<T extends AttributeValue = AttributeValue>(value: T): Value<T> {
+    return trusted({
+      type: "Value",
+      ...ExpressionFormatter.from(({ values }) => values.substitute(value)),
+    });
+  },
+  normalize<T extends AttributeValue = AttributeValue>(
+    input: ValueInput<T>,
   ): Value<T> {
-    if (value instanceof Value) {
-      return value as Value<T>;
+    if (isValue<T>(input)) {
+      return input;
     }
-
-    return Value.from(value) as Value<T>;
-  }
-}
+    return Value.from<T>(input as T);
+  },
+};
 
 /**
  * Factory function to create a {@link Value}.
@@ -76,16 +65,16 @@ export function value<T extends AttributeValue = AttributeValue>(
 }
 
 /**
- * A type guard to assess if something is a {@link RawValue}.
+ * A type guard to assess if something is a {@link ValueInput}.
  *
- * @param operand - The operand to test.
+ * @param value - The operand to test.
  *
- * @returns Whether the operand is a {@link RawValue}.
+ * @returns Whether the operand is a {@link ValueInput}.
  */
-export function isRawValue<T extends AttributeValue = AttributeValue>(
-  operand: unknown,
-): operand is RawValue<T> {
-  return isImplicitValue(operand) || isValue(operand);
+export function isValueInput<T extends AttributeValue = AttributeValue>(
+  value: unknown,
+): value is ValueInput<T> {
+  return isValue<T>(value) || isImplicitValue(value);
 }
 
 function isImplicitValue(value: unknown): value is ImplicitValue {
@@ -101,6 +90,10 @@ function isImplicitValue(value: unknown): value is ImplicitValue {
   );
 }
 
-function isValue(operand: unknown): operand is Value {
-  return operand instanceof Value;
+export function isValue<T extends AttributeValue>(
+  value: unknown,
+): value is Value<T> {
+  return (
+    isExpressionFormatter(value) && "type" in value && value.type === "Value"
+  );
 }

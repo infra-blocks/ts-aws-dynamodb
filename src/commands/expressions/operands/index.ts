@@ -1,25 +1,8 @@
+export { literal, Path, type PathInput as RawPath, path } from "./path.js";
+export * from "./path-or-value.js";
 export {
-  type ImplicitOperand,
-  type Operand,
-  operand,
-  type RawOperand,
-} from "./operand.js";
-export {
-  type ImplicitPath,
-  literal,
-  Path,
-  path,
-  type RawPath,
-} from "./path.js";
-export {
-  type RawSizeOperand,
-  type SizeOperand,
+  type SizeOperandInput,
   type SizeOperandValue,
   size,
 } from "./size.js";
-export {
-  type ImplicitValue,
-  type RawValue,
-  Value,
-  value,
-} from "./value.js";
+export { Value, type ValueInput as RawValue, value } from "./value.js";

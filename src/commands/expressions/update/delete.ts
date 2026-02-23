@@ -1,8 +1,8 @@
 import type { NativeSet } from "../../../types.js";
 import type { AttributeNames } from "../../attributes/names.js";
 import type { AttributeValues } from "../../attributes/values.js";
-import { Path, type RawPath } from "../operands/path.js";
-import { type RawValue, Value } from "../operands/value.js";
+import { Path, type PathInput } from "../operands/path.js";
+import { Value, type ValueInput } from "../operands/value.js";
 import type { IUpdateAction, UpdateAction } from "./action.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 
@@ -28,7 +28,7 @@ export class DeleteAction implements IUpdateAction {
     values: AttributeValues;
   }): string {
     const { names, values } = params;
-    return `${this.path.substitute({ names })} ${this.value.substitute({
+    return `${this.path.format({ names })} ${this.value.format({
       values,
     })}`;
   }
@@ -44,19 +44,19 @@ export class DeleteAction implements IUpdateAction {
  * This operation only supports sets as values. The resulting set will be the original set minus the
  * provided subset.
  *
- * @param rawPath - The attribute path to modify.
- * @param rawValue - The value to remove from the attribute.
+ * @param path - The attribute path to modify.
+ * @param value - The value to remove from the attribute.
  *
  * @returns A {@link DeleteAction} that will remove the subset from the attribute.
  *
  * @see https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.DELETE
  */
-
 export function deleteFrom(
-  rawPath: RawPath,
-  rawValue: RawValue<NativeSet>,
+  path: PathInput,
+  value: ValueInput<NativeSet>,
 ): UpdateAction {
-  const path = Path.normalize(rawPath);
-  const value = Value.normalize(rawValue);
-  return DeleteAction.from({ path, value });
+  return DeleteAction.from({
+    path: Path.normalize(path),
+    value: Value.normalize(value),
+  });
 }

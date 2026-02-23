@@ -21,8 +21,8 @@ export interface IUpdateAction {
    * `SET ${action.stringify({names, values})}`. So the clause identifier is managed
    * by the caller.
    *
-   * @param params.names - The attribute names to substitute in the action.
-   * @param params.values - The attribute values to substitute in the action.
+   * @param params.names - The attribute names to format in the action.
+   * @param params.values - The attribute values to format in the action.
    */
   stringify(params: { names: AttributeNames; values: AttributeValues }): string;
 }

@@ -68,6 +68,8 @@ export type NativeSet = NativeNumberSet | NativeStringSet | NativeBinarySet;
 export type NativeString = string;
 export type NativeStringSet = Set<NativeString>;
 
+export const isAttributePath = isString;
+
 // TODO: move those to internal module.
 // Native type guards.
 export function isNativeBinary(value: unknown): value is NativeBinary {

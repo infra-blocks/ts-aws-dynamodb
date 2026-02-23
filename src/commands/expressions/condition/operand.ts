@@ -1,23 +1,26 @@
 import type { AttributeValue } from "../../../types.js";
-import { type Operand, operand, type RawOperand } from "../operands/operand.js";
+import {
+  PathOrValue,
+  type PathOrValueInput,
+} from "../operands/path-or-value.js";
 import { isSize, type Size } from "../operands/size.js";
 
 export type ConditionOperand<T extends AttributeValue = AttributeValue> =
-  | Operand<T>
+  | PathOrValue<T>
   | Size;
 
-export type RawConditionOperand<T extends AttributeValue = AttributeValue> =
-  | RawOperand<T>
+export type ConditionOperandInput<T extends AttributeValue = AttributeValue> =
+  | PathOrValueInput<T>
   | Size;
+
 // TODO: internal
-
 export const ConditionOperand = {
   normalize<T extends AttributeValue = AttributeValue>(
-    raw: RawConditionOperand<T>,
+    input: ConditionOperandInput<T>,
   ): ConditionOperand<T> {
-    if (isSize(raw)) {
-      return raw;
+    if (isSize(input)) {
+      return input;
     }
-    return operand<T>(raw);
+    return PathOrValue.normalize<T>(input);
   },
 };
