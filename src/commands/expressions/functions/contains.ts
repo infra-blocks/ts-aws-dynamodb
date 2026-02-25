@@ -1,10 +1,10 @@
 import { type Brand, trusted } from "@infra-blocks/types";
 import { ExpressionFormatter } from "../formatter.js";
+import { Operand, type OperandInput } from "../operands/operand.js";
 import {
   PathOrValue,
   type PathOrValueInput,
 } from "../operands/path-or-value.js";
-import { isSize, type Size } from "../operands/size.js";
 
 export type Contains = ExpressionFormatter & Brand<"Contains">;
 
@@ -20,10 +20,10 @@ export type Contains = ExpressionFormatter & Brand<"Contains">;
  */
 export function contains(
   first: PathOrValueInput,
-  second: PathOrValueInput | Size,
+  second: OperandInput,
 ): Contains {
   const firstOperand = PathOrValue.normalize(first);
-  const secondOperand = isSize(second) ? second : PathOrValue.normalize(second);
+  const secondOperand = Operand.normalize(second);
 
   return trusted(
     ExpressionFormatter.from(
