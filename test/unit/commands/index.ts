@@ -45,7 +45,7 @@ export const commandsTests = () => {
       test("should work with GetItem", () => {
         expectTypeOf<CommandInput<GetItem>>().toEqualTypeOf<GetItemInput>();
       });
-      test("should work with GetItem", () => {
+      test("should work with CreateTable", () => {
         expectTypeOf<
           CommandInput<CreateTable>
         >().toEqualTypeOf<CreateTableInput>();
