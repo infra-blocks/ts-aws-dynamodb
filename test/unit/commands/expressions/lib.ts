@@ -3,7 +3,7 @@ import { AttributeNames } from "../../../../src/commands/attributes/names.js";
 import { AttributeValues } from "../../../../src/commands/attributes/values.js";
 import type { ExpressionFormatter } from "../../../../src/commands/expressions/formatter.js";
 
-export function expressionMatch(params: {
+export function matchExpression(params: {
   expression: ExpressionFormatter;
   matcher: RegExp;
 }) {

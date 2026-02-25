@@ -1,0 +1,135 @@
+import { suite, test } from "node:test";
+import { expect } from "@infra-blocks/test";
+import { size } from "../../../../../src/commands/expressions/operands/size.js";
+import { path, value } from "../../../../../src/index.js";
+import { matchExpression } from "../lib.js";
+
+export const sizeTests = () => {
+  suite("size", () => {
+    suite(size.name, () => {
+      test("should not compile with a number value", () => {
+        // @ts-expect-error Numbers are not valid operands for size.
+        size(value(42));
+      });
+      test("should not compile with an implicit number value", () => {
+        // @ts-expect-error Implicit numbers are not valid operands for size.
+        size(42);
+      });
+      test("should not compile with a boolean value", () => {
+        // @ts-expect-error Booleans are not valid operands for size.
+        size(value(true));
+      });
+      test("should not compile with an implicit boolean value", () => {
+        // @ts-expect-error Implicit booleans are not valid operands for size.
+        size(true);
+      });
+      test("should not compile with a null value", () => {
+        // @ts-expect-error Nulls are not valid operands for size.
+        size(value(null));
+      });
+      test("should not compile with an implicit null value", () => {
+        // @ts-expect-error Implicit nulls are not valid operands for size.
+        size(null);
+      });
+      test("should work with a path", () => {
+        const attribute = "test.attribute";
+        const { match, names } = matchExpression({
+          expression: size(path(attribute)),
+          matcher: /size\((#\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(names.substitute(attribute));
+      });
+      test("should work with an implicit path", () => {
+        const attribute = "test.attribute";
+        const { match, names } = matchExpression({
+          expression: size(attribute),
+          matcher: /size\((#\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(names.substitute(attribute));
+      });
+      test("should work with a binary value", () => {
+        const operand = Buffer.from("bitchass value");
+        const { match, values } = matchExpression({
+          expression: size(value(operand)),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with an implicit binary value", () => {
+        const operand = Buffer.from("bitchass value");
+        const { match, values } = matchExpression({
+          expression: size(operand),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with a list value", () => {
+        const operand = ["a", "b", "c"];
+        const { match, values } = matchExpression({
+          expression: size(value(operand)),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with an implicit list value", () => {
+        const operand = ["a", "b", "c"];
+        const { match, values } = matchExpression({
+          expression: size(operand),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work a map value", () => {
+        const operand = { a: 1, b: 2 };
+        const { match, values } = matchExpression({
+          expression: size(value(operand)),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with an implicit map value", () => {
+        const operand = { a: 1, b: 2 };
+        const { match, values } = matchExpression({
+          expression: size(operand),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with a set value", () => {
+        const operand = new Set(["a", "b", "c"]);
+        const { match, values } = matchExpression({
+          expression: size(value(operand)),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with an implicit set value", () => {
+        const operand = new Set(["a", "b", "c"]);
+        const { match, values } = matchExpression({
+          expression: size(operand),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+      test("should work with a string value", () => {
+        const operand = "AI is not I but just A";
+        const { match, values } = matchExpression({
+          expression: size(value(operand)),
+          matcher: /size\((:\S+)\)/,
+        });
+        const substitution = match[1];
+        expect(substitution).to.equal(values.substitute(operand));
+      });
+    });
+  });
+};

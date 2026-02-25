@@ -1,40 +1,41 @@
+import { suite, test } from "node:test";
 import { expect } from "@infra-blocks/test";
 import { Projection } from "../../../../src/commands/expressions/index.js";
 import { literal, path } from "../../../../src/index.js";
-import { expressionMatch } from "./lib.js";
+import { matchExpression } from "./lib.js";
 
-describe("commands.expressions.projection", () => {
-  describe("ProjectionExpression", () => {
-    it("should not compile with a type other than a path input", () => {
+export const projectionTests = () => {
+  suite("projection", () => {
+    test("should not compile with a type other than a path input", () => {
       // @ts-expect-error A string is not a valid rhs operand for add.
       Projection.from([42]);
     });
-    it("should throw for empty input", () => {
+    test("should throw for empty input", () => {
       expect(() => Projection.from([])).to.throw();
     });
-    it("should work with an implicit path", () => {
-      const { match, names } = expressionMatch({
+    test("should work with an implicit path", () => {
+      const { match, names } = matchExpression({
         expression: Projection.from(["toto"]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
-    it("should work with an explicit path", () => {
-      const { match, names } = expressionMatch({
+    test("should work with an explicit path", () => {
+      const { match, names } = matchExpression({
         expression: Projection.from([path("toto")]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
-    it("should work with a path literal", () => {
-      const { match, names } = expressionMatch({
+    test("should work with a path literal", () => {
+      const { match, names } = matchExpression({
         expression: Projection.from([literal("toto")]),
         matcher: /(#\S+)/,
       });
       expect(match[1]).to.equal(names.substitute("toto"));
     });
-    it("should allow for mixed bag of path inputs", () => {
-      const { match, names } = expressionMatch({
+    test("should allow for mixed bag of path inputs", () => {
+      const { match, names } = matchExpression({
         expression: Projection.from([
           "joe.cunt",
           path("myList[5]"),
@@ -51,4 +52,4 @@ describe("commands.expressions.projection", () => {
       );
     });
   });
-});
+};
