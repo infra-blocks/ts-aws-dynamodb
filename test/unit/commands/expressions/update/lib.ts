@@ -3,7 +3,7 @@ import { AttributeNames } from "../../../../../src/commands/attributes/names.js"
 import { AttributeValues } from "../../../../../src/commands/attributes/values.js";
 import type { UpdateAction } from "../../../../../src/index.js";
 
-export function actionMatch(params: {
+export function matchAction(params: {
   action: UpdateAction;
   matcher: RegExp;
 }): {

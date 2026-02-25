@@ -38,7 +38,7 @@
     "test:coverage": "c8 npm run test",
     "test:coverage:lcov": "c8 --reporter=lcov npm run test",
     "test:integration": "mocha --config test/integration/.mocharc.cjs 'test/integration/**/*.spec.ts'",
-    "test:unit": "mocha --config test/unit/.mocharc.cjs 'test/unit/**/*.spec.ts'"
+    "test:unit": "node --import tsx --test 'test/unit/**/*.spec.ts'"
   },
   "devDependencies": {
     "@aws-sdk/util-dynamodb": "^3.995.0",
