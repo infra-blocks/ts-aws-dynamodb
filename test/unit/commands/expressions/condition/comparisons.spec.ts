@@ -1,5 +1,5 @@
 import { expect } from "@infra-blocks/test";
-import { ConditionComparison } from "../../../../../src/commands/expressions/condition/condition-comparison.js";
+import { ConditionComparison } from "../../../../../src/commands/expressions/condition/comparison.js";
 import { path, value } from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 

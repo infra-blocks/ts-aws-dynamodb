@@ -1,7 +1,7 @@
 import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
 import {
-  Condition,
+  KeyCondition,
   type KeyConditionInput,
   Projection,
   type ProjectionInput,
@@ -10,7 +10,7 @@ import { ExpressionsFormatter } from "./lib.js";
 
 export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
-  condition: KeyConditionInput;
+  keyCondition: KeyConditionInput;
   consistentRead?: boolean;
   exclusiveStartKey?: K;
   index?: string;
@@ -30,7 +30,9 @@ function encode<K extends KeyAttributes = KeyAttributes>(
   const result: QueryCommandInput = {
     TableName: input.table,
     IndexName: input.index,
-    KeyConditionExpression: formatter.format(Condition.from(input.condition)),
+    KeyConditionExpression: formatter.format(
+      KeyCondition.from(input.keyCondition),
+    ),
     ConsistentRead: input.consistentRead,
     ExclusiveStartKey: input.exclusiveStartKey,
     Limit: input.limit,

@@ -3,6 +3,7 @@ import { size } from "../../../../../src/commands/expressions/operands/size.js";
 import { path, value } from "../../../../../src/index.js";
 import { expressionMatch } from "../lib.js";
 
+// TODO: move to operands tests.
 describe("commands.expressions.condition.size", () => {
   describe(size.name, () => {
     it("should not compile with a number value", () => {

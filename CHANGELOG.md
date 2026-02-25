@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.69.0] - 2026-02-24
+
+### Changed
+
+- Narrowed the `KeyConditionInput` type significantly comparitively to the previous version. Before,
+`KeyConditionInput` was just an alias for `ConditionInput`, which pretty much involves every possible
+expression. Key condition expressions are, however, much more stringent in reality. The narrowing done
+was to reflect that fact at compilation. So now, most functions, `or`, `not` and some operators are
+not usable anymore as a Query's key condition.
+- Renamed the `QueryInput.condition` field to `keyCondition`. This is more in line with the native API
+and is significant given the distinction in what's allowed.
+
+## [0.68.0] - 2026-02-24
+
+### Changed
+
+- Narrowed the `KeyConditionInput` input type to the acceptable subset of conditions that the DynamoDB
+API expects. For example, before this change, `KeyConditionInput = ConditionInput`. Which meant that
+a "not equals" (`<>`) operator could be used in a key condition, but that would inevitably result
+in an error at runtime.
+
+### Removed
+
+- `ComparableOperand` from exported types. This *shouldn't* break backwards compatibility, but since it
+was exposed by mistake, it could. `Operand` types are internal, whereas `OperandInput` types are visible
+as they are used in the API.
+
 ## [0.67.0] - 2026-02-23
 
 ### Changed
@@ -848,6 +875,8 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
+[0.68.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.67.0...v0.68.0
 [0.67.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.66.0...v0.67.0
 [0.66.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.65.0...v0.66.0
 [0.65.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.64.0...v0.65.0

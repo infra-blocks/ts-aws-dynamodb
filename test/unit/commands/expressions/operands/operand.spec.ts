@@ -2,7 +2,11 @@ import { expect } from "@infra-blocks/test";
 import { PathOrValue } from "../../../../../src/commands/expressions/index.js";
 import { isPath } from "../../../../../src/commands/expressions/operands/path.js";
 import { isValue } from "../../../../../src/commands/expressions/operands/value.js";
-import { path, type RawPathOrValue, value } from "../../../../../src/index.js";
+import {
+  type PathOrValueInput,
+  path,
+  value,
+} from "../../../../../src/index.js";
 
 describe("commands.expressions.operands.operand", () => {
   describe("PathOrValue", () => {
@@ -18,7 +22,7 @@ describe("commands.expressions.operands.operand", () => {
       expect(PathOrValue.normalize(arg)).to.equal(arg);
     });
 
-    const implicitValues: Array<{ name: string; sample: RawPathOrValue }> = [
+    const implicitValues: Array<{ name: string; sample: PathOrValueInput }> = [
       { name: "array", sample: [1, "toto", false] },
       { name: "bigint", sample: 42n },
       { name: "boolean", sample: true },

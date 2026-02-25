@@ -10,8 +10,10 @@ export function expressionMatch(params: {
   const { expression, matcher } = params;
   const names = AttributeNames.create();
   const values = AttributeValues.create();
+  const formatted = expression.format({ names, values });
   const match = checkNotNull(
-    matcher.exec(expression.format({ names, values })),
+    matcher.exec(formatted),
+    `unexpected null match for ${formatted} using regex ${matcher}`,
   );
   return {
     names: names,
