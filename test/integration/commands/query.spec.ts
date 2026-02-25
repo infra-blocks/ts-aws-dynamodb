@@ -1,6 +1,12 @@
 import { asyncArrayCollect } from "@infra-blocks/iter";
 import { expect } from "@infra-blocks/test";
-import { DynamoDbClient, path, value } from "../../../src/index.js";
+import {
+  and,
+  contains,
+  DynamoDbClient,
+  path,
+  value,
+} from "../../../src/index.js";
 import { dropAllTables } from "../fixtures.js";
 
 describe("Query", () => {
@@ -153,6 +159,48 @@ describe("Query", () => {
           { pk: "Global", sk: "joe.cunt+sexy.times@gmail.com" },
         ],
         count: 2,
+        scannedCount: 2,
+        lastEvaluatedKey: undefined,
+      });
+    });
+    it("should correctly forward filter parameter", async function () {
+      const client = this.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+          sortKey: { name: "sk", type: "S" },
+        },
+      });
+      await client.putItem({
+        table,
+        item: {
+          pk: "Global",
+          sk: "joe.cunt@gmail.com",
+          alias: "The Big Cunt",
+          includeMe: true,
+        },
+      });
+      const filteredIn = {
+        pk: "Global",
+        sk: "joe.cunt+sexy.times@gmail.com",
+        alias: "Sexy Times",
+        includeMe: true,
+      };
+      await client.putItem({
+        table,
+        item: filteredIn,
+      });
+
+      const result = await client.query({
+        table,
+        keyCondition: ["pk", "=", value("Global")],
+        filter: and(["includeMe", "=", true], contains("alias", value("Sexy"))),
+      });
+      expect(result).to.deep.equal({
+        items: [filteredIn],
+        count: 1,
         scannedCount: 2,
         lastEvaluatedKey: undefined,
       });

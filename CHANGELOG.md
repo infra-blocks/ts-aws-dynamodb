@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.0] - 2026-02-25
+
+### Added
+
+- `Filter` and `FilterInput` for filter expressions. Those are just aliases to `Condition` and
+`ConditionInput`, as they support exactly the same syntax.
+- `QueryInput` now supports an optional `filter` filed to provide a filter expression on the query.
+
 ## [0.69.0] - 2026-02-24
 
 ### Changed
@@ -875,6 +883,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.70.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.69.0...v0.70.0
 [0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
 [0.68.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.67.0...v0.68.0
 [0.67.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.66.0...v0.67.0

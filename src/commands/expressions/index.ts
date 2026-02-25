@@ -12,6 +12,7 @@ export type {
 } from "./comparisons/index.js";
 // TODO: don't export the typeguards beyond here.
 export * from "./condition/index.js";
+export * from "./filter/index.js";
 export * from "./functions/index.js";
 export * from "./key-condition/index.js";
 export * from "./logic/index.js";
