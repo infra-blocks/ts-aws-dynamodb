@@ -1,16 +1,14 @@
-import {
-  DescribeTimeToLiveCommand,
-  DynamoDBClient,
-} from "@aws-sdk/client-dynamodb";
+import { suite, test } from "node:test";
+import { DescribeTimeToLiveCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 
-describe(DynamoDBClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const updateTimeToLiveTests = (kit: TestKit) => {
+  suite("updateTimeToLive", () => {
+    kit.afterEach.dropTables();
 
-  describe("updateTimeToLive", () => {
-    it("should correctly enable it", async function () {
-      const client = this.createClient();
+    test("should correctly enable it", async () => {
+      const client = kit.createClient();
       const CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -23,7 +21,7 @@ describe(DynamoDBClient.name, () => {
         attribute: "ttl",
         enabled: true,
       });
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTimeToLiveCommand({
           TableName: CreateTableInput.name,
@@ -34,8 +32,8 @@ describe(DynamoDBClient.name, () => {
         response.TimeToLiveDescription?.TimeToLiveStatus,
       );
     });
-    it("should correctly disable it", async function () {
-      const client = this.createClient();
+    test("should correctly disable it", async () => {
+      const client = kit.createClient();
       const CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -53,7 +51,7 @@ describe(DynamoDBClient.name, () => {
         attribute: "ttl",
         enabled: false,
       });
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTimeToLiveCommand({
           TableName: CreateTableInput.name,
@@ -65,8 +63,8 @@ describe(DynamoDBClient.name, () => {
         response.TimeToLiveDescription?.TimeToLiveStatus,
       );
     });
-    it("should fail while disabling already disabled time to live", async function () {
-      const client = this.createClient();
+    test("should fail while disabling already disabled time to live", async () => {
+      const client = kit.createClient();
       const CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -82,8 +80,8 @@ describe(DynamoDBClient.name, () => {
         }),
       ).to.be.rejected;
     });
-    it("should fail while attempting to update on a different attribute", async function () {
-      const client = this.createClient();
+    test("should fail while attempting to update on a different attribute", async () => {
+      const client = kit.createClient();
       const CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -104,8 +102,8 @@ describe(DynamoDBClient.name, () => {
         }),
       ).to.be.rejected;
     });
-    it("should fail if table does not exist", async function () {
-      const client = this.createClient();
+    test("should fail if table does not exist", async () => {
+      const client = kit.createClient();
       await expect(
         client.updateTimeToLive({
           table: "non-existent",
@@ -115,4 +113,4 @@ describe(DynamoDBClient.name, () => {
       ).to.be.rejected;
     });
   });
-});
+};

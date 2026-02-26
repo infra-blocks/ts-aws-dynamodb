@@ -1,15 +1,10 @@
 import * as childProcess from "node:child_process";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
-import { ConsoleLogger } from "@infra-blocks/node-console-logger";
 import type { EnvironmentVariables } from "@infra-blocks/types";
 import { omit } from "radash";
 import { DynamoDbClient } from "../../src/client.js";
-import {
-  getTestConfig,
-  injectTestConfig,
-  type TestConfig,
-} from "./test-config.js";
+import type { TestKit } from "./kit.js";
+import type { TestConfig } from "./test-config.js";
 
 const CURRENT_DIR = import.meta.dirname;
 
@@ -44,7 +39,6 @@ async function init(params: {
   const { DYNAMODB_ENDPOINT_URL } = config;
   const dynamoDbPort = new URL("", DYNAMODB_ENDPOINT_URL).port;
 
-  logger.info("starting services");
   dockerComposeUp({
     env: {
       DYNAMODB_PORT: dynamoDbPort,
@@ -61,45 +55,15 @@ async function init(params: {
   });
 }
 
-function tearDown(params: { logger: Logger }): void {
-  const { logger } = params;
-  logger.info("stopping services");
-  dockerComposeDown({ logger });
-}
-
-before("test suite setup", async function () {
-  injectTestConfig();
-  const config = getTestConfig();
-  const logger = ConsoleLogger.create({
-    name: "test:integration",
-    level: config.TEST_LOG_LEVEL,
-  });
-  await init({ logger, config });
-
-  this.config = config;
-  this.logger = logger;
-  const clientLogger = ConsoleLogger.create({
-    name: "dynamodb",
-    level: config.TEST_LOG_LEVEL,
-  });
-  this.createClient = () =>
-    DynamoDbClient.create({
-      dynamodb: { endpoint: config.DYNAMODB_ENDPOINT_URL },
-      logger: clientLogger,
-    });
-  const testClientLogger = ConsoleLogger.create({
-    name: "aws-sdk",
-    level: config.AWS_SDK_LOG_LEVEL,
-  });
-  this.createTestClient = () =>
-    new DynamoDBClient({
-      endpoint: config.DYNAMODB_ENDPOINT_URL,
-      logger: testClientLogger,
-    });
-  logger.info("setup complete");
-});
-
-after("test suite teardown", function () {
-  tearDown({ logger: this.logger });
-  this.logger.info("teardown complete");
-});
+export const Services = {
+  async start(kit: TestKit) {
+    kit.logger.info("starting services");
+    await init(kit);
+    kit.logger.info("services started");
+  },
+  stop(kit: TestKit) {
+    kit.logger.info("stopping services");
+    dockerComposeDown(kit);
+    kit.logger.info("services stopped");
+  },
+};

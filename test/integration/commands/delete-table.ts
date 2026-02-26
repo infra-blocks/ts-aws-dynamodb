@@ -1,20 +1,21 @@
-import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
+import test, { suite } from "node:test";
+import { ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 
-describe(DynamoDBClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const deleteTableTests = (kit: TestKit) => {
+  suite("deleteTable", () => {
+    kit.afterEach.dropTables();
 
-  describe("deleteTable", () => {
-    it("should fail for non-existent table", async function () {
-      const client = this.createClient();
+    test("should fail for non-existent table", async () => {
+      const client = kit.createClient();
       const params = {
         name: "test-table",
       };
       await expect(client.deleteTable(params)).to.be.rejected;
     });
-    it("should work with existing table", async function () {
-      const client = this.createClient();
+    test("should work with existing table", async () => {
+      const client = kit.createClient();
       const params = {
         name: "test-table",
         keySchema: { partitionKey: { name: "pk", type: "S" } },
@@ -22,9 +23,9 @@ describe(DynamoDBClient.name, () => {
       await client.createTable(params);
       await client.deleteTable({ name: params.name });
 
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(new ListTablesCommand({}));
       expect(response.TableNames).to.be.empty;
     });
   });
-});
+};

@@ -1,21 +1,21 @@
+import test, { suite } from "node:test";
 import { expect, expectTypeOf } from "@infra-blocks/test";
 import {
   attributeNotExists,
   attributeType,
-  DynamoDbClient,
   or,
   path,
   value,
 } from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 import { expectConditionCheckFailure } from "./lib.js";
 
-describe(DynamoDbClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const putItemTests = (kit: TestKit) => {
+  suite("putItem", () => {
+    kit.afterEach.dropTables();
 
-  describe("putItem", () => {
-    it("should work on hash table", async function () {
-      const client = this.createClient();
+    test("should work on hash table", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -31,8 +31,8 @@ describe(DynamoDbClient.name, () => {
       const result = await client.getItem({ table, key: { pk: item.pk } });
       expect(result).to.deep.include({ item });
     });
-    it("should work on compound table", async function () {
-      const client = this.createClient();
+    test("should work on compound table", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -49,8 +49,8 @@ describe(DynamoDbClient.name, () => {
       const result = await client.getItem({ table, key: item });
       expect(result).to.deep.include({ item });
     });
-    it("should behave the same when return values NONE is specified", async function () {
-      const client = this.createClient();
+    test("should behave the same when return values NONE is specified", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -67,8 +67,8 @@ describe(DynamoDbClient.name, () => {
       });
       expect(response.item).to.be.undefined;
     });
-    it("should return the previous item when ALL_OLD requested", async function () {
-      const client = this.createClient();
+    test("should return the previous item when ALL_OLD requested", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -100,8 +100,8 @@ describe(DynamoDbClient.name, () => {
       const result = await client.getItem({ table, key: { pk: firstItem.pk } });
       expect(result).to.deep.include({ item: secondItem });
     });
-    it("should return the previous item on condition check failure when ALL_OLD requested", async function () {
-      const client = this.createClient();
+    test("should return the previous item on condition check failure when ALL_OLD requested", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -133,8 +133,8 @@ describe(DynamoDbClient.name, () => {
           }),
       );
     });
-    it("should work with expression", async function () {
-      const client = this.createClient();
+    test("should work with expression", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -156,8 +156,8 @@ describe(DynamoDbClient.name, () => {
       const result = await client.getItem({ table, key: item });
       expect(result).to.deep.include({ item });
     });
-    it("should strip off undefined attributes", async function () {
-      const client = this.createClient();
+    test("should strip off undefined attributes", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -179,8 +179,8 @@ describe(DynamoDbClient.name, () => {
       // the field will still be stripped.
       expect(result).to.deep.include({ item });
     });
-    it("should throw when passing undefined as part of a collection", async function () {
-      const client = this.createClient();
+    test("should throw when passing undefined as part of a collection", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -200,4 +200,4 @@ describe(DynamoDbClient.name, () => {
       ).to.eventually.be.rejected;
     });
   });
-});
+};
