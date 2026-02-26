@@ -1,5 +1,5 @@
+import test, { suite } from "node:test";
 import {
-  DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
   ResourceNotFoundException,
@@ -11,15 +11,15 @@ import {
   attributeNotExists,
   type CreateTableInput,
 } from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 import { expectConditionCheckFailure } from "./lib.js";
 
-describe(DynamoDBClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const deleteItemTests = (kit: TestKit) => {
+  suite("deleteItem", () => {
+    kit.afterEach.dropTables();
 
-  describe("deleteItem", () => {
-    it("should fail if the table does not exist", async function () {
-      const client = this.createClient();
+    test("should fail if the table does not exist", async () => {
+      const client = kit.createClient();
       const promise = client.deleteItem({
         table: "non-existent",
         key: { pk: "User#BigToto" },
@@ -30,8 +30,8 @@ describe(DynamoDBClient.name, () => {
           .undefined;
       });
     });
-    it("should succeed when the item does not exist", async function () {
-      const client = this.createClient();
+    test("should succeed when the item does not exist", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       const CreateTableInput: CreateTableInput = {
         name: table,
@@ -45,7 +45,7 @@ describe(DynamoDBClient.name, () => {
         key: { pk: "User#BigToto" },
       });
 
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new GetItemCommand({
           TableName: table,
@@ -54,8 +54,8 @@ describe(DynamoDBClient.name, () => {
       );
       expect(response.Item).to.be.undefined;
     });
-    it("should succeed when the item exists", async function () {
-      const client = this.createClient();
+    test("should succeed when the item exists", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       const CreateTableInput: CreateTableInput = {
         name: table,
@@ -64,7 +64,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(CreateTableInput);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       await testClient.send(
         new PutItemCommand({
           TableName: table,
@@ -85,8 +85,8 @@ describe(DynamoDBClient.name, () => {
       );
       expect(response.Item).to.be.undefined;
     });
-    it("should work on compound table", async function () {
-      const client = this.createClient();
+    test("should work on compound table", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       const CreateTableInput: CreateTableInput = {
         name: table,
@@ -96,7 +96,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(CreateTableInput);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       await testClient.send(
         new PutItemCommand({
           TableName: table,
@@ -117,8 +117,8 @@ describe(DynamoDBClient.name, () => {
       );
       expect(response.Item).to.be.undefined;
     });
-    it("should return the previous item when ALL_OLD requested", async function () {
-      const client = this.createClient();
+    test("should return the previous item when ALL_OLD requested", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       const CreateTableInput: CreateTableInput = {
         name: table,
@@ -127,7 +127,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(CreateTableInput);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       await testClient.send(
         new PutItemCommand({
           TableName: table,
@@ -151,8 +151,8 @@ describe(DynamoDBClient.name, () => {
       );
       expect(getItem.Item).to.be.undefined;
     });
-    it("should return the previous item on condition check failure when ALL_OLD requested", async function () {
-      const client = this.createClient();
+    test("should return the previous item on condition check failure when ALL_OLD requested", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       const CreateTableInput: CreateTableInput = {
         name: table,
@@ -161,7 +161,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(CreateTableInput);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       await testClient.send(
         new PutItemCommand({
           TableName: table,
@@ -185,4 +185,4 @@ describe(DynamoDBClient.name, () => {
       );
     });
   });
-});
+};

@@ -1,4 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { suite, test } from "node:test";
 import { expect } from "@infra-blocks/test";
 import {
   add,
@@ -10,15 +10,15 @@ import {
   set,
   value,
 } from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 import { expectConditionCheckFailure } from "./lib.js";
 
-describe(DynamoDBClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const updateItemTests = (kit: TestKit) => {
+  suite("updateItem", () => {
+    kit.afterEach.dropTables();
 
-  describe("updateItem", () => {
-    it("should work on table without sort key", async function () {
-      const client = this.createClient();
+    test("should work on table without sort key", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -28,7 +28,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         stuff: {
           "kebab-field": 42,
           removeMe: "please",
@@ -69,8 +69,8 @@ describe(DynamoDBClient.name, () => {
         },
       });
     });
-    it("should work with return values specified to ALL_OLD", async function () {
-      const client = this.createClient();
+    test("should work with return values specified to ALL_OLD", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -80,7 +80,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -102,8 +102,8 @@ describe(DynamoDBClient.name, () => {
         },
       });
     });
-    it("should work with return values specified to UPDATED_OLD", async function () {
-      const client = this.createClient();
+    test("should work with return values specified to UPDATED_OLD", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -113,7 +113,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -136,8 +136,8 @@ describe(DynamoDBClient.name, () => {
         },
       });
     });
-    it("should work with return values specified to ALL_NEW", async function () {
-      const client = this.createClient();
+    test("should work with return values specified to ALL_NEW", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -147,7 +147,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -167,8 +167,8 @@ describe(DynamoDBClient.name, () => {
       const finalItem = await client.getItem({ table, key: { pk: item.pk } });
       expect(finalItem).to.deep.equal({ item: newItem });
     });
-    it("should work with return values specified to UPDATED_NEW", async function () {
-      const client = this.createClient();
+    test("should work with return values specified to UPDATED_NEW", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -178,7 +178,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -198,8 +198,8 @@ describe(DynamoDBClient.name, () => {
         },
       });
     });
-    it("should work with condition check return values specified to ALL_OLD", async function () {
-      const client = this.createClient();
+    test("should work with condition check return values specified to ALL_OLD", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -209,7 +209,7 @@ describe(DynamoDBClient.name, () => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update this field later.
+        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -230,4 +230,4 @@ describe(DynamoDBClient.name, () => {
       );
     });
   });
-});
+};

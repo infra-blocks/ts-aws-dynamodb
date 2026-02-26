@@ -1,14 +1,15 @@
-import { DescribeTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import test, { suite } from "node:test";
+import { DescribeTableCommand } from "@aws-sdk/client-dynamodb";
 import { expect } from "@infra-blocks/test";
 import type { CreateTableInput } from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import type { TestKit } from "../kit.js";
 
-describe(DynamoDBClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const createTableTests = (kit: TestKit) => {
+  suite("createTable", () => {
+    kit.afterEach.dropTables();
 
-  describe("createTable", () => {
-    it("should work without sort key nor indexes", async function () {
-      const client = this.createClient();
+    test("should work without sort key nor indexes", async () => {
+      const client = kit.createClient();
       const params: CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -16,7 +17,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(params);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTableCommand({
           TableName: params.name,
@@ -28,8 +29,8 @@ describe(DynamoDBClient.name, () => {
         AttributeDefinitions: [{ AttributeName: "pk", AttributeType: "S" }],
       });
     });
-    it("should work with sort key and no indexes", async function () {
-      const client = this.createClient();
+    test("should work with sort key and no indexes", async () => {
+      const client = kit.createClient();
       const params: CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -38,7 +39,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(params);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTableCommand({
           TableName: params.name,
@@ -56,8 +57,8 @@ describe(DynamoDBClient.name, () => {
         ],
       });
     });
-    it("should work with a local secondary index", async function () {
-      const client = this.createClient();
+    test("should work with a local secondary index", async () => {
+      const client = kit.createClient();
       const params: CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -72,7 +73,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(params);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTableCommand({
           TableName: params.name,
@@ -100,8 +101,8 @@ describe(DynamoDBClient.name, () => {
         Projection: { ProjectionType: "ALL" },
       });
     });
-    it("should work with a global secondary index", async function () {
-      const client = this.createClient();
+    test("should work with a global secondary index", async () => {
+      const client = kit.createClient();
       const params: CreateTableInput = {
         name: "test-table",
         keySchema: {
@@ -116,7 +117,7 @@ describe(DynamoDBClient.name, () => {
         },
       };
       await client.createTable(params);
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const response = await testClient.send(
         new DescribeTableCommand({
           TableName: params.name,
@@ -145,4 +146,4 @@ describe(DynamoDBClient.name, () => {
       });
     });
   });
-});
+};

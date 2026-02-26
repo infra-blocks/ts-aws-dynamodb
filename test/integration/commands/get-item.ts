@@ -1,15 +1,16 @@
+import test, { suite } from "node:test";
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { DynamoDbClient, literal } from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import { literal } from "../../../src/index.js";
+import type { TestKit } from "../kit.js";
 
-describe(DynamoDbClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const getItemTests = (kit: TestKit) => {
+  suite("getItem", () => {
+    kit.afterEach.dropTables();
 
-  describe(DynamoDbClient.prototype.getItem.name, () => {
-    it("should work as expected when item is present", async function () {
-      const client = this.createClient();
+    test("should work as expected when item is present", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -18,7 +19,7 @@ describe(DynamoDbClient.name, () => {
           sortKey: { name: "sk", type: "N" },
         },
       });
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       await testClient.send(
         new PutItemCommand({
           TableName: table,
@@ -37,8 +38,8 @@ describe(DynamoDbClient.name, () => {
         },
       });
     });
-    it("should return undefined for missing item", async function () {
-      const client = this.createClient();
+    test("should return undefined for missing item", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -52,8 +53,8 @@ describe(DynamoDbClient.name, () => {
       });
       expect(result).to.be.empty;
     });
-    it("should honor the project expression", async function () {
-      const client = this.createClient();
+    test("should honor the project expression", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -61,7 +62,7 @@ describe(DynamoDbClient.name, () => {
           partitionKey: { name: "pk", type: "S" },
         },
       });
-      const testClient = this.createTestClient();
+      const testClient = kit.createSdkClient();
       const item = {
         pk: "User#BigToto",
         whoCares: "notme",
@@ -108,4 +109,4 @@ describe(DynamoDbClient.name, () => {
       });
     });
   });
-});
+};

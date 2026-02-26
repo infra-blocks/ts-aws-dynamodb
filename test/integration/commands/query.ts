@@ -1,20 +1,15 @@
+import { suite, test } from "node:test";
 import { asyncArrayCollect } from "@infra-blocks/iter";
 import { expect } from "@infra-blocks/test";
-import {
-  and,
-  contains,
-  DynamoDbClient,
-  path,
-  value,
-} from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import { and, contains, path, value } from "../../../src/index.js";
+import type { TestKit } from "../kit.js";
 
-describe("Query", () => {
-  afterEach("clean up", dropAllTables());
+export const queryTests = (kit: TestKit) => {
+  suite("query", () => {
+    kit.afterEach.dropTables();
 
-  describe(DynamoDbClient.prototype.query.name, () => {
-    it("should work on empty table", async function () {
-      const client = this.createClient();
+    test("should work on empty table", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -34,8 +29,9 @@ describe("Query", () => {
         lastEvaluatedKey: undefined,
       });
     });
-    it("should work on table with one item", async function () {
-      const client = this.createClient();
+
+    test("should work on table with one item", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -60,8 +56,9 @@ describe("Query", () => {
         lastEvaluatedKey: undefined,
       });
     });
-    it("should correctly forward limit parameter", async function () {
-      const client = this.createClient();
+
+    test("should correctly forward limit parameter", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -95,8 +92,9 @@ describe("Query", () => {
         },
       });
     });
-    it("should correctly forward projection parameter", async function () {
-      const client = this.createClient();
+
+    test("should correctly forward projection parameter", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -128,8 +126,9 @@ describe("Query", () => {
         lastEvaluatedKey: undefined,
       });
     });
-    it("should correctly forward scanIndexForward parameter", async function () {
-      const client = this.createClient();
+
+    test("should correctly forward scanIndexForward parameter", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -163,8 +162,9 @@ describe("Query", () => {
         lastEvaluatedKey: undefined,
       });
     });
-    it("should correctly forward filter parameter", async function () {
-      const client = this.createClient();
+
+    test("should correctly forward filter parameter", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -206,9 +206,12 @@ describe("Query", () => {
       });
     });
   });
-  describe(DynamoDbClient.prototype.paginateQuery.name, () => {
-    it("should work when results fit within one page", async function () {
-      const client = this.createClient();
+
+  suite("paginateQuery", () => {
+    kit.afterEach.dropTables();
+
+    test("should work when results fit within one page", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: "test-table",
@@ -245,8 +248,9 @@ describe("Query", () => {
         },
       ]);
     });
-    it("should work when results span multiple pages", async function () {
-      const client = this.createClient();
+
+    test("should work when results span multiple pages", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: "test-table",
@@ -309,9 +313,12 @@ describe("Query", () => {
       ]);
     });
   });
-  describe(DynamoDbClient.prototype.iterateQuery.name, () => {
-    it("should work with results spanning multiple pages", async function () {
-      const client = this.createClient();
+
+  suite("iterateQuery", () => {
+    kit.afterEach.dropTables();
+
+    test("should work with results spanning multiple pages", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -356,4 +363,4 @@ describe("Query", () => {
       ]);
     });
   });
-});
+};

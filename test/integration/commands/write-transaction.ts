@@ -1,18 +1,14 @@
+import test, { suite } from "node:test";
 import { expect } from "@infra-blocks/test";
-import {
-  attributeNotExists,
-  DynamoDbClient,
-  set,
-  value,
-} from "../../../src/index.js";
-import { dropAllTables } from "../fixtures.js";
+import { attributeNotExists, set, value } from "../../../src/index.js";
+import type { TestKit } from "../kit.js";
 
-describe(DynamoDbClient.name, () => {
-  afterEach("clean up", dropAllTables());
+export const writeTransactionTests = (kit: TestKit) => {
+  suite("writeTransaction", () => {
+    kit.afterEach.dropTables();
 
-  describe(DynamoDbClient.prototype.writeTransaction.name, () => {
-    it("should work with various actions", async function () {
-      const client = this.createClient();
+    test("should work with various actions", async () => {
+      const client = kit.createClient();
       const table = "test-table";
       await client.createTable({
         name: table,
@@ -71,4 +67,4 @@ describe(DynamoDbClient.name, () => {
         .empty;
     });
   });
-});
+};
