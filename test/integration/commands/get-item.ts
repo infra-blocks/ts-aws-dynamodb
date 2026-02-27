@@ -38,6 +38,7 @@ export const getItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should return undefined for missing item", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -53,6 +54,7 @@ export const getItemTests = (kit: TestKit) => {
       });
       expect(result).to.be.empty;
     });
+
     test("should honor the project expression", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -105,6 +107,59 @@ export const getItemTests = (kit: TestKit) => {
             },
           },
           "fuck.top": "can-you-even?",
+        },
+      });
+    });
+
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      // Since we're only checking for consumed capacity, we don't really care about the
+      // presence of an item.
+      const result = await client.getItem({
+        table,
+        key: { pk: "User#BigToto" },
+        returnConsumedCapacity: "TOTAL",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 0.5,
+        },
+      });
+    });
+
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      // Since we're only checking for consumed capacity, we don't really care about the
+      // presence of an item.
+      const result = await client.getItem({
+        table,
+        key: { pk: "User#BigToto" },
+        returnConsumedCapacity: "INDEXES",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 0.5,
+          table: {
+            capacityUnits: 0.5,
+          },
         },
       });
     });

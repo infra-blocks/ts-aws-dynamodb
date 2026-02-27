@@ -1,7 +1,12 @@
 import type { GetCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { KeyAttributes } from "../../types.js";
 import { Projection, type ProjectionInput } from "../expressions/projection.js";
-import { ExpressionsFormatter } from "./lib.js";
+import {
+  type ConsumedCapacityReturnValue,
+  ExpressionsFormatter,
+} from "./lib.js";
+
+export type GetItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
 
 /**
  * The input required to call the GetItem API.
@@ -22,6 +27,10 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
    * The projection applied to the return item, if any.
    */
   projection?: ProjectionInput;
+  /**
+   * The requested consumed capacity metrics on return, if any.
+   */
+  returnConsumedCapacity?: GetItemConsumedCapacityReturnValue;
 }
 
 export const GetItemInput = {
@@ -35,6 +44,10 @@ function encode<K extends KeyAttributes = KeyAttributes>(
     TableName: input.table,
     Key: input.key,
   };
+
+  if (input.returnConsumedCapacity != null) {
+    result.ReturnConsumedCapacity = input.returnConsumedCapacity;
+  }
 
   if (input.projection == null) {
     return result;

@@ -61,6 +61,7 @@ export type {
   DeleteItemInput,
   DeleteItemReturnValue,
   DeleteTableInput,
+  GetItemConsumedCapacityReturnValue,
   GetItemInput,
   PutItemInput,
   QueryInput,
@@ -70,6 +71,8 @@ export type {
   WriteTransactionWrite,
 } from "./inputs/index.js";
 export type {
+  CapacityUnits,
+  ConsumedCapacity,
   CreateTableOutput,
   DeleteItemOutput,
   DeleteTableOutput,
