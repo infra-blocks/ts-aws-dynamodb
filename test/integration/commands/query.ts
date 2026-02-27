@@ -26,7 +26,6 @@ export const queryTests = (kit: TestKit) => {
         count: 0,
         scannedCount: 0,
         items: [],
-        lastEvaluatedKey: undefined,
       });
     });
 
@@ -53,7 +52,6 @@ export const queryTests = (kit: TestKit) => {
             email: "joe.cunt@gmail.com",
           },
         ],
-        lastEvaluatedKey: undefined,
       });
     });
 
@@ -123,7 +121,6 @@ export const queryTests = (kit: TestKit) => {
         ],
         count: 1,
         scannedCount: 1,
-        lastEvaluatedKey: undefined,
       });
     });
 
@@ -159,7 +156,6 @@ export const queryTests = (kit: TestKit) => {
         ],
         count: 2,
         scannedCount: 2,
-        lastEvaluatedKey: undefined,
       });
     });
 
@@ -202,7 +198,6 @@ export const queryTests = (kit: TestKit) => {
         items: [filteredIn],
         count: 1,
         scannedCount: 2,
-        lastEvaluatedKey: undefined,
       });
     });
   });
@@ -244,7 +239,6 @@ export const queryTests = (kit: TestKit) => {
           ],
           count: 2,
           scannedCount: 2,
-          lastEvaluatedKey: undefined,
         },
       ]);
     });
@@ -308,7 +302,6 @@ export const queryTests = (kit: TestKit) => {
           items: [],
           count: 0,
           scannedCount: 0,
-          lastEvaluatedKey: undefined,
         },
       ]);
     });

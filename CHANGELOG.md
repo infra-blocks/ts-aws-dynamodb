@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.71.0] - 2026-02-27
+
+### Added
+
+- Support for `returnConsumedMetrics` for `GetItem`.
+
+### Changed
+
+- `Query` would return a payload with `lastEvaluatedKey` set to `undefined` instead of being absent.
+This has now been changed so that the key is absent. So, instead of `{..., lastEvaluatedKey: undefined}`,
+the output is now `{...}`.
+
 ## [0.70.0] - 2026-02-25
 
 ### Added
@@ -883,6 +895,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.71.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.0...v0.71.0
 [0.70.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.69.0...v0.70.0
 [0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
 [0.68.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.67.0...v0.68.0

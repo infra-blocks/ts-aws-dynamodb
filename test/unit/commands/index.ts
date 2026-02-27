@@ -15,11 +15,15 @@ import type {
 } from "../../../src/index.js";
 import { attributesTests } from "./attributes/index.js";
 import { expressionsTests } from "./expressions/index.js";
+import { inputTests } from "./inputs/index.js";
+import { outputsTests } from "./outputs/index.js";
 
 export const commandsTests = () => {
   suite("commands", () => {
     attributesTests();
     expressionsTests();
+    inputTests();
+    outputsTests();
 
     suite("CommandOutput", () => {
       test("should work with DeleteItem", () => {

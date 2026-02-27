@@ -4,6 +4,14 @@ import type { ExpressionFormatter } from "../expressions/formatter.js";
 
 export type ConditionCheckFailureReturnValue = "NONE" | "ALL_OLD";
 
+/**
+ * A type regrouping all possible values for `returnConsumedCapacity` options.
+ */
+export type ConsumedCapacityReturnValue = "NONE" | "INDEXES" | "TOTAL";
+
+export const CONSUMED_CAPACITY_RETURN_VALUES: ReadonlyArray<ConsumedCapacityReturnValue> =
+  ["NONE", "INDEXES", "TOTAL"];
+
 export type ExpressionsFormatter = {
   format(formatter: ExpressionFormatter): string;
   getExpressionAttributeNames(): ReturnType<AttributeNames["getSubstitutions"]>;

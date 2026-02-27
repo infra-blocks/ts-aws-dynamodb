@@ -1,3 +1,4 @@
+export type { CapacityUnits, ConsumedCapacity } from "./consumed-capacity.js";
 export * from "./create-table.js";
 export * from "./delete-item.js";
 export * from "./delete-table.js";
