@@ -1,5 +1,7 @@
 import type * as sdk from "@aws-sdk/client-dynamodb";
-import { ObjectBuilder } from "./lib.js";
+import { checkNotNull } from "@infra-blocks/checks";
+import { mapValues } from "es-toolkit/object";
+import { mapIfDefined, unsetUndefined } from "./lib.js";
 
 export type ConsumedCapacity = CapacityUnits & {
   // Although the API marks it as optional, it's always there.
@@ -16,23 +18,19 @@ export type ConsumedCapacity = CapacityUnits & {
 
 export const ConsumedCapacity = {
   decode(output: sdk.ConsumedCapacity): ConsumedCapacity {
-    return {
+    return unsetUndefined({
       ...CapacityUnits.decode(output),
-      ...ObjectBuilder.of<ConsumedCapacity>()
-        .enforceNotNull("tableName", output.TableName)
-        .mapIfNotNull("table", output.Table, CapacityUnits.decode)
-        .mapValuesIfNotNull(
-          "globalSecondaryIndexes",
-          output.GlobalSecondaryIndexes,
-          CapacityUnits.decode,
-        )
-        .mapValuesIfNotNull(
-          "localSecondaryIndexes",
-          output.LocalSecondaryIndexes,
-          CapacityUnits.decode,
-        )
-        .unwrap(),
-    };
+      tableName: checkNotNull(output.TableName),
+      table: mapIfDefined(output.Table, CapacityUnits.decode),
+      globalSecondaryIndexes: mapIfDefined(
+        output.GlobalSecondaryIndexes,
+        (gsis) => mapValues(gsis, CapacityUnits.decode),
+      ),
+      localSecondaryIndexes: mapIfDefined(
+        output.LocalSecondaryIndexes,
+        (lsis) => mapValues(lsis, CapacityUnits.decode),
+      ),
+    });
   },
 };
 
@@ -49,10 +47,10 @@ export const CapacityUnits = {
     ReadCapacityUnits?: number;
     WriteCapacityUnits?: number;
   }): CapacityUnits {
-    return ObjectBuilder.of<CapacityUnits>()
-      .enforceNotNull("capacityUnits", output.CapacityUnits)
-      .setIfNotNull("readCapacityUnits", output.ReadCapacityUnits)
-      .setIfNotNull("writeCapacityUnits", output.WriteCapacityUnits)
-      .unwrap();
+    return unsetUndefined({
+      capacityUnits: checkNotNull(output.CapacityUnits),
+      readCapacityUnits: output.ReadCapacityUnits,
+      writeCapacityUnits: output.WriteCapacityUnits,
+    });
   },
 };

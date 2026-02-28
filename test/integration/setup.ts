@@ -1,7 +1,7 @@
 import * as childProcess from "node:child_process";
 import type { Logger } from "@infra-blocks/logger-interface";
 import type { EnvironmentVariables } from "@infra-blocks/types";
-import { omit } from "radash";
+import { omit } from "es-toolkit/object";
 import { DynamoDbClient } from "../../src/client.js";
 import type { TestKit } from "./kit.js";
 import type { TestConfig } from "./test-config.js";
