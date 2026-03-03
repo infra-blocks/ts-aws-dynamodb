@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.71.0] - 2026-02-27
+## [0.70.0] - 2026-02-27
 
 ### Added
 
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This has now been changed so that the key is absent. So, instead of `{..., lastEvaluatedKey: undefined}`,
 the output is now `{...}`.
 
-## [0.70.0] - 2026-02-25
+## [0.69.0] - 2026-02-25
 
 ### Added
 
@@ -25,7 +25,7 @@ the output is now `{...}`.
 `ConditionInput`, as they support exactly the same syntax.
 - `QueryInput` now supports an optional `filter` filed to provide a filter expression on the query.
 
-## [0.69.0] - 2026-02-24
+## [0.68.0] - 2026-02-24
 
 ### Changed
 
@@ -36,15 +36,6 @@ was to reflect that fact at compilation. So now, most functions, `or`, `not` and
 not usable anymore as a Query's key condition.
 - Renamed the `QueryInput.condition` field to `keyCondition`. This is more in line with the native API
 and is significant given the distinction in what's allowed.
-
-## [0.68.0] - 2026-02-24
-
-### Changed
-
-- Narrowed the `KeyConditionInput` input type to the acceptable subset of conditions that the DynamoDB
-API expects. For example, before this change, `KeyConditionInput = ConditionInput`. Which meant that
-a "not equals" (`<>`) operator could be used in a key condition, but that would inevitably result
-in an error at runtime.
 
 ### Removed
 
@@ -895,7 +886,6 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
-[0.71.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.0...v0.71.0
 [0.70.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.69.0...v0.70.0
 [0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
 [0.68.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.67.0...v0.68.0
