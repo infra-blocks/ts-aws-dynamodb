@@ -28,7 +28,8 @@ export type ImplicitValue = Exclude<AttributeValue, AttributePath>;
  * unless it is a string, then it *must* be of type {@link Value}.
  */
 export type ValueInput<T extends AttributeValue = AttributeValue> =
-  T extends ImplicitValue ? T | Value<T> : Value<T>;
+  | Value<T>
+  | (T extends ImplicitValue ? T : never);
 
 // TODO: include branding in base formatter?
 export type Value<T extends AttributeValue = AttributeValue> = ValueFormatter &
