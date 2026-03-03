@@ -1,11 +1,41 @@
 import { suite, test } from "node:test";
-import { expect } from "@infra-blocks/test";
+import { expect, expectTypeOf } from "@infra-blocks/test";
 import { AttributeValues } from "../../../../../src/commands/attributes/values.js";
-import { isValueInput } from "../../../../../src/commands/expressions/operands/value.js";
-import { value } from "../../../../../src/index.js";
+import {
+  isValueInput,
+  type Value,
+  type ValueInput,
+} from "../../../../../src/commands/expressions/operands/value.js";
+import {
+  type KeyAttributeValue,
+  type NativeBinary,
+  type NativeNumber,
+  value,
+} from "../../../../../src/index.js";
 
 export const valueTests = () => {
   suite("value", () => {
+    suite("ValueInput", () => {
+      // This is a regression test where the previous typing did not allow Value<KeyAttributeValue> to
+      // extend ValueInput<KeyAttributeValue>. The latter resolved to a union of type number | Value<number> | ...
+      // which the base type could not extend, as its own inner value of KeyAttributeValue wasn't assignable
+      // to any of those. That is a bug, because the below code is indeed correct.
+      test("should allow a union typed value", () => {
+        expectTypeOf<Value<KeyAttributeValue>>().toExtend<
+          ValueInput<KeyAttributeValue>
+        >();
+        expectTypeOf<ValueInput<KeyAttributeValue>>().toEqualTypeOf<
+          Value<KeyAttributeValue> | NativeNumber | NativeBinary
+        >();
+      });
+    });
+
+    suite("Value", () => {
+      test("should allow a singleton type to extend a union type", () => {
+        expectTypeOf<Value<number>>().toExtend<Value<KeyAttributeValue>>();
+      });
+    });
+
     suite(value.name, () => {
       test("should be correctly substitute the value", () => {
         const operand = value(42);
@@ -13,6 +43,7 @@ export const valueTests = () => {
         expect(operand.format({ values })).to.equal(values.substitute(42));
       });
     });
+
     suite(isValueInput.name, () => {
       test("should return false for string", () => {
         expect(isValueInput("foo")).to.be.false;

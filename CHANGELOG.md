@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.1] - 2026-03-03
+
+### Fixed
+
+- Retyped `ValueInput<T>` to behave as expected when T is a union. For example, the previous
+version would resolve to this for `T = string | number`: `Value<string> | number | Value<number>`.
+The problem is that `Value<string | number>` is not assignable to the resolved type, yet it
+should be. The fix resolves to `Value<string | number> | number`, which accepts:
+`Value<string> | Value<number> | Value<string | number> | number`.
+
 ## [0.70.0] - 2026-02-27
 
 ### Added
@@ -886,6 +896,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.70.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.0...v0.70.1
 [0.70.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.69.0...v0.70.0
 [0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
 [0.68.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.67.0...v0.68.0
