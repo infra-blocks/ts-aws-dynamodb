@@ -1,6 +1,7 @@
 import type { UpdateCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { trusted } from "@infra-blocks/types";
 import type { Attributes } from "../../types.js";
-import { ObjectBuilder } from "./lib.js";
+import { mapIfDefined, unsetUndefined } from "./lib.js";
 
 export type UpdateItemOutput<T extends Attributes = Attributes> = {
   attributes?: T;
@@ -13,7 +14,7 @@ export const UpdateItemOutput = {
 function decode<T extends Attributes = Attributes>(
   output: UpdateCommandOutput,
 ): UpdateItemOutput<T> {
-  return ObjectBuilder.of<UpdateItemOutput<T>>()
-    .setIfNotNull("attributes", output.Attributes)
-    .unwrap();
+  return unsetUndefined({
+    attributes: mapIfDefined(output.Attributes, trusted<T>),
+  });
 }
