@@ -50,19 +50,12 @@ function encode<K extends KeyAttributes = KeyAttributes>(
       input.returnValuesOnConditionCheckFailure;
   }
 
-  // If there is no condition, we know that the names and values are finalized and
-  // we are ready to return the payload.
-  if (input.condition == null) {
-    result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
-    result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
-    return result;
+  if (input.condition != null) {
+    result.ConditionExpression = formatter.format(
+      Condition.from(input.condition),
+    );
   }
 
-  // Otherwise, we need to stringify the condition, reusing the same names and values
-  // as before.
-  result.ConditionExpression = formatter.format(
-    Condition.from(input.condition),
-  );
   result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
   result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
   return result;
