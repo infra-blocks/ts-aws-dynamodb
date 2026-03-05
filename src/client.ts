@@ -1,7 +1,11 @@
-import type { DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
-import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
-import type { TranslateConfig } from "@aws-sdk/lib-dynamodb";
+import {
+  type AttributeValue,
+  DynamoDBClient,
+  type DynamoDBClientConfig,
+  ListTablesCommand,
+} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 import type { Logger } from "@infra-blocks/logger-interface";
 import { NullLogger } from "@infra-blocks/null-logger";
 import { type Retry, type RetryConfig, retry } from "@infra-blocks/retry";
@@ -40,15 +44,31 @@ import {
 import { TooManyItemsException } from "./error.js";
 import type { Attributes, KeyAttributes, KeySchema } from "./types.js";
 
+const MARSHALL_OPTIONS = {
+  convertEmptyValues: false,
+  removeUndefinedValues: false,
+  convertClassInstanceToMap: false,
+  convertTopLevelContainer: true,
+  allowImpreciseNumbers: false,
+};
+
+const UNMARSHALL_OPTIONS = {
+  wrapNumbers: false,
+  // This is actually not configurable. When set to false, it appears to break
+  // all of lib dynamodb's unmarshalling. Kek.
+  convertWithoutMapWrapper: true,
+};
+
+// This is the default translation configuration from the lib-dynamodb client.
+const TRANSLATE_CONFIG = {
+  marshallOptions: MARSHALL_OPTIONS,
+  unmarshallOptions: UNMARSHALL_OPTIONS,
+};
+
 /**
  * Re-export of the native client's, renamed.
  */
 export type DynamoDbClientConfig = DynamoDBClientConfig;
-
-/**
- * Re-export of the document client's {@link TranslateConfig}, renamed.
- */
-export type DocumentClientConfig = TranslateConfig;
 
 /**
  * Creation parameters for the {@link DynamoDbClient}.
@@ -61,13 +81,6 @@ export type CreateParams = {
    * provided by the AWS SDK.
    */
   dynamodb?: DynamoDbClientConfig;
-  /**
-   * The configuration for the document client.
-   *
-   * When none is provided, the document client is instantiated with the default
-   * configuration provided by the AWS SDK.
-   */
-  document?: DocumentClientConfig;
   /**
    * Optional logger to use for logging.
    *
@@ -405,6 +418,38 @@ export class DynamoDbClient {
   upsert = this.putItem;
 
   /**
+   * Unmarshalls an item using this client's translation configuration.
+   *
+   * The item to unmarshall is expected to be an object with fields whose
+   * values are attribute definitions. Example:
+   * ```typescript
+   * {
+   *   "field1": {
+   *     "S": "toto"
+   *   },
+   *   "field2": {
+   *     "N": "42"
+   *   },
+   *   ...
+   * }
+   * ```
+   *
+   * @param data - The item to unmarshall.
+   *
+   * @returns The unmarshalled data as a flat object.
+   */
+  unmarshall<T extends Attributes = Attributes>(
+    data: Record<string, AttributeValue>,
+  ): T {
+    return trusted(
+      unmarshall(data, {
+        ...UNMARSHALL_OPTIONS,
+        convertWithoutMapWrapper: false,
+      }),
+    );
+  }
+
+  /**
    * Creates an instance of the {@link DynamoDbClient} wrapping the provided document
    * client directly.
    *
@@ -416,7 +461,7 @@ export class DynamoDbClient {
    *
    * @returns A new instance of the {@link DynamoDbClient} wrapping the provided document client.
    */
-  static from(params: {
+  private static from(params: {
     client: DynamoDBDocumentClient;
     logger?: Logger;
   }): DynamoDbClient {
@@ -431,18 +476,19 @@ export class DynamoDbClient {
    * package, which is itself a wrapper around the {@link DynamoDBClient} from the
    * `@aws-sdk/client-dynamodb` package.
    *
-   * This factory function first intantiates the vanilla client with optionally provided
-   * configuration, then wraps it in a {@link DynamoDBDocumentClient} that can also
-   * be configured. When no configuration is used, both clients are created using their
-   * respective default configuration.
+   * This factory function intantiates the vanilla client with the optionally provided
+   * configuration. When no configuration is provided, the AWS SDK's defaults are used.
    *
-   * The DynamoDB vanilla client can be configured using the `dynamodb` parameter,
-   * The document client can be configured using the `document` parameter,
+   * The AWS SDK client is then wrapped it in a {@link DynamoDBDocumentClient} that cannot be
+   * configured at this time. This is because the current code makes assumptions based on the
+   * default translation configuration. Future iterations could allow some translation
+   * configurations.
    *
-   * The `logger` parameter is optional and defaults to a {@link NullLogger}.
+   * The DynamoDB vanilla client can be configured using the `dynamodb` parameter.
    *
-   * The user also has the option to create and configure the document client outside of this code
-   * and use the {@link DynamoDbClient.from} method wrap it with a fresh instance of this class.
+   * The `logger` parameter is optional and defaults to a {@link NullLogger}. Note that this
+   * logger is used by *this* client, and not by the SDK client. If you want the
+   * SDK client to use a custom logger, pass it as configuration of the SDK client.
    *
    * @param params - The creation parameters.
    *
@@ -452,7 +498,7 @@ export class DynamoDbClient {
     const p = params || {};
     const { logger } = p;
     const dynamodb = new DynamoDBClient(p.dynamodb || {});
-    const client = DynamoDBDocumentClient.from(dynamodb, p.document);
+    const client = DynamoDBDocumentClient.from(dynamodb, TRANSLATE_CONFIG);
     return DynamoDbClient.from({ client, logger });
   }
 }

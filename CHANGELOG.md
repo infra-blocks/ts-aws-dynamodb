@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.71.0] - 2026-03-05
+
+### Added
+
+- An `unmarshall` function on the client is now available. It dispatches to the `unmarshall`
+function from the `@aws-sdk/util-dynamodb` library and forwards the unmarshalling options
+used to create the wrapped document client. This is useful to unmarshall items from
+`ConditionalCheckFailueExceptions`, as those are not unmarshalled by the document client on
+purpose, apparently. See: https://github.com/aws/aws-sdk-js-v3/issues/6723#issuecomment-2552073784.
+
+### Changed
+
+- Removed the ability to specify the translation configuration (or rather pass the document
+client) at creation. This is because not all options are supported at the moment, and it
+would conflict with some exported typing. Therefore, this has been hidden, as it should have
+been from the beginning.
+
 ## [0.70.1] - 2026-03-03
 
 ### Fixed
@@ -896,6 +913,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.71.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.1...v0.71.0
 [0.70.1]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.0...v0.70.1
 [0.70.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.69.0...v0.70.0
 [0.69.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.68.0...v0.69.0
