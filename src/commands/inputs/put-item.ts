@@ -1,22 +1,44 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import type { Attributes } from "../../types.js";
 import { Condition, type ConditionInput } from "../expressions/index.js";
-import type { ConditionCheckFailureReturnValue } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
+import type {
+  ConditionCheckFailureReturnValue,
+  ConsumedCapacityReturnValue,
+} from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
+
+export type PutItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
 
 export type PutItemReturnValue = ConditionCheckFailureReturnValue;
 
 export type PutItemInput<T extends Attributes = Attributes> = {
+  /**
+   * The table where the item will be stored located.
+   */
   table: string;
+  /**
+   * The item in question.
+   */
   item: T;
+  /**
+   * A condition expression for the operation, if any.
+   */
   condition?: ConditionInput;
+  /**
+   * The requested consumed capacity metrics on return, if any.
+   */
+  returnConsumedCapacity?: PutItemConsumedCapacityReturnValue;
+  /**
+   * The requested return values, if any. Defaults to "NONE".
+   */
   returnValues?: PutItemReturnValue;
-  // The item will be stored in the thrown exception and won't be unarmashalled.
-  // See: https://github.com/aws/aws-sdk-js-v3/issues/6723
+  /**
+   * Whether to store the item in a {@link ConditionalCheckFailureException} when one
+   * is thrown. Defaults to "NONE".
+   */
   returnValuesOnConditionCheckFailure?: ConditionCheckFailureReturnValue;
 };
-
-export type PutItemResult<T extends Attributes> = { item?: T };
 
 export const PutItemInput = {
   encode,
@@ -25,31 +47,18 @@ export const PutItemInput = {
 function encode<T extends Attributes = Attributes>(
   input: PutItemInput<T>,
 ): PutCommandInput {
-  const result: PutCommandInput = {
+  const formatter = ExpressionsFormatter.create();
+  return unsetUndefined({
     TableName: input.table,
     Item: input.item,
-  };
-
-  if (input.returnValues != null) {
-    result.ReturnValues = input.returnValues;
-  }
-
-  if (input.returnValuesOnConditionCheckFailure != null) {
-    result.ReturnValuesOnConditionCheckFailure =
-      input.returnValuesOnConditionCheckFailure;
-  }
-
-  // Expression attribute names and values can only be specified when a condition is provided,
-  // which is optional.
-  if (input.condition == null) {
-    return result;
-  }
-
-  const formatter = ExpressionsFormatter.create();
-  return {
-    ...result,
-    ConditionExpression: formatter.format(Condition.from(input.condition)),
+    ConditionExpression: ifDefined(input.condition, (v) =>
+      formatter.format(Condition.from(v)),
+    ),
     ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
     ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
-  };
+    ReturnConsumedCapacity: input.returnConsumedCapacity,
+    ReturnValues: input.returnValues,
+    ReturnValuesOnConditionCheckFailure:
+      input.returnValuesOnConditionCheckFailure,
+  });
 }

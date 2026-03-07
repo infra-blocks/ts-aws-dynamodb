@@ -6,7 +6,7 @@ import { CONSUMED_CAPACITY_RETURN_VALUES } from "../../../../src/commands/inputs
 import { literal, path } from "../../../../src/index.js";
 
 export const getItemTests = () => {
-  suite("getItem", () => {
+  suite("GetItemInput", () => {
     suite(GetItemInput.encode.name, () => {
       const expectWorks = (input: GetItemInput, expected: GetCommandInput) => {
         expect(GetItemInput.encode(input)).to.deep.equal(expected);

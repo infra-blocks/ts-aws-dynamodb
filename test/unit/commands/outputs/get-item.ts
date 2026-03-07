@@ -5,7 +5,7 @@ import { trusted } from "@infra-blocks/types";
 import { GetItemOutput } from "../../../../src/commands/outputs/index.js";
 
 export const getItemTests = () => {
-  suite("getItem", () => {
+  suite("GetItemOutput", () => {
     suite(GetItemOutput.decode.name, () => {
       const expectWorks = (
         output: GetCommandOutput,

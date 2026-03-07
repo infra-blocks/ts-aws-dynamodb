@@ -25,7 +25,7 @@ export type DeleteItemInput<K extends KeyAttributes = KeyAttributes> = {
    */
   key: K;
   /**
-   * A condition expression for the operation.
+   * A condition expression for the operation, if any.
    */
   condition?: ConditionInput;
   /**
@@ -33,12 +33,12 @@ export type DeleteItemInput<K extends KeyAttributes = KeyAttributes> = {
    */
   returnConsumedCapacity?: DeleteItemConsumedCapacityReturnValue;
   /**
-   * The requested return value, if any.
+   * The requested return values, if any. Defaults to "NONE".
    */
   returnValues?: DeleteItemReturnValue;
   /**
    * Whether to store the item in a {@link ConditionalCheckFailureException} when one
-   * is thrown.
+   * is thrown. Defaults to "NONE".
    */
   returnValuesOnConditionCheckFailure?: ConditionCheckFailureReturnValue;
 };

@@ -1,32 +1,29 @@
 import { suite, test } from "node:test";
-import type { DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
+import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
 import { expect, expectTypeOf } from "@infra-blocks/test";
-import { DeleteItemInput } from "../../../../src/commands/inputs/index.js";
+import { PutItemInput } from "../../../../src/commands/inputs/index.js";
 import {
   CONDITION_CHECK_FAILURE_RETURN_VALUES,
   CONSUMED_CAPACITY_RETURN_VALUES,
 } from "../../../../src/commands/inputs/lib.js";
 import { value } from "../../../../src/index.js";
 
-export const deleteItemTests = () => {
-  suite("DeleteItemInput", () => {
-    suite(DeleteItemInput.encode.name, () => {
-      const expectWorks = (
-        input: DeleteItemInput,
-        expected: DeleteCommandInput,
-      ) => {
-        expect(DeleteItemInput.encode(input)).to.deep.equal(expected);
+export const putItemTests = () => {
+  suite("PutItemInput", () => {
+    suite(PutItemInput.encode.name, () => {
+      const expectWorks = (input: PutItemInput, expected: PutCommandInput) => {
+        expect(PutItemInput.encode(input)).to.deep.equal(expected);
       };
 
       test("should work with minimum set of fields", () => {
         expectWorks(
           {
             table: "toto",
-            key: { pk: "word", sk: "pop" },
+            item: { pk: "word", sk: "pop" },
           },
           {
             TableName: "toto",
-            Key: {
+            Item: {
               pk: "word",
               sk: "pop",
             },
@@ -38,12 +35,12 @@ export const deleteItemTests = () => {
         expectWorks(
           {
             table: "toto",
-            key: { pk: "word", sk: "pop" },
+            item: { pk: "word", sk: "pop" },
             condition: ["toto", "=", value("tata")],
           },
           {
             TableName: "toto",
-            Key: {
+            Item: {
               pk: "word",
               sk: "pop",
             },
@@ -63,12 +60,12 @@ export const deleteItemTests = () => {
           expectWorks(
             {
               table: "toto",
-              key: { pk: "word", sk: "pop" },
+              item: { pk: "word", sk: "pop" },
               returnConsumedCapacity: v,
             },
             {
               TableName: "toto",
-              Key: {
+              Item: {
                 pk: "word",
                 sk: "pop",
               },
@@ -83,12 +80,12 @@ export const deleteItemTests = () => {
           expectWorks(
             {
               table: "toto",
-              key: { pk: "word", sk: "pop" },
+              item: { pk: "word", sk: "pop" },
               returnValues: v,
             },
             {
               TableName: "toto",
-              Key: {
+              Item: {
                 pk: "word",
                 sk: "pop",
               },
@@ -100,19 +97,17 @@ export const deleteItemTests = () => {
 
       test("should not compile with a return value set to 'UPDATED_OLD'", () => {
         expectTypeOf<"UPDATED_OLD">().not.toExtend<
-          DeleteItemInput["returnValues"]
+          PutItemInput["returnValues"]
         >();
       });
 
       test("should not compile with a return value set to 'ALL_NEW'", () => {
-        expectTypeOf<"ALL_NEW">().not.toExtend<
-          DeleteItemInput["returnValues"]
-        >();
+        expectTypeOf<"ALL_NEW">().not.toExtend<PutItemInput["returnValues"]>();
       });
 
       test("should not compile with a return value set to 'UPDATED_NEW'", () => {
         expectTypeOf<"UPDATED_NEW">().not.toExtend<
-          DeleteItemInput["returnValues"]
+          PutItemInput["returnValues"]
         >();
       });
 
@@ -121,12 +116,12 @@ export const deleteItemTests = () => {
           expectWorks(
             {
               table: "toto",
-              key: { pk: "word", sk: "pop" },
+              item: { pk: "word", sk: "pop" },
               returnValuesOnConditionCheckFailure: v,
             },
             {
               TableName: "toto",
-              Key: {
+              Item: {
                 pk: "word",
                 sk: "pop",
               },
