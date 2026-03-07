@@ -434,9 +434,24 @@ export class DynamoDbClient {
    * }
    * ```
    *
-   * @param data - The item to unmarshall.
+   * In the context of this library, this method is especially useful in
+   * conjunction with `returnValuesOnConditionCheckFailure`. This is because
+   * the item stored in the exception is *unmarshalled*. The `@aws-sdk/lib-dynamodb`
+   * does not automatically unmarshall the content of that exception, and
+   * that appears to be by design.
    *
-   * @returns The unmarshalled data as a flat object.
+   * @example
+   * const err: ConditionalCheckFailedException = ...
+   * const item = err.Item != null ? client.unmarshall(err.Item) : undefined;
+   *
+   * @param data - The item to unmarshall, expected as a record where keys are
+   * attribute names, and values are their definitions as specified by the SDK
+   * client.
+   *
+   * @returns The unmarshalled data, where attribute definitions have been
+   * converted to their matching JS types.
+   *
+   * @see https://github.com/aws/aws-sdk-js-v3/issues/6723
    */
   unmarshall<T extends Attributes = Attributes>(
     data: Record<string, AttributeValue>,
