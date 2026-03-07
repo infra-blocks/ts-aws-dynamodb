@@ -1,17 +1,17 @@
 import { suite, test } from "node:test";
-import type { DeleteCommandOutput } from "@aws-sdk/lib-dynamodb";
+import type { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { expect } from "@infra-blocks/test";
 import { trusted } from "@infra-blocks/types";
-import { DeleteItemOutput } from "../../../../src/commands/outputs/index.js";
+import { PutItemOutput } from "../../../../src/commands/outputs/index.js";
 
-export const deleteItemTests = () => {
-  suite("DeleteItemOutput", () => {
-    suite(DeleteItemOutput.decode.name, () => {
+export const putItemTests = () => {
+  suite("PutItemOutput", () => {
+    suite(PutItemOutput.decode.name, () => {
       const expectWorks = (
-        output: DeleteCommandOutput,
-        expected: DeleteItemOutput,
+        output: PutCommandOutput,
+        expected: PutItemOutput,
       ) => {
-        expect(DeleteItemOutput.decode(output)).to.deep.equal(expected);
+        expect(PutItemOutput.decode(output)).to.deep.equal(expected);
       };
 
       test("should work with minimal fields", () => {

@@ -31,6 +31,7 @@ export const putItemTests = (kit: TestKit) => {
       const result = await client.getItem({ table, key: { pk: item.pk } });
       expect(result).to.deep.include({ item });
     });
+
     test("should work on compound table", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -49,6 +50,7 @@ export const putItemTests = (kit: TestKit) => {
       const result = await client.getItem({ table, key: item });
       expect(result).to.deep.include({ item });
     });
+
     test("should behave the same when return values NONE is specified", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -67,6 +69,7 @@ export const putItemTests = (kit: TestKit) => {
       });
       expect(response.item).to.be.undefined;
     });
+
     test("should return the previous item when ALL_OLD requested", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -100,6 +103,7 @@ export const putItemTests = (kit: TestKit) => {
       const result = await client.getItem({ table, key: { pk: firstItem.pk } });
       expect(result).to.deep.include({ item: secondItem });
     });
+
     test("should return the previous item on condition check failure when ALL_OLD requested", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -133,6 +137,7 @@ export const putItemTests = (kit: TestKit) => {
           }),
       );
     });
+
     test("should work with expression", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -156,6 +161,7 @@ export const putItemTests = (kit: TestKit) => {
       const result = await client.getItem({ table, key: item });
       expect(result).to.deep.include({ item });
     });
+
     test("should strip off undefined attributes", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -179,6 +185,7 @@ export const putItemTests = (kit: TestKit) => {
       // the field will still be stripped.
       expect(result).to.deep.include({ item });
     });
+
     test("should throw when passing undefined as part of a collection", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -198,6 +205,55 @@ export const putItemTests = (kit: TestKit) => {
           },
         }),
       ).to.eventually.be.rejected;
+    });
+
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      const result = await client.putItem({
+        table,
+        item: { pk: "User#BigToto" },
+        returnConsumedCapacity: "TOTAL",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+        },
+      });
+    });
+
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      const result = await client.putItem({
+        table,
+        item: { pk: "User#BigToto" },
+        returnConsumedCapacity: "INDEXES",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+          table: {
+            capacityUnits: 1,
+          },
+        },
+      });
     });
   });
 };

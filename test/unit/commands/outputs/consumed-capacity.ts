@@ -4,7 +4,7 @@ import { expect } from "@infra-blocks/test";
 import { ConsumedCapacity } from "../../../../src/commands/outputs/consumed-capacity.js";
 
 export const consumedCapacityTests = () => {
-  suite("consumed-capacity", () => {
+  suite("ConsumedCapacity", () => {
     const expectWorks = (
       output: sdk.ConsumedCapacity,
       expected: ConsumedCapacity,
