@@ -66,7 +66,7 @@
     "@infra-blocks/logger-interface": "^0.3.1",
     "@infra-blocks/null-logger": "^0.1.1",
     "@infra-blocks/retry": "^0.1.1",
-    "@infra-blocks/types": "^0.28.0",
+    "@infra-blocks/types": "^0.32.0",
     "es-toolkit": "^1.45.0"
   }
 }

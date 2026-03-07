@@ -1,9 +1,13 @@
 import type { DeleteCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { trusted } from "@infra-blocks/types";
 import type { Attributes } from "../../types.js";
-import { mapIfDefined, unsetUndefined } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
+import { ConsumedCapacity } from "./consumed-capacity.js";
 
-export type DeleteItemOutput<T extends Attributes = Attributes> = { item?: T };
+export type DeleteItemOutput<T extends Attributes = Attributes> = {
+  item?: T;
+  consumedCapacity?: ConsumedCapacity;
+};
 
 export const DeleteItemOutput = {
   decode,
@@ -13,6 +17,10 @@ function decode<T extends Attributes = Attributes>(
   output: DeleteCommandOutput,
 ): DeleteItemOutput<T> {
   return unsetUndefined({
-    item: mapIfDefined(output.Attributes, trusted<T>),
+    item: ifDefined(output.Attributes, trusted<T>),
+    consumedCapacity: ifDefined(
+      output.ConsumedCapacity,
+      ConsumedCapacity.decode,
+    ),
   });
 }
