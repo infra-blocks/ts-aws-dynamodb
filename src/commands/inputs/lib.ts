@@ -4,6 +4,9 @@ import type { ExpressionFormatter } from "../expressions/formatter.js";
 
 export type ConditionCheckFailureReturnValue = "NONE" | "ALL_OLD";
 
+export const CONDITION_CHECK_FAILURE_RETURN_VALUES: ReadonlyArray<ConditionCheckFailureReturnValue> =
+  ["NONE", "ALL_OLD"];
+
 /**
  * A type regrouping all possible values for `returnConsumedCapacity` options.
  */

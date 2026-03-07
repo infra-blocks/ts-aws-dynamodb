@@ -30,6 +30,7 @@ export const deleteItemTests = (kit: TestKit) => {
           .undefined;
       });
     });
+
     test("should succeed when the item does not exist", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -54,6 +55,7 @@ export const deleteItemTests = (kit: TestKit) => {
       );
       expect(response.Item).to.be.undefined;
     });
+
     test("should succeed when the item exists", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -85,6 +87,7 @@ export const deleteItemTests = (kit: TestKit) => {
       );
       expect(response.Item).to.be.undefined;
     });
+
     test("should work on compound table", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -117,6 +120,7 @@ export const deleteItemTests = (kit: TestKit) => {
       );
       expect(response.Item).to.be.undefined;
     });
+
     test("should return the previous item when ALL_OLD requested", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -151,6 +155,7 @@ export const deleteItemTests = (kit: TestKit) => {
       );
       expect(getItem.Item).to.be.undefined;
     });
+
     test("should return the previous item on condition check failure when ALL_OLD requested", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -183,6 +188,57 @@ export const deleteItemTests = (kit: TestKit) => {
             other: { S: "coucou" },
           }),
       );
+    });
+
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      // Since we're only checking for consumed capacity, we don't really care about the
+      // presence of an item.
+      const result = await client.deleteItem({
+        table,
+        key: { pk: "User#BigToto" },
+        returnConsumedCapacity: "TOTAL",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+        },
+      });
+    });
+
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      const result = await client.deleteItem({
+        table,
+        key: { pk: "User#BigToto" },
+        returnConsumedCapacity: "INDEXES",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+          table: {
+            capacityUnits: 1,
+          },
+        },
+      });
     });
   });
 };

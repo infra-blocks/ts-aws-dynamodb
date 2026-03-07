@@ -2,7 +2,7 @@ import type { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
 import { trusted } from "@infra-blocks/types";
 import type { Attributes, KeyAttributes } from "../../index.js";
-import { mapIfDefined, unsetUndefined } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
 
 export type QueryOutput<
   T extends Attributes = Attributes,
@@ -26,6 +26,6 @@ function decode<
     count: checkNotNull(output.Count),
     items: (output.Items ?? []) as Array<T>,
     scannedCount: checkNotNull(output.ScannedCount),
-    lastEvaluatedKey: mapIfDefined(output.LastEvaluatedKey, trusted<K>),
+    lastEvaluatedKey: ifDefined(output.LastEvaluatedKey, trusted<K>),
   });
 }

@@ -1,7 +1,7 @@
 import type * as sdk from "@aws-sdk/client-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
 import { mapValues } from "es-toolkit/object";
-import { mapIfDefined, unsetUndefined } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
 
 export type ConsumedCapacity = CapacityUnits & {
   // Although the API marks it as optional, it's always there.
@@ -21,14 +21,12 @@ export const ConsumedCapacity = {
     return unsetUndefined({
       ...CapacityUnits.decode(output),
       tableName: checkNotNull(output.TableName),
-      table: mapIfDefined(output.Table, CapacityUnits.decode),
-      globalSecondaryIndexes: mapIfDefined(
-        output.GlobalSecondaryIndexes,
-        (gsis) => mapValues(gsis, CapacityUnits.decode),
+      table: ifDefined(output.Table, CapacityUnits.decode),
+      globalSecondaryIndexes: ifDefined(output.GlobalSecondaryIndexes, (gsis) =>
+        mapValues(gsis, CapacityUnits.decode),
       ),
-      localSecondaryIndexes: mapIfDefined(
-        output.LocalSecondaryIndexes,
-        (lsis) => mapValues(lsis, CapacityUnits.decode),
+      localSecondaryIndexes: ifDefined(output.LocalSecondaryIndexes, (lsis) =>
+        mapValues(lsis, CapacityUnits.decode),
       ),
     });
   },
