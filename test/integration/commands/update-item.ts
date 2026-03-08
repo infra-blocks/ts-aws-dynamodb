@@ -28,7 +28,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         stuff: {
           "kebab-field": 42,
           removeMe: "please",
@@ -69,6 +68,7 @@ export const updateItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should work with return values specified to ALL_OLD", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -80,7 +80,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -102,6 +101,7 @@ export const updateItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should work with return values specified to UPDATED_OLD", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -113,7 +113,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -136,6 +135,7 @@ export const updateItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should work with return values specified to ALL_NEW", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -147,7 +147,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -167,6 +166,7 @@ export const updateItemTests = (kit: TestKit) => {
       const finalItem = await client.getItem({ table, key: { pk: item.pk } });
       expect(finalItem).to.deep.equal({ item: newItem });
     });
+
     test("should work with return values specified to UPDATED_NEW", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -178,7 +178,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -198,6 +197,7 @@ export const updateItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should work with condition check return values specified to ALL_OLD", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -209,7 +209,6 @@ export const updateItemTests = (kit: TestKit) => {
       });
       const item = {
         pk: "BigIron#1",
-        // Going to update kit.field later.
         oldField: "hello?",
       };
       await client.putItem({ table, item });
@@ -228,6 +227,64 @@ export const updateItemTests = (kit: TestKit) => {
             oldField: { S: "hello?" },
           }),
       );
+    });
+
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+      const item = {
+        pk: "BigIron#1",
+        oldField: "hello?",
+      };
+      await client.putItem({ table, item });
+      const result = await client.updateItem({
+        table,
+        key: { pk: "User#BigToto" },
+        update: [set("oldField", value("bye!"))],
+        returnConsumedCapacity: "TOTAL",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+        },
+      });
+    });
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+      const item = {
+        pk: "BigIron#1",
+        oldField: "hello?",
+      };
+      await client.putItem({ table, item });
+      const result = await client.updateItem({
+        table,
+        key: { pk: "User#BigToto" },
+        update: [set("oldField", value("bye!"))],
+        returnConsumedCapacity: "INDEXES",
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1,
+          table: {
+            capacityUnits: 1,
+          },
+        },
+      });
     });
   });
 };

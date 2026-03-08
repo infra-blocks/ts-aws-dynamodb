@@ -1,32 +1,43 @@
 import { suite, test } from "node:test";
-import type { DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
-import { expect, expectTypeOf } from "@infra-blocks/test";
-import { DeleteItemInput } from "../../../../src/commands/inputs/index.js";
+import type { UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import { expect } from "@infra-blocks/test";
+import {
+  UPDATE_ITEM_RETURN_VALUES,
+  UpdateItemInput,
+} from "../../../../src/commands/inputs/index.js";
 import {
   CONDITION_CHECK_FAILURE_RETURN_VALUES,
   CONSUMED_CAPACITY_RETURN_VALUES,
 } from "../../../../src/commands/inputs/lib.js";
-import { value } from "../../../../src/index.js";
+import { attributeExists, set, value } from "../../../../src/index.js";
 
-export const deleteItemTests = () => {
-  suite("DeleteItemInput", () => {
-    suite(DeleteItemInput.encode.name, () => {
+export const updateItemTests = () => {
+  suite("UpdateItemInput", () => {
+    suite(UpdateItemInput.encode.name, () => {
       const expectWorks = (
-        input: DeleteItemInput,
-        expected: DeleteCommandInput,
+        input: UpdateItemInput,
+        expected: UpdateCommandInput,
       ) => {
-        expect(DeleteItemInput.encode(input)).to.deep.equal(expected);
+        expect(UpdateItemInput.encode(input)).to.deep.equal(expected);
       };
 
       const minimalInput = {
         table: "toto",
         key: { pk: "word", sk: "pop" },
+        update: [set("pk", value("toto"))],
       };
       const minimalExpected = {
         TableName: "toto",
         Key: {
           pk: "word",
           sk: "pop",
+        },
+        UpdateExpression: "SET #attr1 = :value1",
+        ExpressionAttributeNames: {
+          "#attr1": "pk",
+        },
+        ExpressionAttributeValues: {
+          ":value1": "toto",
         },
       };
 
@@ -38,17 +49,11 @@ export const deleteItemTests = () => {
         expectWorks(
           {
             ...minimalInput,
-            condition: ["toto", "=", value("tata")],
+            condition: attributeExists("pk"),
           },
           {
             ...minimalExpected,
-            ConditionExpression: "#attr1 = :value1",
-            ExpressionAttributeNames: {
-              "#attr1": "toto",
-            },
-            ExpressionAttributeValues: {
-              ":value1": "tata",
-            },
+            ConditionExpression: "attribute_exists(#attr1)",
           },
         );
       });
@@ -68,7 +73,7 @@ export const deleteItemTests = () => {
         });
       }
 
-      for (const v of ["NONE", "ALL_OLD"] as const) {
+      for (const v of UPDATE_ITEM_RETURN_VALUES) {
         test(`should work with return values set to '${v}'`, () => {
           expectWorks(
             {
@@ -82,24 +87,6 @@ export const deleteItemTests = () => {
           );
         });
       }
-
-      test("should not compile with a return value set to 'UPDATED_OLD'", () => {
-        expectTypeOf<"UPDATED_OLD">().not.toExtend<
-          DeleteItemInput["returnValues"]
-        >();
-      });
-
-      test("should not compile with a return value set to 'ALL_NEW'", () => {
-        expectTypeOf<"ALL_NEW">().not.toExtend<
-          DeleteItemInput["returnValues"]
-        >();
-      });
-
-      test("should not compile with a return value set to 'UPDATED_NEW'", () => {
-        expectTypeOf<"UPDATED_NEW">().not.toExtend<
-          DeleteItemInput["returnValues"]
-        >();
-      });
 
       for (const v of CONDITION_CHECK_FAILURE_RETURN_VALUES) {
         test(`should work with returnValuesOnConditionCheckFailure set to '${v}'`, () => {

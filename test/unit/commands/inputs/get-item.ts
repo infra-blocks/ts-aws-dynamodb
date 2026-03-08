@@ -12,36 +12,31 @@ export const getItemTests = () => {
         expect(GetItemInput.encode(input)).to.deep.equal(expected);
       };
 
+      const minimalInput = {
+        table: "toto",
+        key: { pk: "word", sk: "pop" },
+      };
+      const minimalExpected = {
+        TableName: "toto",
+        Key: {
+          pk: "word",
+          sk: "pop",
+        },
+      };
+
       test("should work with minimum set of fields", () => {
-        expectWorks(
-          {
-            table: "toto",
-            key: { pk: "word", sk: "pop" },
-          },
-          {
-            TableName: "toto",
-            Key: {
-              pk: "word",
-              sk: "pop",
-            },
-          },
-        );
+        expectWorks(minimalInput, minimalExpected);
       });
 
       for (const value of CONSUMED_CAPACITY_RETURN_VALUES) {
         test(`should work with returnConsumedCapacity: ${value}`, () => {
           expectWorks(
             {
-              table: "toto",
-              key: { pk: "word", sk: "pop" },
+              ...minimalInput,
               returnConsumedCapacity: value,
             },
             {
-              TableName: "toto",
-              Key: {
-                pk: "word",
-                sk: "pop",
-              },
+              ...minimalExpected,
               ReturnConsumedCapacity: value,
             },
           );
@@ -51,16 +46,11 @@ export const getItemTests = () => {
       test("should work with projection", () => {
         expectWorks(
           {
-            table: "toto",
-            key: { pk: "word", sk: "pop" },
+            ...minimalInput,
             projection: ["toto", path("tata.tutu"), literal("joe.cunt")],
           },
           {
-            TableName: "toto",
-            Key: {
-              pk: "word",
-              sk: "pop",
-            },
+            ...minimalExpected,
             ProjectionExpression: "#attr1,#attr2.#attr3,#attr4",
             ExpressionAttributeNames: {
               "#attr1": "toto",
@@ -75,17 +65,12 @@ export const getItemTests = () => {
       test("should work with all fields set", () => {
         expectWorks(
           {
-            table: "toto",
-            key: { pk: "word", sk: "pop" },
+            ...minimalInput,
             projection: ["toto", "list[4]"],
             returnConsumedCapacity: "INDEXES",
           },
           {
-            TableName: "toto",
-            Key: {
-              pk: "word",
-              sk: "pop",
-            },
+            ...minimalExpected,
             ProjectionExpression: "#attr1,#attr2[4]",
             ExpressionAttributeNames: {
               "#attr1": "toto",

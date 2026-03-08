@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.74.0] - 2026-03-08
+
+### Added
+
+- Support for `returnConsumedCapacity` for `UpdateItem`.
+
 ## [0.73.0] - 2026-03-07
 
 ### Added
@@ -925,6 +931,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.74.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.73.0...v0.74.0
 [0.73.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.72.0...v0.73.0
 [0.72.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.71.0...v0.72.0
 [0.71.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.70.1...v0.71.0
