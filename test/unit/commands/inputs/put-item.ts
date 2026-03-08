@@ -15,35 +15,30 @@ export const putItemTests = () => {
         expect(PutItemInput.encode(input)).to.deep.equal(expected);
       };
 
+      const minimalInput = {
+        table: "toto",
+        item: { pk: "word", sk: "pop" },
+      };
+      const minimalExpected = {
+        TableName: "toto",
+        Item: {
+          pk: "word",
+          sk: "pop",
+        },
+      };
+
       test("should work with minimum set of fields", () => {
-        expectWorks(
-          {
-            table: "toto",
-            item: { pk: "word", sk: "pop" },
-          },
-          {
-            TableName: "toto",
-            Item: {
-              pk: "word",
-              sk: "pop",
-            },
-          },
-        );
+        expectWorks(minimalInput, minimalExpected);
       });
 
       test("should work with condition", () => {
         expectWorks(
           {
-            table: "toto",
-            item: { pk: "word", sk: "pop" },
+            ...minimalInput,
             condition: ["toto", "=", value("tata")],
           },
           {
-            TableName: "toto",
-            Item: {
-              pk: "word",
-              sk: "pop",
-            },
+            ...minimalExpected,
             ConditionExpression: "#attr1 = :value1",
             ExpressionAttributeNames: {
               "#attr1": "toto",
@@ -59,16 +54,11 @@ export const putItemTests = () => {
         test(`should work with returnConsumedCapacity set to '${v}'`, () => {
           expectWorks(
             {
-              table: "toto",
-              item: { pk: "word", sk: "pop" },
+              ...minimalInput,
               returnConsumedCapacity: v,
             },
             {
-              TableName: "toto",
-              Item: {
-                pk: "word",
-                sk: "pop",
-              },
+              ...minimalExpected,
               ReturnConsumedCapacity: v,
             },
           );
@@ -79,16 +69,11 @@ export const putItemTests = () => {
         test(`should work with return values set to '${v}'`, () => {
           expectWorks(
             {
-              table: "toto",
-              item: { pk: "word", sk: "pop" },
+              ...minimalInput,
               returnValues: v,
             },
             {
-              TableName: "toto",
-              Item: {
-                pk: "word",
-                sk: "pop",
-              },
+              ...minimalExpected,
               ReturnValues: v,
             },
           );
@@ -115,16 +100,11 @@ export const putItemTests = () => {
         test(`should work with returnValuesOnConditionCheckFailure set to '${v}'`, () => {
           expectWorks(
             {
-              table: "toto",
-              item: { pk: "word", sk: "pop" },
+              ...minimalInput,
               returnValuesOnConditionCheckFailure: v,
             },
             {
-              TableName: "toto",
-              Item: {
-                pk: "word",
-                sk: "pop",
-              },
+              ...minimalExpected,
               ReturnValuesOnConditionCheckFailure: v,
             },
           );

@@ -7,8 +7,14 @@ import {
   Update,
   type UpdateInput,
 } from "../expressions/index.js";
-import type { ConditionCheckFailureReturnValue } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
+import type {
+  ConditionCheckFailureReturnValue,
+  ConsumedCapacityReturnValue,
+} from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
+
+export type UpdateItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
 
 export type UpdateItemReturnValue =
   | "NONE"
@@ -17,13 +23,46 @@ export type UpdateItemReturnValue =
   | "ALL_NEW"
   | "UPDATED_NEW";
 
+export const UPDATE_ITEM_RETURN_VALUES: ReadonlyArray<UpdateItemReturnValue> = [
+  "NONE",
+  "ALL_OLD",
+  "UPDATED_OLD",
+  "ALL_NEW",
+  "UPDATED_NEW",
+];
+
 export interface UpdateItemInput<K extends KeyAttributes = KeyAttributes> {
+  /**
+   * The table name of the updated item.
+   */
   table: string;
+  /**
+   * The primary key values of the item to update.
+   *
+   * This should always include at least the partition key, and the sort key if one
+   * is part of the table's primary key. No more than 2 fields are expected here.
+   */
   key: K;
+  /**
+   * The update expression of the operation.
+   */
   update: UpdateInput;
+  /**
+   * A condition expression for the operation, if any.
+   */
   condition?: ConditionInput;
+  /**
+   * The requested consumed capacity metrics on return. Defaults to "NONE".
+   */
+  returnConsumedCapacity?: UpdateItemConsumedCapacityReturnValue;
+  /**
+   * The requested return values. Defaults to "NONE".
+   */
   returnValues?: UpdateItemReturnValue;
-  // Item stored unmarshalled in the thrown exception.
+  /**
+   * The values to store the item in a {@link ConditionalCheckFailureException} when one
+   * is thrown. Defaults to "NONE".
+   */
   returnValuesOnConditionCheckFailure?: ConditionCheckFailureReturnValue;
 }
 
@@ -35,30 +74,20 @@ function encode<K extends KeyAttributes = KeyAttributes>(
   input: UpdateItemInput<K>,
 ): UpdateCommandInput {
   const formatter = ExpressionsFormatter.create();
-  const result: UpdateCommandInput = {
+  return unsetUndefined({
     TableName: input.table,
     Key: input.key,
     UpdateExpression: formatter.format(Update.from(input.update)),
-  };
-
-  if (input.returnValues != null) {
-    result.ReturnValues = input.returnValues;
-  }
-
-  if (input.returnValuesOnConditionCheckFailure != null) {
-    result.ReturnValuesOnConditionCheckFailure =
-      input.returnValuesOnConditionCheckFailure;
-  }
-
-  if (input.condition != null) {
-    result.ConditionExpression = formatter.format(
-      Condition.from(input.condition),
-    );
-  }
-
-  result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
-  result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
-  return result;
+    ConditionExpression: ifDefined(input.condition, (v) =>
+      formatter.format(Condition.from(v)),
+    ),
+    ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
+    ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
+    ReturnConsumedCapacity: input.returnConsumedCapacity,
+    ReturnValues: input.returnValues,
+    ReturnValuesOnConditionCheckFailure:
+      input.returnValuesOnConditionCheckFailure,
+  });
 }
 
 /*
