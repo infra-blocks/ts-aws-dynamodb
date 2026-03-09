@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.76.0] - 2026-03-09
+
+### Changed
+
+- Narrowed the types expected by `WriteTransactionInput`. Indeed, the previous version expected the same types
+as their non-transaction equivalents. For example, a put in the previous version was a such `{ put: PutItemInput }`.
+However, this is incorrect, as some fields are not supported by the [API](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
+For example, `{ put: {..., returnValues: "ALL_OLD" } }` should not compile, as `returnValues` is not a field supported
+by write transactions at this time. Therefore, write transactions have been retyped as such: `{ put: WriteTransactionPutItemInput }`,
+where the input now correctly lists the accepted fields. This is true for `delete`s and `update`s as well.
+
 ## [0.75.0] - 2026-03-09
 
 ### Added
@@ -937,6 +948,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.76.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.75.0...v0.76.0
 [0.75.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.74.0...v0.75.0
 [0.74.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.73.0...v0.74.0
 [0.73.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.72.0...v0.73.0
