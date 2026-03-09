@@ -28,16 +28,16 @@ export const getItemTests = () => {
         expectWorks(minimalInput, minimalExpected);
       });
 
-      for (const value of CONSUMED_CAPACITY_RETURN_VALUES) {
-        test(`should work with returnConsumedCapacity: ${value}`, () => {
+      for (const v of CONSUMED_CAPACITY_RETURN_VALUES) {
+        test(`should work with returnConsumedCapacity: ${v}`, () => {
           expectWorks(
             {
               ...minimalInput,
-              returnConsumedCapacity: value,
+              returnConsumedCapacity: v,
             },
             {
               ...minimalExpected,
-              ReturnConsumedCapacity: value,
+              ReturnConsumedCapacity: v,
             },
           );
         });
