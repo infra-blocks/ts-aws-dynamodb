@@ -5,11 +5,29 @@ import { DeleteItemInput } from "./delete-item.js";
 import { PutItemInput } from "./put-item.js";
 import { UpdateItemInput } from "./update-item.js";
 
-// TODO: consider moving condition check here esé?
+export type WriteTransactionPutItemInput = Pick<
+  PutItemInput,
+  "table" | "item" | "condition" | "returnValuesOnConditionCheckFailure"
+>;
+
+export type WriteTransactionUpdateItemInput = Pick<
+  UpdateItemInput,
+  | "table"
+  | "key"
+  | "update"
+  | "condition"
+  | "returnValuesOnConditionCheckFailure"
+>;
+
+export type WriteTransactionDeleteItemInput = Pick<
+  DeleteItemInput,
+  "table" | "key" | "condition" | "returnValuesOnConditionCheckFailure"
+>;
+
 export type WriteTransactionWrite =
-  | { put: PutItemInput }
-  | { update: UpdateItemInput }
-  | { delete: DeleteItemInput }
+  | { put: WriteTransactionPutItemInput }
+  | { update: WriteTransactionUpdateItemInput }
+  | { delete: WriteTransactionDeleteItemInput }
   | { conditionCheck: ConditionCheckInput };
 
 export type WriteTransactionInput = {

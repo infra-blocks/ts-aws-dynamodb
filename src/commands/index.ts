@@ -67,7 +67,10 @@ export type {
   QueryInput,
   UpdateItemInput,
   UpdateTimeToLiveInput,
+  WriteTransactionDeleteItemInput,
   WriteTransactionInput,
+  WriteTransactionPutItemInput,
+  WriteTransactionUpdateItemInput,
   WriteTransactionWrite,
 } from "./inputs/index.js";
 export type {
