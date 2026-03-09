@@ -355,5 +355,76 @@ export const queryTests = (kit: TestKit) => {
         },
       ]);
     });
+
+    // TODO: test with indexes.
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      // Just putting an item so that the returned capacity isn't 0.
+      await client.putItem({
+        table,
+        item: {
+          pk: "toto",
+        },
+      });
+
+      const result = await client.query({
+        table,
+        keyCondition: ["pk", "=", value("toto")],
+        returnConsumedCapacity: "TOTAL",
+      });
+      expect(result).to.deep.equal({
+        count: 1,
+        items: [{ pk: "toto" }],
+        scannedCount: 1,
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 0.5,
+        },
+      });
+    });
+
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      await client.putItem({
+        table,
+        item: {
+          pk: "toto",
+        },
+      });
+
+      const result = await client.query({
+        table,
+        keyCondition: ["pk", "=", value("toto")],
+        returnConsumedCapacity: "INDEXES",
+      });
+      expect(result).to.deep.equal({
+        count: 1,
+        items: [{ pk: "toto" }],
+        scannedCount: 1,
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 0.5,
+          table: {
+            capacityUnits: 0.5,
+          },
+        },
+      });
+    });
   });
 };

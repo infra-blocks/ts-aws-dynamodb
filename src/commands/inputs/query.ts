@@ -8,7 +8,11 @@ import {
   Projection,
   type ProjectionInput,
 } from "../expressions/index.js";
-import { ExpressionsFormatter } from "./lib.js";
+import { ifDefined, unsetUndefined } from "../lib.js";
+import {
+  type ConsumedCapacityReturnValue,
+  ExpressionsFormatter,
+} from "./lib.js";
 
 export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
@@ -19,6 +23,7 @@ export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   index?: string;
   limit?: number;
   projection?: ProjectionInput;
+  returnConsumedCapacity?: ConsumedCapacityReturnValue;
   scanIndexForward?: boolean;
 };
 
@@ -30,30 +35,25 @@ function encode<K extends KeyAttributes = KeyAttributes>(
   input: QueryInput<K>,
 ): QueryCommandInput {
   const formatter = ExpressionsFormatter.create();
-  const result: QueryCommandInput = {
+  return unsetUndefined({
     TableName: input.table,
     IndexName: input.index,
-    KeyConditionExpression: formatter.format(
-      KeyCondition.from(input.keyCondition),
-    ),
     ConsistentRead: input.consistentRead,
     ExclusiveStartKey: input.exclusiveStartKey,
     Limit: input.limit,
+    ReturnConsumedCapacity: input.returnConsumedCapacity,
     ScanIndexForward: input.scanIndexForward,
-  };
-
-  if (input.filter != null) {
-    result.FilterExpression = formatter.format(Filter.from(input.filter));
-  }
-
-  if (input.projection != null) {
-    result.ProjectionExpression = formatter.format(
-      Projection.from(input.projection),
-    );
-  }
-
-  result.ExpressionAttributeNames = formatter.getExpressionAttributeNames();
-  result.ExpressionAttributeValues = formatter.getExpressionAttributeValues();
-
-  return result;
+    // Expressions
+    KeyConditionExpression: formatter.format(
+      KeyCondition.from(input.keyCondition),
+    ),
+    FilterExpression: ifDefined(input.filter, (v) =>
+      formatter.format(Filter.from(v)),
+    ),
+    ProjectionExpression: ifDefined(input.projection, (v) =>
+      formatter.format(Projection.from(v)),
+    ),
+    ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
+    ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
+  });
 }
