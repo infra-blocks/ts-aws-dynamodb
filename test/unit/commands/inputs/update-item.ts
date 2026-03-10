@@ -61,14 +61,8 @@ export const updateItemTests = () => {
       for (const v of CONSUMED_CAPACITY_RETURN_VALUES) {
         test(`should work with returnConsumedCapacity set to '${v}'`, () => {
           expectWorks(
-            {
-              ...minimalInput,
-              returnConsumedCapacity: v,
-            },
-            {
-              ...minimalExpected,
-              ReturnConsumedCapacity: v,
-            },
+            { ...minimalInput, returnConsumedCapacity: v },
+            { ...minimalExpected, ReturnConsumedCapacity: v },
           );
         });
       }

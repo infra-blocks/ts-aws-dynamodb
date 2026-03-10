@@ -14,6 +14,8 @@ import {
   ExpressionsFormatter,
 } from "./lib.js";
 
+export type QueryConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
+
 export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   table: string;
   keyCondition: KeyConditionInput;
@@ -23,7 +25,7 @@ export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   index?: string;
   limit?: number;
   projection?: ProjectionInput;
-  returnConsumedCapacity?: ConsumedCapacityReturnValue;
+  returnConsumedCapacity?: QueryConsumedCapacityReturnValue;
   scanIndexForward?: boolean;
 };
 
