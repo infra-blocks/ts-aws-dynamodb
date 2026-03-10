@@ -80,6 +80,7 @@ export type {
   DeleteItemOutput,
   DeleteTableOutput,
   GetItemOutput,
+  ItemCollectionMetrics,
   PutItemOutput,
   QueryOutput,
   UpdateItemOutput,

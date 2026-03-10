@@ -40,3 +40,11 @@ export const ExpressionsFormatter = {
     };
   },
 };
+
+/**
+ * A type regrouping all possible values for `returnItemCollectionMetrics` options.
+ */
+export type ItemCollectionMetricsReturnValue = "NONE" | "SIZE";
+
+export const ITEM_COLLECTION_METRICS_RETURN_VALUES: ReadonlyArray<ItemCollectionMetricsReturnValue> =
+  ["NONE", "SIZE"];

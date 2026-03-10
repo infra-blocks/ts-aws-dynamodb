@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.78.0] - 2026-03-11
 
+### Added
+
+- Support for `returnItemCollectionMetrics` on `PutItem`.
+
 ### Fixed
 
 - The `CreateTableInput.lsis` type previously allowed partial key schemas, or key schemas without sort keys. This
