@@ -5,6 +5,7 @@ import { getItemTests } from "./get-item.js";
 import { putItemTests } from "./put-item.js";
 import { queryTests } from "./query.js";
 import { updateItemTests } from "./update-item.js";
+import { writeTransactionTests } from "./write-transaction.js";
 
 export const outputsTests = () => {
   suite("outputs", () => {
@@ -14,5 +15,6 @@ export const outputsTests = () => {
     queryTests();
     putItemTests();
     updateItemTests();
+    writeTransactionTests();
   });
 };

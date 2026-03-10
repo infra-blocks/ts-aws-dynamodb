@@ -1,9 +1,14 @@
 import type { TransactWriteCommandInput } from "@aws-sdk/lib-dynamodb";
 import { type UnpackedArray, unreachable } from "@infra-blocks/types";
+import { unsetUndefined } from "../lib.js";
 import { ConditionCheckInput } from "./condition-check.js";
 import { DeleteItemInput } from "./delete-item.js";
+import type { ConsumedCapacityReturnValue } from "./lib.js";
 import { PutItemInput } from "./put-item.js";
 import { UpdateItemInput } from "./update-item.js";
+
+export type WriteTransactionConsumedCapacityReturnValue =
+  ConsumedCapacityReturnValue;
 
 export type WriteTransactionPutItemInput = Pick<
   PutItemInput,
@@ -32,13 +37,18 @@ export type WriteTransactionWrite =
 
 export type WriteTransactionInput = {
   writes: WriteTransactionWrite[];
+  /**
+   * The requested consumed capacity metrics on return, if any.
+   */
+  returnConsumedCapacity?: WriteTransactionConsumedCapacityReturnValue;
 };
 
 export const WriteTransactionInput = {
   encode(input: WriteTransactionInput): TransactWriteCommandInput {
-    return {
+    return unsetUndefined({
       TransactItems: input.writes.map(WriteTransactionWrite.encode),
-    };
+      ReturnConsumedCapacity: input.returnConsumedCapacity,
+    });
   },
 };
 

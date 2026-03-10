@@ -256,6 +256,7 @@ export const updateItemTests = (kit: TestKit) => {
         },
       });
     });
+
     test("should work with return consumed capacity set to 'INDEXES'", async () => {
       const client = kit.createClient();
       const table = "test-table";

@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import test, { suite } from "node:test";
 import { expect } from "@infra-blocks/test";
 import { attributeNotExists, set, value } from "../../../src/index.js";
@@ -65,6 +66,81 @@ export const writeTransactionTests = (kit: TestKit) => {
       ).to.deep.equal({ item: { pk: "UpdatedItem", newField: 42 } });
       expect(await client.getItem({ table, key: { pk: "DeletedItem" } })).to.be
         .empty;
+    });
+
+    test("should work with return consumed capacity set to 'TOTAL'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+      const result = await client.writeTransaction({
+        writes: [
+          {
+            delete: {
+              table,
+              key: { pk: "wot" },
+            },
+          },
+          {
+            put: {
+              table,
+              item: { pk: "plotz" },
+            },
+          },
+        ],
+        returnConsumedCapacity: "TOTAL",
+      });
+      assert.deepEqual(result, {
+        consumedCapacity: [
+          {
+            tableName: "test-table",
+            capacityUnits: 3,
+          },
+        ],
+      });
+    });
+
+    test("should work with return consumed capacity set to 'INDEXES'", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+      const result = await client.writeTransaction({
+        writes: [
+          {
+            delete: {
+              table,
+              key: { pk: "wot" },
+            },
+          },
+          {
+            put: {
+              table,
+              item: { pk: "plotz" },
+            },
+          },
+        ],
+        returnConsumedCapacity: "INDEXES",
+      });
+      assert.deepEqual(result, {
+        consumedCapacity: [
+          {
+            tableName: "test-table",
+            capacityUnits: 3,
+            table: {
+              capacityUnits: 3,
+            },
+          },
+        ],
+      });
     });
   });
 };
