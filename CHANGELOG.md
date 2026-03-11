@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.78.0] - 2026-03-11
+
+### Added
+
+- Support for `returnItemCollectionMetrics` on `PutItem`.
+
+### Fixed
+
+- The `CreateTableInput.lsis` type previously allowed partial key schemas, or key schemas without sort keys. This
+has now been corrected to not compile if the sort key is missing.
+
 ## [0.77.0] - 2026-03-10
 
 ### Added
@@ -954,6 +965,7 @@ intuitive.
 - Initial release of the package! Move the implementation work in progress from another
 project to here.
 
+[0.78.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.77.0...v0.78.0
 [0.77.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.76.0...v0.77.0
 [0.76.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.75.0...v0.76.0
 [0.75.0]: https://github.com/infra-blocks/ts-aws-dynamodb/compare/v0.74.0...v0.75.0

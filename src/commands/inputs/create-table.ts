@@ -11,7 +11,8 @@ export interface CreateTableInput<KS extends KeySchema = KeySchema> {
   keySchema: KS;
   // TODO: the index definition should be more complete.
   gsis?: Record<string, KeySchema>;
-  lsis?: Record<string, KeySchema>;
+  // The sort key is required on LSIs.
+  lsis?: Record<string, Required<KeySchema>>;
 }
 
 export const CreateTableInput = {

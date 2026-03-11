@@ -1,6 +1,6 @@
+import assert from "node:assert/strict";
 import { suite, test } from "node:test";
 import type { PutCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { expect } from "@infra-blocks/test";
 import { trusted } from "@infra-blocks/types";
 import { PutItemOutput } from "../../../../src/commands/outputs/index.js";
 
@@ -11,7 +11,7 @@ export const putItemTests = () => {
         output: PutCommandOutput,
         expected: PutItemOutput,
       ) => {
-        expect(PutItemOutput.decode(output)).to.deep.equal(expected);
+        assert.deepEqual(PutItemOutput.decode(output), expected);
       };
 
       test("should work with minimal fields", () => {
@@ -22,6 +22,23 @@ export const putItemTests = () => {
         expectWorks(trusted({ Attributes: { pk: "stfu", sk: "plz" } }), {
           item: { pk: "stfu", sk: "plz" },
         });
+      });
+
+      test("should work with item collection metrics", () => {
+        expectWorks(
+          trusted({
+            ItemCollectionMetrics: {
+              ItemCollectionKey: { pk: "toto" },
+              SizeEstimateRangeGB: [0, 10],
+            },
+          }),
+          {
+            itemCollectionMetrics: {
+              itemCollectionKey: { pk: "toto" },
+              sizeEstimateRangeGb: [0, 10],
+            },
+          },
+        );
       });
 
       test("should work with consumed capacity", () => {

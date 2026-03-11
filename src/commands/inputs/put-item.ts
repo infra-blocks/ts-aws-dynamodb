@@ -5,10 +5,14 @@ import { ifDefined, unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,
+  ItemCollectionMetricsReturnValue,
 } from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 export type PutItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
+
+export type PutItemItemCollectionMetricsReturnValue =
+  ItemCollectionMetricsReturnValue;
 
 export type PutItemReturnValue = ConditionCheckFailureReturnValue;
 
@@ -26,9 +30,13 @@ export type PutItemInput<T extends Attributes = Attributes> = {
    */
   condition?: ConditionInput;
   /**
-   * The requested consumed capacity metrics on return, if any.
+   * The requested consumed capacity metrics on return, if any. Defaults to "NONE".
    */
   returnConsumedCapacity?: PutItemConsumedCapacityReturnValue;
+  /**
+   * The requested item collection metrics on return, if any. Defaults to "NONE".
+   */
+  returnItemCollectionMetrics?: PutItemItemCollectionMetricsReturnValue;
   /**
    * The requested return values, if any. Defaults to "NONE".
    */
@@ -57,6 +65,7 @@ function encode<T extends Attributes = Attributes>(
     ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
     ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
     ReturnConsumedCapacity: input.returnConsumedCapacity,
+    ReturnItemCollectionMetrics: input.returnItemCollectionMetrics,
     ReturnValues: input.returnValues,
     ReturnValuesOnConditionCheckFailure:
       input.returnValuesOnConditionCheckFailure,
