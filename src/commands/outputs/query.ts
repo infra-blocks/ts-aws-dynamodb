@@ -1,8 +1,9 @@
 import type { QueryCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
+import { ifDefined } from "@infra-blocks/toolkit";
 import { trusted } from "@infra-blocks/types";
 import type { Attributes, KeyAttributes } from "../../index.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import { ConsumedCapacity } from "./consumed-capacity.js";
 
 export type QueryOutput<

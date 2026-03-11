@@ -1,7 +1,8 @@
 import type { GetCommandOutput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import { trusted } from "@infra-blocks/types";
 import type { Attributes } from "../../types.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import { ConsumedCapacity } from "./consumed-capacity.js";
 
 export type GetItemOutput<T extends Attributes = Attributes> = {

@@ -1,7 +1,8 @@
 import type { PutCommandInput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import type { Attributes } from "../../types.js";
 import { Condition, type ConditionInput } from "../expressions/index.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,

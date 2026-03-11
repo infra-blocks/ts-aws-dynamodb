@@ -1,4 +1,5 @@
 import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import type { KeyAttributes } from "../../types.js";
 import {
   Filter,
@@ -8,7 +9,7 @@ import {
   Projection,
   type ProjectionInput,
 } from "../expressions/index.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import {
   type ConsumedCapacityReturnValue,
   ExpressionsFormatter,
