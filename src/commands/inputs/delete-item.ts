@@ -1,7 +1,8 @@
 import type { DeleteCommandInput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import type { KeyAttributes } from "../../types.js";
 import { Condition, type ConditionInput } from "../expressions/index.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,

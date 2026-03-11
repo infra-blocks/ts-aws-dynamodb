@@ -1,5 +1,6 @@
 import type { TransactWriteCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { ifDefined } from "@infra-blocks/toolkit";
+import { unsetUndefined } from "../lib.js";
 import { ConsumedCapacity } from "./consumed-capacity.js";
 
 export type WriteTransactionOutput = {

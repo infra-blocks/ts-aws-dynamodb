@@ -1,4 +1,5 @@
 import type { UpdateCommandInput as NativeUpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import type { WithRequired } from "@infra-blocks/types";
 import type { KeyAttributes } from "../../types.js";
 import {
@@ -7,7 +8,7 @@ import {
   Update,
   type UpdateInput,
 } from "../expressions/index.js";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,

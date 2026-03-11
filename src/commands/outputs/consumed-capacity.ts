@@ -1,7 +1,8 @@
 import type * as sdk from "@aws-sdk/client-dynamodb";
 import { checkNotNull } from "@infra-blocks/checks";
+import { ifDefined } from "@infra-blocks/toolkit";
 import { mapValues } from "es-toolkit/object";
-import { ifDefined, unsetUndefined } from "../lib.js";
+import { unsetUndefined } from "../lib.js";
 
 export type ConsumedCapacity = CapacityUnits & {
   // Although the API marks it as optional, it's always there.
