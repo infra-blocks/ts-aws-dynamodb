@@ -3,12 +3,18 @@ import { type UnpackedArray, unreachable } from "@infra-blocks/types";
 import { unsetUndefined } from "../lib.js";
 import { ConditionCheckInput } from "./condition-check.js";
 import { DeleteItemInput } from "./delete-item.js";
-import type { ConsumedCapacityReturnValue } from "./lib.js";
+import type {
+  ConsumedCapacityReturnValue,
+  ItemCollectionMetricsReturnValue,
+} from "./lib.js";
 import { PutItemInput } from "./put-item.js";
 import { UpdateItemInput } from "./update-item.js";
 
 export type WriteTransactionConsumedCapacityReturnValue =
   ConsumedCapacityReturnValue;
+
+export type WriteTransactionItemCollectionMetricsReturnValue =
+  ItemCollectionMetricsReturnValue;
 
 export type WriteTransactionPutItemInput = Pick<
   PutItemInput,
@@ -38,9 +44,13 @@ export type WriteTransactionWrite =
 export type WriteTransactionInput = {
   writes: WriteTransactionWrite[];
   /**
-   * The requested consumed capacity metrics on return, if any.
+   * The requested consumed capacity metrics on return, if any. Defaults to "NONE".
    */
   returnConsumedCapacity?: WriteTransactionConsumedCapacityReturnValue;
+  /**
+   * The requested item collection metrics on return, if any. Defaults to "NONE".
+   */
+  returnItemCollectionMetrics?: WriteTransactionItemCollectionMetricsReturnValue;
 };
 
 export const WriteTransactionInput = {
@@ -48,6 +58,7 @@ export const WriteTransactionInput = {
     return unsetUndefined({
       TransactItems: input.writes.map(WriteTransactionWrite.encode),
       ReturnConsumedCapacity: input.returnConsumedCapacity,
+      ReturnItemCollectionMetrics: input.returnItemCollectionMetrics,
     });
   },
 };

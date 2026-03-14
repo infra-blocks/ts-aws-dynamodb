@@ -33,6 +33,23 @@ export const writeTransactionTests = () => {
           },
         );
       });
+
+      test("should work with item collection metrics", () => {
+        expectWorks(
+          trusted({
+            ItemCollectionMetrics: {
+              ItemCollectionKey: { pk: "toto" },
+              SizeEstimateRangeGB: [0, 10],
+            },
+          }),
+          {
+            itemCollectionMetrics: {
+              itemCollectionKey: { pk: "toto" },
+              sizeEstimateRangeGb: [0, 10],
+            },
+          },
+        );
+      });
     });
   });
 };
