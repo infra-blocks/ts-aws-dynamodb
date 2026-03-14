@@ -6,10 +6,14 @@ import { unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,
+  ItemCollectionMetricsReturnValue,
 } from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 export type DeleteItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
+
+export type DeleteItemItemCollectionMetricsReturnValue =
+  ItemCollectionMetricsReturnValue;
 
 export type DeleteItemReturnValue = ConditionCheckFailureReturnValue;
 
@@ -30,9 +34,13 @@ export type DeleteItemInput<K extends KeyAttributes = KeyAttributes> = {
    */
   condition?: ConditionInput;
   /**
-   * The requested consumed capacity metrics on return, if any.
+   * The requested consumed capacity metrics on return, if any. Defaults to "NONE".
    */
   returnConsumedCapacity?: DeleteItemConsumedCapacityReturnValue;
+  /**
+   * The requested item collection metrics on return, if any. Defaults to "NONE".
+   */
+  returnItemCollectionMetrics?: DeleteItemItemCollectionMetricsReturnValue;
   /**
    * The requested return values, if any. Defaults to "NONE".
    */
@@ -62,6 +70,7 @@ function encode<K extends KeyAttributes>(
     ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
     ReturnConsumedCapacity: input.returnConsumedCapacity,
     ReturnValues: input.returnValues,
+    ReturnItemCollectionMetrics: input.returnItemCollectionMetrics,
     ReturnValuesOnConditionCheckFailure:
       input.returnValuesOnConditionCheckFailure,
   });
