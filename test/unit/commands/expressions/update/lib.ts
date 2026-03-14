@@ -14,6 +14,6 @@ export function matchAction(params: {
   const { action, matcher } = params;
   const names = AttributeNames.create();
   const values = AttributeValues.create();
-  const match = checkNotNull(matcher.exec(action.stringify({ names, values })));
+  const match = checkNotNull(matcher.exec(action.format({ names, values })));
   return { names, values, match };
 }
