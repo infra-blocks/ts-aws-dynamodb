@@ -18,12 +18,6 @@ export const putItemTests = () => {
         expectWorks(trusted({}), {});
       });
 
-      test("should work with an item", () => {
-        expectWorks(trusted({ Attributes: { pk: "stfu", sk: "plz" } }), {
-          item: { pk: "stfu", sk: "plz" },
-        });
-      });
-
       test("should work with consumed capacity", () => {
         expectWorks(
           trusted({
@@ -36,6 +30,12 @@ export const putItemTests = () => {
             },
           },
         );
+      });
+
+      test("should work with an item", () => {
+        expectWorks(trusted({ Attributes: { pk: "stfu", sk: "plz" } }), {
+          item: { pk: "stfu", sk: "plz" },
+        });
       });
 
       test("should work with item collection metrics", () => {
