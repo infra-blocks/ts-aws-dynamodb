@@ -63,7 +63,7 @@ export class Update implements ExpressionFormatter {
     }
     parts.push(
       `ADD ${actions
-        .map((action) => action.stringify({ names, values }))
+        .map((action) => action.format({ names, values }))
         .join(",")}`,
     );
   }
@@ -80,7 +80,7 @@ export class Update implements ExpressionFormatter {
     }
     parts.push(
       `DELETE ${actions
-        .map((action) => action.stringify({ names, values }))
+        .map((action) => action.format({ names, values }))
         .join(",")}`,
     );
   }
@@ -95,9 +95,7 @@ export class Update implements ExpressionFormatter {
       return;
     }
     parts.push(
-      `REMOVE ${actions
-        .map((action) => action.stringify({ names }))
-        .join(",")}`,
+      `REMOVE ${actions.map((action) => action.format({ names })).join(",")}`,
     );
   }
 
@@ -113,7 +111,7 @@ export class Update implements ExpressionFormatter {
     }
     parts.push(
       `SET ${actions
-        .map((action) => action.stringify({ names, values }))
+        .map((action) => action.format({ names, values }))
         .join(",")}`,
     );
   }

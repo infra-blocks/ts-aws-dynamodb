@@ -33,10 +33,7 @@ export class SetAction implements IUpdateAction {
     clauses.pushSetAction(this);
   }
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
+  format(params: { names: AttributeNames; values: AttributeValues }): string {
     const { names, values } = params;
     let result = `${this.params.path.format({ names })} = ${this.params.operand.format(
       {

@@ -23,10 +23,7 @@ export class DeleteAction implements IUpdateAction {
     clauses.pushDeleteAction(this);
   }
 
-  stringify(params: {
-    names: AttributeNames;
-    values: AttributeValues;
-  }): string {
+  format(params: { names: AttributeNames; values: AttributeValues }): string {
     const { names, values } = params;
     return `${this.path.format({ names })} ${this.value.format({
       values,

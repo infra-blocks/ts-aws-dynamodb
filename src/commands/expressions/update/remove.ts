@@ -14,7 +14,7 @@ export class RemoveAction implements IUpdateAction {
     clauses.pushRemoveAction(this);
   }
 
-  stringify(params: { names: AttributeNames }): string {
+  format(params: { names: AttributeNames }): string {
     const { names } = params;
     return this.path.format({ names });
   }

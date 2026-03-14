@@ -1,31 +1,18 @@
-import type { AttributeNames } from "../../attributes/names.js";
-import type { AttributeValues } from "../../attributes/values.js";
+import type { ExpressionFormatter } from "../formatter.js";
 import type { AddAction } from "./add.js";
 import type { UpdateExpressionClauses } from "./clauses.js";
 import type { DeleteAction } from "./delete.js";
 import type { RemoveAction } from "./remove.js";
 import type { SetAction } from "./set.js";
 
-export interface IUpdateAction {
+export type IUpdateAction = ExpressionFormatter & {
   /**
    * Registers the action within the {@link UpdateExpressionClauses}.
    *
    * @param clauses - The clauses to register the action in.
    */
   register(clauses: UpdateExpressionClauses): void;
-
-  /**
-   * Stringifies the action within the clause.
-   *
-   * For example, if the action is a `SetAction`, it will be invoked as such:
-   * `SET ${action.stringify({names, values})}`. So the clause identifier is managed
-   * by the caller.
-   *
-   * @param params.names - The attribute names to format in the action.
-   * @param params.values - The attribute values to format in the action.
-   */
-  stringify(params: { names: AttributeNames; values: AttributeValues }): string;
-}
+};
 
 /**
  * This type aggregates all the possible update actions that can be performed.
