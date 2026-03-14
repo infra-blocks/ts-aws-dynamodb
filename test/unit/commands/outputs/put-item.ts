@@ -24,6 +24,20 @@ export const putItemTests = () => {
         });
       });
 
+      test("should work with consumed capacity", () => {
+        expectWorks(
+          trusted({
+            ConsumedCapacity: { TableName: "test-table", CapacityUnits: 1 },
+          }),
+          {
+            consumedCapacity: {
+              tableName: "test-table",
+              capacityUnits: 1,
+            },
+          },
+        );
+      });
+
       test("should work with item collection metrics", () => {
         expectWorks(
           trusted({
@@ -36,20 +50,6 @@ export const putItemTests = () => {
             itemCollectionMetrics: {
               itemCollectionKey: { pk: "toto" },
               sizeEstimateRangeGb: [0, 10],
-            },
-          },
-        );
-      });
-
-      test("should work with consumed capacity", () => {
-        expectWorks(
-          trusted({
-            ConsumedCapacity: { TableName: "test-table", CapacityUnits: 1 },
-          }),
-          {
-            consumedCapacity: {
-              tableName: "test-table",
-              capacityUnits: 1,
             },
           },
         );

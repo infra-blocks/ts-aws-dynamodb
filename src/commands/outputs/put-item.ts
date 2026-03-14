@@ -8,6 +8,10 @@ import { ItemCollectionMetrics } from "./item-collection-metrics.js";
 
 export type PutItemOutput<T extends Attributes = Attributes> = {
   /**
+   * The returned consumed capacity, if any.
+   */
+  consumedCapacity?: ConsumedCapacity;
+  /**
    * The returned item, if any.
    */
   item?: T;
@@ -15,10 +19,6 @@ export type PutItemOutput<T extends Attributes = Attributes> = {
    * The returned item collection metrics, if any.
    */
   itemCollectionMetrics?: ItemCollectionMetrics;
-  /**
-   * The returned consumed capacity, if any.
-   */
-  consumedCapacity?: ConsumedCapacity;
 };
 
 export const PutItemOutput = {

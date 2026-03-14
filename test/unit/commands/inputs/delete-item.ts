@@ -5,6 +5,7 @@ import { DeleteItemInput } from "../../../../src/commands/inputs/index.js";
 import {
   CONDITION_CHECK_FAILURE_RETURN_VALUES,
   CONSUMED_CAPACITY_RETURN_VALUES,
+  ITEM_COLLECTION_METRICS_RETURN_VALUES,
 } from "../../../../src/commands/inputs/lib.js";
 import { value } from "../../../../src/index.js";
 
@@ -63,6 +64,21 @@ export const deleteItemTests = () => {
             {
               ...minimalExpected,
               ReturnConsumedCapacity: v,
+            },
+          );
+        });
+      }
+
+      for (const v of ITEM_COLLECTION_METRICS_RETURN_VALUES) {
+        test(`should work with returnItemCollectionMetrics set to '${v}'`, () => {
+          expectWorks(
+            {
+              ...minimalInput,
+              returnItemCollectionMetrics: v,
+            },
+            {
+              ...minimalExpected,
+              ReturnItemCollectionMetrics: v,
             },
           );
         });
