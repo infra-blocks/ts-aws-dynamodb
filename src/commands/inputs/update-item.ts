@@ -12,10 +12,14 @@ import { unsetUndefined } from "../lib.js";
 import type {
   ConditionCheckFailureReturnValue,
   ConsumedCapacityReturnValue,
+  ItemCollectionMetricsReturnValue,
 } from "./lib.js";
 import { ExpressionsFormatter } from "./lib.js";
 
 export type UpdateItemConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
+
+export type UpdateItemItemCollectionMetricsReturnValue =
+  ItemCollectionMetricsReturnValue;
 
 export type UpdateItemReturnValue =
   | "NONE"
@@ -57,6 +61,10 @@ export interface UpdateItemInput<K extends KeyAttributes = KeyAttributes> {
    */
   returnConsumedCapacity?: UpdateItemConsumedCapacityReturnValue;
   /**
+   * The requested item collection metrics on return, if any. Defaults to "NONE".
+   */
+  returnItemCollectionMetrics?: UpdateItemItemCollectionMetricsReturnValue;
+  /**
    * The requested return values. Defaults to "NONE".
    */
   returnValues?: UpdateItemReturnValue;
@@ -85,6 +93,7 @@ function encode<K extends KeyAttributes = KeyAttributes>(
     ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
     ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
     ReturnConsumedCapacity: input.returnConsumedCapacity,
+    ReturnItemCollectionMetrics: input.returnItemCollectionMetrics,
     ReturnValues: input.returnValues,
     ReturnValuesOnConditionCheckFailure:
       input.returnValuesOnConditionCheckFailure,
