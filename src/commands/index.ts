@@ -65,6 +65,7 @@ export type {
   GetItemInput,
   PutItemInput,
   QueryInput,
+  ScanInput,
   UpdateItemInput,
   UpdateTimeToLiveInput,
   WriteTransactionDeleteItemInput,
