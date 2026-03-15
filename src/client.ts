@@ -31,6 +31,9 @@ import {
   Query,
   type QueryInput,
   type QueryOutput,
+  Scan,
+  type ScanInput,
+  type ScanOutput,
   UpdateItem,
   type UpdateItemInput,
   type UpdateItemOutput,
@@ -270,8 +273,7 @@ export class DynamoDbClient {
    *
    * @param input - The parameters to use to query the table or index.
    *
-   * @returns An async generator that yields items matching the query, one
-   * at a time, and that handles pagination automatically.
+   * @returns A page resulting from the query operation using the provided input.
    *
    * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html
    */
@@ -343,6 +345,30 @@ export class DynamoDbClient {
         },
       },
     );
+  }
+
+  /**
+   * Scans a table, or an index, using the Scan API.
+   *
+   * It produces a single page of results, which may or may not contain all the
+   * items of the scan. If the result is incomplete, the {@link ScanOutput.lastEvaluatedKey}
+   * will be set, and should be used in a follow up scan as the {@link ScanInput.exclusiveStartKey}.
+   *
+   * @param input - The parameters to use to scan the table or index.
+   *
+   * @returns A page resulting from the scan operation using the provided input.
+   *
+   * @see https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html
+   */
+  scan<
+    T extends Attributes = Attributes,
+    K extends KeyAttributes = KeyAttributes,
+  >(input: ScanInput<K>): Promise<ScanOutput<T, K>> {
+    if (this.logger.isDebugEnabled()) {
+      this.logger.debug("scan(%s)", JSON.stringify(input));
+    }
+
+    return this.send(new Scan<T, K>(input));
   }
 
   // TODO: without branding, one type equals all types...

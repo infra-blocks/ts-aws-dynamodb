@@ -1,11 +1,9 @@
-import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import type { ScanCommandInput } from "@aws-sdk/lib-dynamodb";
 import { ifDefined } from "@infra-blocks/toolkit";
 import type { KeyAttributes } from "../../types.js";
 import {
   Filter,
   type FilterInput,
-  KeyCondition,
-  type KeyConditionInput,
   Projection,
   type ProjectionInput,
 } from "../expressions/index.js";
@@ -15,19 +13,14 @@ import {
   ExpressionsFormatter,
 } from "./lib.js";
 
-export type QueryConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
+export type ScanConsumedCapacityReturnValue = ConsumedCapacityReturnValue;
 
-export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
+export type ScanInput<K extends KeyAttributes = KeyAttributes> = {
   /**
    * The name of the table to query, or the name of the table owning
    * the index to query, when provided.
    */
   table: string;
-  /**
-   * The key condition narrowing the query. This minimally needs to
-   * include an equality check on the partition key.
-   */
-  keyCondition: KeyConditionInput;
   /**
    * Whether to perform a consistent read. Defaults to false.
    */
@@ -55,40 +48,42 @@ export type QueryInput<K extends KeyAttributes = KeyAttributes> = {
   /**
    * The requested consumed capacity metrics on return, if any.
    */
-  returnConsumedCapacity?: QueryConsumedCapacityReturnValue;
+  returnConsumedCapacity?: ScanConsumedCapacityReturnValue;
   /**
-   * Whether to scan the index forward or backwards. Forwards means ascending, while backwards means descending.
-   * Defaults to true.
+   * The segment ID of the parallel query. Must always be provided in conjunction
+   * with `totalSegments`.
    */
-  scanIndexForward?: boolean;
+  segment?: number;
+  /**
+   * The number of segments dividing the parallel query. Must always be provided
+   * in conjunction with `segment`.
+   */
+  totalSegments?: number;
 };
 
-export const QueryInput = {
+export const ScanInput = {
   encode,
 };
 
 function encode<K extends KeyAttributes = KeyAttributes>(
-  input: QueryInput<K>,
-): QueryCommandInput {
+  input: ScanInput<K>,
+): ScanCommandInput {
   const formatter = ExpressionsFormatter.create();
   return unsetUndefined({
     TableName: input.table,
-    IndexName: input.index,
     ConsistentRead: input.consistentRead,
     ExclusiveStartKey: input.exclusiveStartKey,
+    FilterExpression: ifDefined(input.filter, (f) =>
+      formatter.format(Filter.from(f)),
+    ),
+    IndexName: input.index,
     Limit: input.limit,
+    ProjectionExpression: ifDefined(input.projection, (p) =>
+      formatter.format(Projection.from(p)),
+    ),
     ReturnConsumedCapacity: input.returnConsumedCapacity,
-    ScanIndexForward: input.scanIndexForward,
-    // Expressions
-    KeyConditionExpression: formatter.format(
-      KeyCondition.from(input.keyCondition),
-    ),
-    FilterExpression: ifDefined(input.filter, (v) =>
-      formatter.format(Filter.from(v)),
-    ),
-    ProjectionExpression: ifDefined(input.projection, (v) =>
-      formatter.format(Projection.from(v)),
-    ),
+    Segment: input.segment,
+    TotalSegments: input.totalSegments,
     ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
     ExpressionAttributeValues: formatter.getExpressionAttributeValues(),
   });

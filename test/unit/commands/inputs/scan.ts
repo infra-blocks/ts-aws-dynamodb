@@ -1,30 +1,22 @@
 import { suite, test } from "node:test";
-import type { QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import type { ScanCommandInput } from "@aws-sdk/lib-dynamodb";
 import { expect } from "@infra-blocks/test";
-import { QueryInput } from "../../../../src/commands/inputs/index.js";
+import { ScanInput } from "../../../../src/commands/inputs/index.js";
 import { CONSUMED_CAPACITY_RETURN_VALUES } from "../../../../src/commands/inputs/lib.js";
 import { beginsWith, literal, path, value } from "../../../../src/index.js";
 
-export const queryTests = () => {
-  suite("QueryInput", () => {
-    suite(QueryInput.encode.name, () => {
-      const expectWorks = (input: QueryInput, expected: QueryCommandInput) => {
-        expect(QueryInput.encode(input)).to.deep.equal(expected);
+export const scanTests = () => {
+  suite("ScanInput", () => {
+    suite(ScanInput.encode.name, () => {
+      const expectWorks = (input: ScanInput, expected: ScanCommandInput) => {
+        expect(ScanInput.encode(input)).to.deep.equal(expected);
       };
 
-      const minimalInput: QueryInput = {
+      const minimalInput: ScanInput = {
         table: "toto",
-        keyCondition: ["pk", "=", value("toto")],
       };
-      const minimalExpected: QueryCommandInput = {
+      const minimalExpected: ScanCommandInput = {
         TableName: "toto",
-        KeyConditionExpression: "#attr1 = :value1",
-        ExpressionAttributeNames: {
-          "#attr1": "pk",
-        },
-        ExpressionAttributeValues: {
-          ":value1": "toto",
-        },
       };
 
       test("should work with minimum set of fields", () => {
@@ -50,10 +42,12 @@ export const queryTests = () => {
           { ...minimalInput, filter: beginsWith("pk", value("t")) },
           {
             ...minimalExpected,
-            FilterExpression: "begins_with(#attr1, :value2)",
+            FilterExpression: "begins_with(#attr1, :value1)",
+            ExpressionAttributeNames: {
+              "#attr1": "pk",
+            },
             ExpressionAttributeValues: {
-              ...minimalExpected.ExpressionAttributeValues,
-              ":value2": "t",
+              ":value1": "t",
             },
           },
         );
@@ -74,13 +68,12 @@ export const queryTests = () => {
           },
           {
             ...minimalExpected,
-            ProjectionExpression: "#attr2,#attr3.#attr4,#attr5",
+            ProjectionExpression: "#attr1,#attr2.#attr3,#attr4",
             ExpressionAttributeNames: {
-              ...minimalExpected.ExpressionAttributeNames,
-              "#attr2": "toto",
-              "#attr3": "tata",
-              "#attr4": "tutu",
-              "#attr5": "joe.cunt",
+              "#attr1": "toto",
+              "#attr2": "tata",
+              "#attr3": "tutu",
+              "#attr4": "joe.cunt",
             },
           },
         );
@@ -95,10 +88,13 @@ export const queryTests = () => {
         });
       }
 
-      test("should work with scan index forward", () => {
+      // These should be provided together all the time, even though
+      // we don't do the runtime check ourselves. It would simply throw
+      // once being processed by the SDK.
+      test("should work with segmentation fields", () => {
         expectWorks(
-          { ...minimalInput, scanIndexForward: false },
-          { ...minimalExpected, ScanIndexForward: false },
+          { ...minimalInput, segment: 0, totalSegments: 10 },
+          { ...minimalExpected, Segment: 0, TotalSegments: 10 },
         );
       });
     });

@@ -5,6 +5,7 @@ export * from "./delete-table.js";
 export * from "./get-item.js";
 export * from "./put-item.js";
 export * from "./query.js";
+export * from "./scan.js";
 export * from "./update-item.js";
 export * from "./update-time-to-live.js";
 export * from "./write-transaction.js";

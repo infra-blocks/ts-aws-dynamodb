@@ -4,6 +4,7 @@ import type { DeleteTable } from "./delete-table.js";
 import type { GetItem } from "./get-item.js";
 import type { PutItem } from "./put-item.js";
 import type { Query } from "./query.js";
+import type { Scan } from "./scan.js";
 import type { UpdateItem } from "./update-item.js";
 import type { UpdateTimeToLive } from "./update-time-to-live.js";
 import type { WriteTransaction } from "./write-transaction.js";
@@ -15,6 +16,7 @@ export type DynamoDbClientCommand =
   | DeleteTable
   | PutItem
   | Query
+  | Scan
   | UpdateItem
   | UpdateTimeToLive
   | WriteTransaction;

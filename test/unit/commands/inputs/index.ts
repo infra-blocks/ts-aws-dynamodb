@@ -3,6 +3,7 @@ import { deleteItemTests } from "./delete-item.js";
 import { getItemTests } from "./get-item.js";
 import { putItemTests } from "./put-item.js";
 import { queryTests } from "./query.js";
+import { scanTests } from "./scan.js";
 import { updateItemTests } from "./update-item.js";
 import { writeTransactionTests } from "./write-transaction.js";
 
@@ -12,6 +13,7 @@ export const inputTests = () => {
     getItemTests();
     putItemTests();
     queryTests();
+    scanTests();
     updateItemTests();
     writeTransactionTests();
   });
