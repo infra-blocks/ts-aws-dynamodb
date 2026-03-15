@@ -28,6 +28,13 @@ export const getItemTests = () => {
         expectWorks(minimalInput, minimalExpected);
       });
 
+      test("should work with consistentRead", () => {
+        expectWorks(
+          { ...minimalInput, consistentRead: true },
+          { ...minimalExpected, ConsistentRead: true },
+        );
+      });
+
       for (const v of CONSUMED_CAPACITY_RETURN_VALUES) {
         test(`should work with returnConsumedCapacity: ${v}`, () => {
           expectWorks(
