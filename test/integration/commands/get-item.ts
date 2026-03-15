@@ -163,5 +163,31 @@ export const getItemTests = (kit: TestKit) => {
         },
       });
     });
+
+    test("should work with consistent read set to true", async () => {
+      const client = kit.createClient();
+      const table = "test-table";
+      await client.createTable({
+        name: table,
+        keySchema: {
+          partitionKey: { name: "pk", type: "S" },
+        },
+      });
+
+      // Since we're only checking for consumed capacity, we don't really care about the
+      // presence of an item.
+      const result = await client.getItem({
+        table,
+        key: { pk: "User#BigToto" },
+        consistentRead: true,
+        returnConsumedCapacity: "TOTAL", // Using the consumed capacity here to assess if it was consistent or not.
+      });
+      expect(result).to.deep.equal({
+        consumedCapacity: {
+          tableName: "test-table",
+          capacityUnits: 1, // Consistent reads are double the capacity units.
+        },
+      });
+    });
   });
 };

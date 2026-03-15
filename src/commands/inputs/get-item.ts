@@ -1,6 +1,8 @@
 import type { GetCommandInput } from "@aws-sdk/lib-dynamodb";
+import { ifDefined } from "@infra-blocks/toolkit";
 import type { KeyAttributes } from "../../types.js";
 import { Projection, type ProjectionInput } from "../expressions/projection.js";
+import { unsetUndefined } from "../lib.js";
 import {
   type ConsumedCapacityReturnValue,
   ExpressionsFormatter,
@@ -24,6 +26,10 @@ export interface GetItemInput<K extends KeyAttributes = KeyAttributes> {
    */
   key: K;
   /**
+   * Whether to perform a consistent read. Defaults to false.
+   */
+  consistentRead?: boolean;
+  /**
    * The projection applied to the return item, if any.
    */
   projection?: ProjectionInput;
@@ -40,23 +46,15 @@ export const GetItemInput = {
 function encode<K extends KeyAttributes = KeyAttributes>(
   input: GetItemInput<K>,
 ): GetCommandInput {
-  const result: GetCommandInput = {
+  const formatter = ExpressionsFormatter.create();
+  return unsetUndefined({
     TableName: input.table,
     Key: input.key,
-  };
-
-  if (input.returnConsumedCapacity != null) {
-    result.ReturnConsumedCapacity = input.returnConsumedCapacity;
-  }
-
-  if (input.projection == null) {
-    return result;
-  }
-
-  const formatter = ExpressionsFormatter.create();
-  return {
-    ...result,
-    ProjectionExpression: formatter.format(Projection.from(input.projection)),
+    ConsistentRead: input.consistentRead,
+    ProjectionExpression: ifDefined(input.projection, (v) =>
+      formatter.format(Projection.from(v)),
+    ),
+    ReturnConsumedCapacity: input.returnConsumedCapacity,
     ExpressionAttributeNames: formatter.getExpressionAttributeNames(),
-  };
+  });
 }
