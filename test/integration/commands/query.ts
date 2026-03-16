@@ -356,7 +356,6 @@ export const queryTests = (kit: TestKit) => {
       ]);
     });
 
-    // TODO: test with indexes.
     test("should work with return consumed capacity set to 'TOTAL'", async () => {
       const client = kit.createClient();
       const table = "test-table";
@@ -375,9 +374,8 @@ export const queryTests = (kit: TestKit) => {
         },
       });
 
-      const result = await client.query({
+      const result = await client.scan({
         table,
-        keyCondition: ["pk", "=", value("toto")],
         returnConsumedCapacity: "TOTAL",
       });
       expect(result).to.deep.equal({
@@ -408,9 +406,8 @@ export const queryTests = (kit: TestKit) => {
         },
       });
 
-      const result = await client.query({
+      const result = await client.scan({
         table,
-        keyCondition: ["pk", "=", value("toto")],
         returnConsumedCapacity: "INDEXES",
       });
       expect(result).to.deep.equal({

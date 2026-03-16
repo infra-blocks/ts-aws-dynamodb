@@ -5,6 +5,7 @@ import { getItemTests } from "./get-item.js";
 import { itemCollectionMetricsTests } from "./item-collection-metrics.js";
 import { putItemTests } from "./put-item.js";
 import { queryTests } from "./query.js";
+import { scanTests } from "./scan.js";
 import { updateItemTests } from "./update-item.js";
 import { writeTransactionTests } from "./write-transaction.js";
 
@@ -13,9 +14,10 @@ export const outputsTests = () => {
     consumedCapacityTests();
     deleteItemTests();
     getItemTests();
-    queryTests();
     itemCollectionMetricsTests();
     putItemTests();
+    queryTests();
+    scanTests();
     updateItemTests();
     writeTransactionTests();
   });

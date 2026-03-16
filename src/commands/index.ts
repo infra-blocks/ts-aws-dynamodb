@@ -65,6 +65,7 @@ export type {
   GetItemInput,
   PutItemInput,
   QueryInput,
+  ScanInput,
   UpdateItemInput,
   UpdateTimeToLiveInput,
   WriteTransactionDeleteItemInput,
@@ -83,12 +84,14 @@ export type {
   ItemCollectionMetrics,
   PutItemOutput,
   QueryOutput,
+  ScanOutput,
   UpdateItemOutput,
   UpdateTimeToLiveOutput,
   WriteTransactionOutput,
 } from "./outputs/index.js";
 export { PutItem } from "./put-item.js";
 export { Query } from "./query.js";
+export { Scan } from "./scan.js";
 export { UpdateItem } from "./update-item.js";
 export { UpdateTimeToLive } from "./update-time-to-live.js";
 export { WriteTransaction } from "./write-transaction.js";
